@@ -749,6 +749,40 @@
                 }
             }, [view]);
 
+            const resetAllData = async () => {
+                if (!confirm('⚠️ DANGER: This will delete ALL games, game history, and localStorage data. This cannot be undone. Are you absolutely sure?')) {
+                    return;
+                }
+
+                if (!confirm('Last chance! This will permanently delete everything. Continue?')) {
+                    return;
+                }
+
+                try {
+                    // Clear all Firebase data
+                    await database.ref('games').remove();
+                    await database.ref('gameHistory').remove();
+
+                    // Clear all localStorage
+                    localStorage.clear();
+
+                    // Reset all state
+                    setGameCode('');
+                    setPlayerName('');
+                    setPlayerId(null);
+                    setGameData(null);
+                    setAvailableGames([]);
+                    setGameHistory([]);
+                    setMyCreatedGames([]);
+                    setView('home');
+
+                    alert('✅ All data has been reset successfully!');
+                } catch (error) {
+                    console.error('Error resetting data:', error);
+                    alert('❌ Error resetting data. Check console for details.');
+                }
+            };
+
             const terminateGame = async (gameCode, gameName) => {
                 if (!confirm(`Are you sure you want to terminate the game "${gameCode}"? This will end the game for all players and cannot be undone.`)) {
                     return;
@@ -818,6 +852,31 @@
 
                                 <button onClick={() => setView('manage')} className="w-full px-6 py-4 bg-orange-600 text-white rounded-lg hover:bg-orange-700 font-semibold text-lg">
                                     Manage My Games
+                                </button>
+                            </div>
+
+                            {/* Hidden Admin Reset Button - Hold Shift and click the logo 3 times to show */}
+                            <div className="mt-8 text-center">
+                                <button
+                                    onClick={(e) => {
+                                        if (e.shiftKey) {
+                                            const clickCount = parseInt(e.target.dataset.clicks || '0') + 1;
+                                            e.target.dataset.clicks = clickCount;
+                                            if (clickCount >= 3) {
+                                                if (confirm('Show admin reset button?')) {
+                                                    const resetBtn = document.createElement('button');
+                                                    resetBtn.textContent = '🔥 RESET ALL DATA';
+                                                    resetBtn.className = 'mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm font-bold';
+                                                    resetBtn.onclick = resetAllData;
+                                                    e.target.parentNode.appendChild(resetBtn);
+                                                    e.target.dataset.clicks = '0';
+                                                }
+                                            }
+                                        }
+                                    }}
+                                    className="text-xs text-gray-400 hover:text-gray-600"
+                                >
+                                    v1.0
                                 </button>
                             </div>
 
@@ -968,9 +1027,17 @@
                                 </div>
                             )}
 
-                            <div className="mt-6">
+                            <div className="mt-6 space-y-2">
                                 <button onClick={() => setView('home')} className="w-full px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">
                                     Back to Home
+                                </button>
+
+                                <button
+                                    onClick={resetAllData}
+                                    className="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm font-bold"
+                                    title="Delete all games and data - cannot be undone!"
+                                >
+                                    🔥 Reset All Data (DANGER)
                                 </button>
                             </div>
                         </div>
