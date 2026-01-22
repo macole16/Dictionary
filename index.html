@@ -32,6 +32,37 @@
         }
         const database = firebase.database();
 
+        // Logo Component - Open Dictionary Book
+        const DictionaryLogo = ({ size = 64 }) => (
+            <svg width={size} height={size} viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                {/* Book pages */}
+                <path d="M30 50 L30 150 L95 160 L95 60 Z" fill="#f0f0f0" stroke="#8b5cf6" strokeWidth="3"/>
+                <path d="M170 50 L170 150 L105 160 L105 60 Z" fill="#f0f0f0" stroke="#8b5cf6" strokeWidth="3"/>
+
+                {/* Book spine shadow */}
+                <path d="M95 60 L105 60 L105 160 L95 160 Z" fill="#c4b5fd"/>
+
+                {/* Left page text lines */}
+                <line x1="40" y1="75" x2="85" y2="75" stroke="#9333ea" strokeWidth="2"/>
+                <line x1="40" y1="85" x2="80" y2="85" stroke="#9333ea" strokeWidth="2"/>
+                <line x1="40" y1="95" x2="85" y2="95" stroke="#9333ea" strokeWidth="2"/>
+                <line x1="40" y1="105" x2="75" y2="105" stroke="#9333ea" strokeWidth="2"/>
+
+                {/* Right page text lines */}
+                <line x1="115" y1="75" x2="160" y2="75" stroke="#9333ea" strokeWidth="2"/>
+                <line x1="115" y1="85" x2="155" y2="85" stroke="#9333ea" strokeWidth="2"/>
+                <line x1="115" y1="95" x2="160" y2="95" stroke="#9333ea" strokeWidth="2"/>
+                <line x1="115" y1="105" x2="150" y2="105" stroke="#9333ea" strokeWidth="2"/>
+
+                {/* Decorative stars/sparkles */}
+                <path d="M50 130 L52 135 L57 135 L53 138 L55 143 L50 140 L45 143 L47 138 L43 135 L48 135 Z" fill="#fbbf24"/>
+                <path d="M150 130 L152 135 L157 135 L153 138 L155 143 L150 140 L145 143 L147 138 L143 135 L148 135 Z" fill="#fbbf24"/>
+
+                {/* Book cover border */}
+                <rect x="28" y="48" width="144" height="4" fill="#8b5cf6" rx="2"/>
+            </svg>
+        );
+
         function MultiplayerDictionaryGame() {
             const [view, setView] = useState('home');
             const [gameCode, setGameCode] = useState('');
@@ -557,8 +588,13 @@
                 return (
                     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 flex items-center justify-center p-4">
                         <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full">
-                            <h1 className="text-3xl font-bold text-purple-900 mb-2 text-center">Dictionary Game</h1>
-                            <p className="text-gray-600 text-center mb-8">Multiplayer word bluffing game</p>
+                            <div className="text-center mb-8">
+                                <div className="flex justify-center mb-4">
+                                    <DictionaryLogo size={80} />
+                                </div>
+                                <h1 className="text-3xl font-bold text-purple-900 mb-2">Dictionary Game</h1>
+                                <p className="text-gray-600">Multiplayer word bluffing game</p>
+                            </div>
 
                             <div className="space-y-4">
                                 <button onClick={() => setView('host')} className="w-full px-6 py-4 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-semibold text-lg">
@@ -598,7 +634,10 @@
                 return (
                     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 flex items-center justify-center p-4">
                         <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full">
-                            <h2 className="text-2xl font-bold text-purple-900 mb-6">Host New Game</h2>
+                            <div className="flex items-center gap-3 mb-6">
+                                <DictionaryLogo size={48} />
+                                <h2 className="text-2xl font-bold text-purple-900">Host New Game</h2>
+                            </div>
 
                             <div className="space-y-4">
                                 <div>
@@ -623,7 +662,10 @@
                 return (
                     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 flex items-center justify-center p-4">
                         <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full">
-                            <h2 className="text-2xl font-bold text-purple-900 mb-6">Join Game</h2>
+                            <div className="flex items-center gap-3 mb-6">
+                                <DictionaryLogo size={48} />
+                                <h2 className="text-2xl font-bold text-purple-900">Join Game</h2>
+                            </div>
 
                             {availableGames.length > 0 && (
                                 <div className="mb-6">
