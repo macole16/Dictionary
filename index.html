@@ -612,7 +612,7 @@
                                     <div className="space-y-3 mb-6">
                                         <h3 className="font-semibold">Player Definitions:</h3>
                                         {Object.entries(definitions).map(([defId, def]) => {
-                                            const playerInfo =const playerInfo = players[defId];
+                                            const playerInfo = players[defId];
                                             const voteCount = gameData.voteCounts?.[defId] || 0;
                                             return (
                                                 <div key={defId} className="p-4 bg-purple-50 rounded-lg">
