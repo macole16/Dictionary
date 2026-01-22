@@ -96,6 +96,7 @@
             const [availableGames, setAvailableGames] = useState([]);
             const [gameHistory, setGameHistory] = useState([]);
             const [selectedAvatar, setSelectedAvatar] = useState('cat');
+            const [myCreatedGames, setMyCreatedGames] = useState([]);
 
             // Try to restore session from localStorage
             useEffect(() => {
@@ -159,6 +160,11 @@
                 localStorage.setItem('dictionaryGame_code', code);
                 localStorage.setItem('dictionaryGame_playerId', newPlayerId);
                 localStorage.setItem('dictionaryGame_playerName', playerName);
+
+                // Add to created games list
+                const createdGames = JSON.parse(localStorage.getItem('dictionaryGame_createdGames') || '[]');
+                createdGames.push({ code, createdAt: Date.now(), playerName });
+                localStorage.setItem('dictionaryGame_createdGames', JSON.stringify(createdGames));
 
                 setGameCode(code);
                 setPlayerId(newPlayerId);
@@ -548,6 +554,11 @@
                 // Delete active game
                 await database.ref(`games/${gameCode}`).remove();
 
+                // Remove from created games list
+                const createdGames = JSON.parse(localStorage.getItem('dictionaryGame_createdGames') || '[]');
+                const updatedCreatedGames = createdGames.filter(game => game.code !== gameCode);
+                localStorage.setItem('dictionaryGame_createdGames', JSON.stringify(updatedCreatedGames));
+
                 // Clear localStorage
                 localStorage.removeItem('dictionaryGame_code');
                 localStorage.removeItem('dictionaryGame_playerId');
@@ -704,6 +715,86 @@
                 setView('home');
             };
 
+            // Load created games for management
+            useEffect(() => {
+                if (view === 'manage') {
+                    const createdGames = JSON.parse(localStorage.getItem('dictionaryGame_createdGames') || '[]');
+                    const gamePromises = createdGames.map(async (createdGame) => {
+                        const snapshot = await database.ref(`games/${createdGame.code}`).once('value');
+                        if (snapshot.exists()) {
+                            const gameData = snapshot.val();
+                            return {
+                                ...createdGame,
+                                ...gameData,
+                                playerCount: Object.keys(gameData.players || {}).length,
+                                exists: true
+                            };
+                        } else {
+                            return { ...createdGame, exists: false };
+                        }
+                    });
+
+                    Promise.all(gamePromises).then(games => {
+                        const activeGames = games.filter(game => game.exists);
+                        const inactiveGameCodes = games.filter(game => !game.exists).map(game => game.code);
+
+                        // Clean up localStorage of inactive games
+                        if (inactiveGameCodes.length > 0) {
+                            const updatedCreatedGames = createdGames.filter(game => !inactiveGameCodes.includes(game.code));
+                            localStorage.setItem('dictionaryGame_createdGames', JSON.stringify(updatedCreatedGames));
+                        }
+
+                        setMyCreatedGames(activeGames);
+                    });
+                }
+            }, [view]);
+
+            const terminateGame = async (gameCode, gameName) => {
+                if (!confirm(`Are you sure you want to terminate the game "${gameCode}"? This will end the game for all players and cannot be undone.`)) {
+                    return;
+                }
+
+                try {
+                    // Get game data before deletion
+                    const snapshot = await database.ref(`games/${gameCode}`).once('value');
+                    if (snapshot.exists()) {
+                        const gameData = snapshot.val();
+                        const players = gameData.players || {};
+                        const sortedPlayers = Object.entries(players)
+                            .map(([id, player]) => ({ name: player.name, score: player.score }))
+                            .sort((a, b) => b.score - a.score);
+
+                        // Save to history as terminated game
+                        const historyId = `${gameCode}_terminated_${Date.now()}`;
+                        await database.ref(`gameHistory/${historyId}`).set({
+                            gameCode,
+                            players: sortedPlayers,
+                            winner: sortedPlayers[0] || null,
+                            endedAt: Date.now(),
+                            hostName: gameData.hostName,
+                            roundsPlayed: gameData.roundsPlayed || 0,
+                            terminated: true
+                        });
+                    }
+
+                    // Delete the game
+                    await database.ref(`games/${gameCode}`).remove();
+
+                    // Remove from created games list
+                    const createdGames = JSON.parse(localStorage.getItem('dictionaryGame_createdGames') || '[]');
+                    const updatedCreatedGames = createdGames.filter(game => game.code !== gameCode);
+                    localStorage.setItem('dictionaryGame_createdGames', JSON.stringify(updatedCreatedGames));
+
+                    // Refresh the list
+                    setMyCreatedGames(prev => prev.filter(game => game.code !== gameCode));
+
+                    alert(`Game ${gameCode} has been terminated successfully.`);
+                } catch (error) {
+                    console.error('Error terminating game:', error);
+                    alert('Error terminating game. Please try again.');
+                }
+            };
+
             if (view === 'home') {
                 return (
                     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 flex items-center justify-center p-4">
@@ -723,6 +814,10 @@
 
                                 <button onClick={() => setView('join')} className="w-full px-6 py-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold text-lg">
                                     Join Game
+                                </button>
+
+                                <button onClick={() => setView('manage')} className="w-full px-6 py-4 bg-orange-600 text-white rounded-lg hover:bg-orange-700 font-semibold text-lg">
+                                    Manage My Games
                                 </button>
                             </div>
 
