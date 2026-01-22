@@ -662,6 +662,48 @@
                 alert('Game code copied!');
             };
 
+            const leaveGame = async () => {
+                if (!confirm('Are you sure you want to leave this game? This cannot be undone.')) {
+                    return;
+                }
+
+                const players = gameData.players || {};
+                const isHost = gameData.host === playerId;
+                const playerCount = Object.keys(players).length;
+
+                // Remove the player from the game
+                await database.ref(`games/${gameCode}/players/${playerId}`).remove();
+                await database.ref(`games/${gameCode}/lastActivity`).set(Date.now());
+
+                // If the leaving player was the host, transfer host to another player or end game
+                if (isHost && playerCount > 1) {
+                    const remainingPlayers = Object.entries(players).filter(([id]) => id !== playerId);
+                    if (remainingPlayers.length > 0) {
+                        const [newHostId, newHostPlayer] = remainingPlayers[0];
+                        await database.ref(`games/${gameCode}`).update({
+                            host: newHostId,
+                            hostName: newHostPlayer.name,
+                            [`players/${newHostId}/isHost`]: true
+                        });
+                        console.log(`Host transferred to ${newHostPlayer.name}`);
+                    }
+                } else if (isHost && playerCount === 1) {
+                    // Last player leaving, delete the game
+                    await database.ref(`games/${gameCode}`).remove();
+                } else if (playerCount === 1) {
+                    // Last non-host player leaving, delete the game
+                    await database.ref(`games/${gameCode}`).remove();
+                }
+
+                // Clear localStorage and return to home
+                localStorage.removeItem('dictionaryGame_code');
+                localStorage.removeItem('dictionaryGame_playerId');
+                localStorage.removeItem('dictionaryGame_playerName');
+
+                alert('You have left the game.');
+                setView('home');
+            };
+
             if (view === 'home') {
                 return (
                     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 flex items-center justify-center p-4">
@@ -877,15 +919,20 @@
                                         </p>
                                     </div>
                                     <div className="text-right">
-                                        <div className="flex items-center gap-2 bg-purple-100 px-4 py-2 rounded-lg">
+                                        <div className="flex items-center gap-2 bg-purple-100 px-4 py-2 rounded-lg mb-2">
                                             <span className="font-mono font-bold text-purple-900 text-xl">{gameCode}</span>
                                             <button onClick={copyGameCode} className="text-purple-600 hover:text-purple-800 text-sm">Copy</button>
                                         </div>
-                                        {isDictionaryHolder && gameData.state === 'setup' && (
-                                            <button onClick={restartRound} className="mt-2 px-3 py-1 bg-orange-500 text-white rounded text-sm hover:bg-orange-600">
-                                                Restart Round
+                                        <div className="flex gap-2">
+                                            {isDictionaryHolder && gameData.state === 'setup' && (
+                                                <button onClick={restartRound} className="px-3 py-1 bg-orange-500 text-white rounded text-sm hover:bg-orange-600">
+                                                    Restart Round
+                                                </button>
+                                            )}
+                                            <button onClick={leaveGame} className="px-3 py-1 bg-red-500 text-white rounded text-sm hover:bg-red-600">
+                                                Leave Game
                                             </button>
-                                        )}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
