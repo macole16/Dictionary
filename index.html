@@ -49,6 +49,8 @@
             const [loadingDefinition, setLoadingDefinition] = useState(false);
             const [usedWords, setUsedWords] = useState([]);
             const [skippedWords, setSkippedWords] = useState([]);
+            const [availableGames, setAvailableGames] = useState([]);
+            const [gameHistory, setGameHistory] = useState([]);
 
             const generateGameCode = () => {
                 return Math.random().toString(36).substring(2, 8).toUpperCase();
@@ -62,6 +64,8 @@
                     host: newPlayerId,
                     hostName: playerName,
                     state: 'setup',
+                    createdAt: Date.now(),
+                    lastActivity: Date.now(),
                     players: {
                         [newPlayerId]: {
                             name: playerName,
@@ -98,11 +102,66 @@
                     isHost: false
                 });
 
+                await database.ref(`games/${code}/lastActivity`).set(Date.now());
+
                 setGameCode(code);
                 setPlayerId(newPlayerId);
                 setPlayerName(inputPlayerName);
                 setView('game');
             };
+
+            // Load available games
+            useEffect(() => {
+                if (view === 'join') {
+                    const gamesRef = database.ref('games');
+
+                    gamesRef.on('value', (snapshot) => {
+                        const data = snapshot.val();
+                        if (data) {
+                            const games = Object.entries(data)
+                                .filter(([code, game]) => {
+                                    // Filter out old games (older than 24 hours)
+                                    const age = Date.now() - (game.lastActivity || game.createdAt || 0);
+                                    return age < 24 * 60 * 60 * 1000;
+                                })
+                                .map(([code, game]) => ({
+                                    code,
+                                    hostName: game.hostName,
+                                    playerCount: Object.keys(game.players || {}).length,
+                                    state: game.state,
+                                    createdAt: game.createdAt
+                                }))
+                                .sort((a, b) => b.createdAt - a.createdAt);
+
+                            setAvailableGames(games);
+                        } else {
+                            setAvailableGames([]);
+                        }
+                    });
+
+                    return () => gamesRef.off();
+                }
+            }, [view]);
+
+            // Load game history
+            useEffect(() => {
+                if (view === 'home' || view === 'join') {
+                    const historyRef = database.ref('gameHistory');
+
+                    historyRef.orderByChild('endedAt').limitToLast(10).on('value', (snapshot) => {
+                        const data = snapshot.val();
+                        if (data) {
+                            const history = Object.values(data)
+                                .sort((a, b) => b.endedAt - a.endedAt);
+                            setGameHistory(history);
+                        } else {
+                            setGameHistory([]);
+                        }
+                    });
+
+                    return () => historyRef.off();
+                }
+            }, [view]);
 
             useEffect(() => {
                 if (gameCode && view === 'game') {
@@ -331,6 +390,38 @@
                 }
             };
 
+            const endGame = async () => {
+                if (!confirm('End this game and save to history? This will close the game for all players.')) {
+                    return;
+                }
+
+                const players = gameData.players || {};
+                const sortedPlayers = Object.entries(players)
+                    .map(([id, player]) => ({ name: player.name, score: player.score }))
+                    .sort((a, b) => b.score - a.score);
+
+                // Save to history
+                const historyId = `${gameCode}_${Date.now()}`;
+                await database.ref(`gameHistory/${historyId}`).set({
+                    gameCode,
+                    players: sortedPlayers,
+                    winner: sortedPlayers[0],
+                    endedAt: Date.now(),
+                    hostName: gameData.hostName,
+                    roundsPlayed: gameData.roundsPlayed || 0
+                });
+
+                // Delete active game
+                await database.ref(`games/${gameCode}`).remove();
+
+                alert('Game ended and saved to history!');
+                setView('home');
+            };
+
+            const quickJoinGame = (code) => {
+                setInputGameCode(code);
+            };
+
             const submitDefinition = async () => {
                 if (!myDefinition.trim()) {
                     alert('Please enter a definition');
@@ -393,7 +484,9 @@
                     realDefinition: null,
                     definitions: null,
                     votes: null,
-                    voteCounts: null
+                    voteCounts: null,
+                    roundsPlayed: (gameData.roundsPlayed || 0) + 1,
+                    lastActivity: Date.now()
                 });
                 setCurrentWord('');
                 setRealDefinition('');
@@ -446,6 +539,26 @@
                                     Join Game
                                 </button>
                             </div>
+
+                            {gameHistory.length > 0 && (
+                                <div className="mt-8">
+                                    <h2 className="text-lg font-semibold text-gray-700 mb-3">Recent Games</h2>
+                                    <div className="space-y-2 max-h-64 overflow-y-auto">
+                                        {gameHistory.map((game, idx) => (
+                                            <div key={idx} className="bg-gray-50 p-3 rounded text-sm">
+                                                <div className="flex justify-between items-start mb-1">
+                                                    <span className="font-semibold text-purple-900">🏆 {game.winner?.name}</span>
+                                                    <span className="text-xs text-gray-500">{new Date(game.endedAt).toLocaleDateString()}</span>
+                                                </div>
+                                                <div className="text-xs text-gray-600">
+                                                    {game.players?.slice(0, 3).map(p => `${p.name} (${p.score})`).join(', ')}
+                                                    {game.players?.length > 3 && '...'}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
                 );
@@ -482,7 +595,31 @@
                         <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full">
                             <h2 className="text-2xl font-bold text-purple-900 mb-6">Join Game</h2>
 
-                            <div className="space-y-4">
+                            {availableGames.length > 0 && (
+                                <div className="mb-6">
+                                    <h3 className="text-sm font-semibold text-gray-700 mb-2">Active Games:</h3>
+                                    <div className="space-y-2 max-h-48 overflow-y-auto">
+                                        {availableGames.map((game) => (
+                                            <button
+                                                key={game.code}
+                                                onClick={() => quickJoinGame(game.code)}
+                                                className="w-full text-left p-3 bg-blue-50 hover:bg-blue-100 rounded-lg border border-blue-200"
+                                            >
+                                                <div className="flex justify-between items-center">
+                                                    <div>
+                                                        <span className="font-mono font-bold text-blue-900">{game.code}</span>
+                                                        <span className="text-sm text-gray-600 ml-2">• Host: {game.hostName}</span>
+                                                    </div>
+                                                    <span className="text-sm text-gray-500">{game.playerCount} players</span>
+                                                </div>
+                                            </button>
+                                        ))}
+                                    </div>
+                                    <p className="text-xs text-gray-500 mt-2">Click a game to auto-fill the code</p>
+                                </div>
+                            )}
+
+                            <div className="space-y-4">{availableGames.length > 0 && <p className="text-sm text-gray-600 text-center">Or enter code manually:</p>}
                                 <div>
                                     <label className="block text-sm font-medium mb-2">Game Code</label>
                                     <input type="text" value={inputGameCode} onChange={(e) => setInputGameCode(e.target.value.toUpperCase())} placeholder="Enter 6-digit code" maxLength="6" className="w-full px-4 py-2 border rounded-lg uppercase" />
