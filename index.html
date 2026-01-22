@@ -24,7 +24,6 @@
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
 
-        // Initialize Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyDFlzHW747uu1p1TdqWbdFM_omkjORRht4",
             authDomain: "dictionary-5fae9.firebaseapp.com",
@@ -40,43 +39,37 @@
         }
         const database = firebase.database();
 
-        // Lucide icons
         const BookOpen = () => (
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
                 <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
             </svg>
         );
 
         const Users = () => (
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
                 <circle cx="9" cy="7" r="4"></circle>
-                <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
-                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
             </svg>
         );
 
         const Trophy = () => (
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
                 <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
-                <path d="M4 22h16"></path>
-                <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path>
-                <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path>
                 <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path>
             </svg>
         );
 
         const Copy = () => (
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <rect x="9" y="9" width="13" height="13" rx="2"></rect>
                 <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
             </svg>
         );
 
         function MultiplayerDictionaryGame() {
-            const [view, setView] = useState('home'); // home, host, join, game
+            const [view, setView] = useState('home');
             const [gameCode, setGameCode] = useState('');
             const [playerName, setPlayerName] = useState('');
             const [playerId, setPlayerId] = useState(null);
@@ -92,17 +85,15 @@
             const gameRef = useRef(null);
 
             const wordLists = {
-                kids: ['canopy', 'whimsy', 'gadget', 'mosaic', 'nimble', 'frolic', 'plume', 'burrow', 'ember', 'marvel'],
-                teen: ['ambiguous', 'benevolent', 'candor', 'diligent', 'ephemeral', 'facetious', 'gregarious', 'haphazard'],
-                adult: ['absquatulate', 'bumfuzzle', 'callipygian', 'defenestrate', 'erinaceous', 'gobemouche', 'kakistocracy']
+                kids: ['canopy', 'whimsy', 'gadget', 'mosaic', 'nimble'],
+                teen: ['ambiguous', 'benevolent', 'candor', 'diligent', 'ephemeral'],
+                adult: ['absquatulate', 'bumfuzzle', 'callipygian', 'defenestrate', 'kakistocracy']
             };
 
-            // Generate random game code
             const generateGameCode = () => {
                 return Math.random().toString(36).substring(2, 8).toUpperCase();
             };
 
-            // Create new game
             const createGame = async () => {
                 const code = generateGameCode();
                 const newPlayerId = Date.now().toString();
@@ -128,7 +119,6 @@
                 setView('game');
             };
 
-            // Join existing game
             const joinGame = async () => {
                 if (!inputGameCode || !inputPlayerName) {
                     alert('Please enter both game code and your name');
@@ -158,7 +148,6 @@
                 setView('game');
             };
 
-            // Listen to game updates
             useEffect(() => {
                 if (gameCode && view === 'game') {
                     gameRef.current = database.ref(`games/${gameCode}`);
@@ -178,14 +167,13 @@
                 }
             }, [gameCode, view]);
 
-            // Get random word
             const getRandomWord = async () => {
                 setLoadingWord(true);
                 try {
                     let word = null;
 
                     if (difficulty === 'kids') {
-                        const topics = ['animals', 'nature', 'school', 'sports', 'food'];
+                        const topics = ['animals', 'nature', 'school'];
                         const topic = topics[Math.floor(Math.random() * topics.length)];
                         const response = await fetch(`https://api.datamuse.com/words?topics=${topic}&max=100`);
                         const data = await response.json();
@@ -224,7 +212,6 @@
                 setLoadingWord(false);
             };
 
-            // Start round (host only)
             const startRound = async () => {
                 if (!currentWord || !realDefinition) {
                     alert('Please enter word and definition');
@@ -242,7 +229,6 @@
                 });
             };
 
-            // Submit definition
             const submitDefinition = async () => {
                 if (!myDefinition.trim()) {
                     alert('Please enter a definition');
@@ -257,35 +243,29 @@
                 setMyDefinition('');
             };
 
-            // Start voting (host only)
             const startVoting = async () => {
                 await database.ref(`games/${gameCode}`).update({
                     state: 'voting'
                 });
             };
 
-            // Cast vote
             const castVote = async (defId) => {
                 await database.ref(`games/${gameCode}/votes/${playerId}`).set(defId);
                 setMyVote(defId);
             };
 
-            // Show results (host only)
             const showResults = async () => {
                 const votes = gameData.votes || {};
                 const definitions = gameData.definitions || {};
                 const players = gameData.players || {};
 
-                // Count votes
                 const voteCounts = {};
                 Object.values(votes).forEach(defId => {
                     voteCounts[defId] = (voteCounts[defId] || 0) + 1;
                 });
 
-                // Update scores
                 const updates = {};
 
-                // Points for fake definitions
                 Object.keys(definitions).forEach(defPlayerId => {
                     if (voteCounts[defPlayerId]) {
                         const currentScore = players[defPlayerId]?.score || 0;
@@ -293,7 +273,6 @@
                     }
                 });
 
-                // Points for host if people voted for real definition
                 if (voteCounts['real']) {
                     const hostId = gameData.host;
                     const currentScore = players[hostId]?.score || 0;
@@ -306,7 +285,6 @@
                 await database.ref(`games/${gameCode}`).update(updates);
             };
 
-            // New round (host only)
             const newRound = async () => {
                 await database.ref(`games/${gameCode}`).update({
                     state: 'setup',
@@ -322,7 +300,6 @@
                 setMyVote(null);
             };
 
-            // Copy game code
             const copyGameCode = () => {
                 navigator.clipboard.writeText(gameCode);
                 alert('Game code copied!');
@@ -333,7 +310,6 @@
             const definitions = gameData?.definitions || {};
             const votes = gameData?.votes || {};
 
-            // Home screen
             if (view === 'home') {
                 return (
                     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 flex items-center justify-center p-4">
@@ -366,7 +342,6 @@
                 );
             }
 
-            // Host setup screen
             if (view === 'host') {
                 return (
                     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 flex items-center justify-center p-4">
@@ -405,7 +380,6 @@
                 );
             }
 
-            // Join game screen
             if (view === 'join') {
                 return (
                     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 flex items-center justify-center p-4">
@@ -456,12 +430,10 @@
                 );
             }
 
-            // Game screen
             if (view === 'game' && gameData) {
                 return (
                     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 p-4">
                         <div className="max-w-4xl mx-auto">
-                            {/* Header */}
                             <div className="bg-white rounded-lg shadow-lg p-6 mb-4">
                                 <div className="flex justify-between items-start">
                                     <div>
@@ -482,7 +454,6 @@
                                 </div>
                             </div>
 
-                            {/* Players */}
                             <div className="bg-white rounded-lg shadow-lg p-6 mb-4">
                                 <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
                                     <Users />
@@ -501,7 +472,6 @@
                                 </div>
                             </div>
 
-                            {/* Setup (Host Only) */}
                             {isHost && gameData.state === 'setup' && (
                                 <div className="bg-white rounded-lg shadow-lg p-6 mb-4">
                                     <h2 className="text-xl font-semibold mb-4">Setup Round</h2>
@@ -560,14 +530,12 @@
                                 </div>
                             )}
 
-                            {/* Waiting (Non-Host during setup) */}
                             {!isHost && gameData.state === 'setup' && (
                                 <div className="bg-white rounded-lg shadow-lg p-6 mb-4 text-center">
                                     <p className="text-gray-600">Waiting for host to start the round...</p>
                                 </div>
                             )}
 
-                            {/* Collecting Definitions */}
                             {gameData.state === 'collecting' && (
                                 <div className="bg-white rounded-lg shadow-lg p-6 mb-4">
                                     <h2 className="text-xl font-semibold mb-2">
@@ -625,7 +593,6 @@
                                 </div>
                             )}
 
-                            {/* Voting */}
                             {gameData.state === 'voting' && (
                                 <div className="bg-white rounded-lg shadow-lg p-6 mb-4">
                                     <h2 className="text-xl font-semibold mb-2">Vote for the Real Definition</h2>
@@ -660,3 +627,48 @@
                                             <p className="text-sm text-gray-600">
                                                 Votes cast: {Object.keys(votes).length} / {Object.keys(players).length - 1}
                                             </p>
+                                            {Object.keys(votes).length >= Object.keys(players).length - 1 && (
+                                                <button
+                                                    onClick={showResults}
+                                                    className="w-full px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                                                >
+                                                    Show Results
+                                                </button>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                            {gameData.state === 'results' && (
+                                <div className="bg-white rounded-lg shadow-lg p-6 mb-4">
+                                    <h2 className="text-xl font-semibold mb-4">Round Results</h2>
+
+                                    <div className="mb-6 p-4 bg-green-50 rounded-lg">
+                                        <h3 className="font-semibold text-green-900 mb-2">Real Definition:</h3>
+                                        <p className="text-gray-800">{gameData.realDefinition}</p>
+                                        <p className="text-sm text-green-700 mt-2">
+                                            Votes: {gameData.voteCounts?.real || 0}
+                                        </p>
+                                    </div>
+
+                                    <div className="space-y-3 mb-6">
+                                        <h3 className="font-semibold">Player Definitions:</h3>
+                                        {Object.entries(definitions).map(([defId, def]) => {
+                                            const playerInfo = players[defId];
+                                            const voteCount = gameData.voteCounts?.[defId] || 0;
+                                            return (
+                                                <div key={defId} className="p-4 bg-purple-50 rounded-lg">
+                                                    <p className="font-semibold text-purple-900">{playerInfo?.name}'s definition:</p>
+                                                    <p className="text-gray-800 mt-1">{def.text}</p>
+                                                    <p className="text-sm text-purple-700 mt-2">Votes: {voteCount}</p>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+
+                                    {isHost && (
+                                        <button
+                                            onClick={newRound}
+                                            className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                                        >
