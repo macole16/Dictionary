@@ -795,6 +795,91 @@
                             </div>
                         </div>
                     </div>
+                                );
+            }
+
+            if (view === 'manage') {
+                return (
+                    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 flex items-center justify-center p-4">
+                        <div className="bg-white rounded-lg shadow-xl p-8 max-w-2xl w-full">
+                            <div className="flex items-center gap-3 mb-6">
+                                <DictionaryLogo size={48} />
+                                <h2 className="text-2xl font-bold text-purple-900">Manage My Games</h2>
+                            </div>
+
+                            {myCreatedGames.length === 0 ? (
+                                <div className="text-center py-8">
+                                    <p className="text-gray-600 mb-4">You haven't created any active games yet.</p>
+                                    <button onClick={() => setView('host')} className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
+                                        Create Your First Game
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="space-y-4">
+                                    <p className="text-gray-600 mb-4">Games you created that are still active:</p>
+                                    {myCreatedGames.map((game) => (
+                                        <div key={game.code} className="bg-gradient-to-r from-orange-50 to-red-50 border border-orange-200 rounded-lg p-4">
+                                            <div className="flex justify-between items-start">
+                                                <div className="flex-1">
+                                                    <div className="flex items-center gap-3 mb-2">
+                                                        <span className="font-mono font-bold text-xl text-orange-900">{game.code}</span>
+                                                        <span className="px-2 py-1 bg-orange-200 text-orange-800 text-xs rounded-full">
+                                                            {game.state || 'setup'}
+                                                        </span>
+                                                    </div>
+                                                    <div className="grid grid-cols-2 gap-4 text-sm text-gray-600">
+                                                        <div>
+                                                            <span className="font-medium">Players:</span> {game.playerCount}
+                                                        </div>
+                                                        <div>
+                                                            <span className="font-medium">Host:</span> {game.hostName}
+                                                        </div>
+                                                        <div>
+                                                            <span className="font-medium">Created:</span> {new Date(game.createdAt).toLocaleDateString()}
+                                                        </div>
+                                                        <div>
+                                                            <span className="font-medium">Rounds:</span> {game.roundsPlayed || 0}
+                                                        </div>
+                                                    </div>
+                                                    {game.currentWord && (
+                                                        <div className="mt-2 text-sm">
+                                                            <span className="font-medium text-purple-700">Current Word:</span>
+                                                            <span className="text-purple-900 font-bold ml-1">{game.currentWord}</span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className="flex gap-2 ml-4">
+                                                    <button
+                                                        onClick={() => {
+                                                            navigator.clipboard.writeText(game.code);
+                                                            alert('Game code copied!');
+                                                        }}
+                                                        className="px-3 py-2 bg-blue-500 text-white rounded text-sm hover:bg-blue-600"
+                                                        title="Copy game code"
+                                                    >
+                                                        Copy Code
+                                                    </button>
+                                                    <button
+                                                        onClick={() => terminateGame(game.code, game.hostName)}
+                                                        className="px-3 py-2 bg-red-500 text-white rounded text-sm hover:bg-red-600"
+                                                        title="Terminate this game"
+                                                    >
+                                                        Terminate
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+
+                            <div className="mt-6">
+                                <button onClick={() => setView('home')} className="w-full px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">
+                                    Back to Home
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 );
             }
 
