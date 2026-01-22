@@ -63,6 +63,19 @@
             </svg>
         );
 
+        // Avatar options with emojis
+        const avatarOptions = [
+            { id: 'cat', emoji: '🐱', label: 'Cat' },
+            { id: 'dog', emoji: '🐶', label: 'Dog' },
+            { id: 'bird', emoji: '🐦', label: 'Bird' },
+            { id: 'hat', emoji: '🎩', label: 'Hat' },
+            { id: 'car', emoji: '🚗', label: 'Car' },
+            { id: 'bulb', emoji: '💡', label: 'Light Bulb' },
+            { id: 'snake', emoji: '🐍', label: 'Snake' },
+            { id: 'scholar', emoji: '👨‍🎓', label: 'Scholar' },
+            { id: 'school', emoji: '🏫', label: 'School' }
+        ];
+
         function MultiplayerDictionaryGame() {
             const [view, setView] = useState('home');
             const [gameCode, setGameCode] = useState('');
@@ -82,6 +95,7 @@
             const [skippedWords, setSkippedWords] = useState([]);
             const [availableGames, setAvailableGames] = useState([]);
             const [gameHistory, setGameHistory] = useState([]);
+            const [selectedAvatar, setSelectedAvatar] = useState('cat');
 
             const generateGameCode = () => {
                 return Math.random().toString(36).substring(2, 8).toUpperCase();
@@ -101,7 +115,8 @@
                         [newPlayerId]: {
                             name: playerName,
                             score: 0,
-                            isHost: true
+                            isHost: true,
+                            avatar: selectedAvatar
                         }
                     }
                 });
@@ -130,7 +145,8 @@
                 await database.ref(`games/${code}/players/${newPlayerId}`).set({
                     name: inputPlayerName,
                     score: 0,
-                    isHost: false
+                    isHost: false,
+                    avatar: selectedAvatar
                 });
 
                 await database.ref(`games/${code}/lastActivity`).set(Date.now());
@@ -645,6 +661,26 @@
                                     <input type="text" value={playerName} onChange={(e) => setPlayerName(e.target.value)} placeholder="Enter your name" className="w-full px-4 py-2 border rounded-lg" />
                                 </div>
 
+                                <div>
+                                    <label className="block text-sm font-medium mb-2">Choose Your Avatar</label>
+                                    <div className="grid grid-cols-5 gap-2">
+                                        {avatarOptions.map((avatar) => (
+                                            <button
+                                                key={avatar.id}
+                                                onClick={() => setSelectedAvatar(avatar.id)}
+                                                className={`p-3 text-3xl rounded-lg border-2 transition ${
+                                                    selectedAvatar === avatar.id
+                                                        ? 'border-purple-600 bg-purple-50'
+                                                        : 'border-gray-200 hover:border-purple-300'
+                                                }`}
+                                                title={avatar.label}
+                                            >
+                                                {avatar.emoji}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
                                 <button onClick={createGame} disabled={!playerName.trim()} className="w-full px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:bg-gray-400">
                                     Create Game
                                 </button>
@@ -700,6 +736,26 @@
                                 <div>
                                     <label className="block text-sm font-medium mb-2">Your Name</label>
                                     <input type="text" value={inputPlayerName} onChange={(e) => setInputPlayerName(e.target.value)} placeholder="Enter your name" className="w-full px-4 py-2 border rounded-lg" />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium mb-2">Choose Your Avatar</label>
+                                    <div className="grid grid-cols-5 gap-2">
+                                        {avatarOptions.map((avatar) => (
+                                            <button
+                                                key={avatar.id}
+                                                onClick={() => setSelectedAvatar(avatar.id)}
+                                                className={`p-3 text-3xl rounded-lg border-2 transition ${
+                                                    selectedAvatar === avatar.id
+                                                        ? 'border-blue-600 bg-blue-50'
+                                                        : 'border-gray-200 hover:border-blue-300'
+                                                }`}
+                                                title={avatar.label}
+                                            >
+                                                {avatar.emoji}
+                                            </button>
+                                        ))}
+                                    </div>
                                 </div>
 
                                 <button onClick={joinGame} disabled={!inputGameCode.trim() || !inputPlayerName.trim()} className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400">
@@ -766,12 +822,18 @@
                                     </div>
                                 )}
                                 <div className="grid grid-cols-2 gap-2">
-                                    {Object.entries(players).map(([id, player]) => (
-                                        <div key={id} className="flex justify-between bg-purple-50 p-3 rounded">
-                                            <span className="font-medium">{player.name}</span>
-                                            <span className="text-purple-700">{player.score}</span>
-                                        </div>
-                                    ))}
+                                    {Object.entries(players).map(([id, player]) => {
+                                        const avatar = avatarOptions.find(a => a.id === player.avatar);
+                                        return (
+                                            <div key={id} className="flex justify-between items-center bg-purple-50 p-3 rounded">
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-2xl">{avatar?.emoji || '👤'}</span>
+                                                    <span className="font-medium">{player.name}</span>
+                                                </div>
+                                                <span className="text-purple-700">{player.score}</span>
+                                            </div>
+                                        );
+                                    })}
                                 </div>
                             </div>
 
