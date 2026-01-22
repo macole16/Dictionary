@@ -47,6 +47,8 @@
             const [myVote, setMyVote] = useState(null);
             const [loadingWord, setLoadingWord] = useState(false);
             const [loadingDefinition, setLoadingDefinition] = useState(false);
+            const [usedWords, setUsedWords] = useState([]);
+            const [skippedWords, setSkippedWords] = useState([]);
 
             const generateGameCode = () => {
                 return Math.random().toString(36).substring(2, 8).toUpperCase();
@@ -110,6 +112,13 @@
                         const data = snapshot.val();
                         if (data) {
                             setGameData(data);
+                            // Load word history
+                            if (data.usedWords) {
+                                setUsedWords(data.usedWords);
+                            }
+                            if (data.skippedWords) {
+                                setSkippedWords(data.skippedWords);
+                            }
                         }
                     });
 
@@ -241,7 +250,7 @@
                     if (!definition) {
                         console.log('Trying DictionaryAPI.com...');
                         try {
-                            const response = await fetch(`https://www.dictionaryapi.com/api/v3/references/collegiate/json/${currentWord.toLowerCase()}?f238ab7c-ef09-4f75-a5e7-8b2bf236a01e`);
+                            const response = await fetch(`https://www.dictionaryapi.com/api/v3/references/collegiate/json/${currentWord.toLowerCase()}?key=your-key-here`);
                             // Note: This requires an API key, but we'll try anyway in case it works
                             if (response.ok) {
                                 const data = await response.json();
@@ -273,6 +282,18 @@
                     return;
                 }
 
+                // Check if word was already used
+                const wordLower = currentWord.toLowerCase().trim();
+                if (usedWords.includes(wordLower)) {
+                    if (!confirm(`"${currentWord}" has been used before. Use it anyway?`)) {
+                        return;
+                    }
+                } else {
+                    // Add to used words
+                    const updatedUsedWords = [...usedWords, wordLower];
+                    await database.ref(`games/${gameCode}/usedWords`).set(updatedUsedWords);
+                }
+
                 await database.ref(`games/${gameCode}`).update({
                     state: 'collecting',
                     currentWord: currentWord,
@@ -281,6 +302,33 @@
                     definitions: {},
                     votes: {}
                 });
+            };
+
+            const skipWord = async () => {
+                if (!currentWord.trim()) {
+                    alert('Please enter a word first');
+                    return;
+                }
+
+                const wordLower = currentWord.toLowerCase().trim();
+                const updatedSkippedWords = [...skippedWords, wordLower];
+                await database.ref(`games/${gameCode}/skippedWords`).set(updatedSkippedWords);
+
+                setCurrentWord('');
+                setRealDefinition('');
+                alert(`"${currentWord}" has been marked as skipped`);
+            };
+
+            const clearWordHistory = async () => {
+                if (confirm('Clear all word history (used and skipped)? This cannot be undone.')) {
+                    await database.ref(`games/${gameCode}`).update({
+                        usedWords: [],
+                        skippedWords: []
+                    });
+                    setUsedWords([]);
+                    setSkippedWords([]);
+                    alert('Word history cleared!');
+                }
             };
 
             const submitDefinition = async () => {
@@ -540,6 +588,12 @@
                                                     {loadingWord ? 'Loading...' : 'Random'}
                                                 </button>
                                             </div>
+                                            {currentWord && usedWords.includes(currentWord.toLowerCase().trim()) && (
+                                                <p className="text-sm text-orange-600 mb-2">⚠️ This word has been used before</p>
+                                            )}
+                                            {currentWord && skippedWords.includes(currentWord.toLowerCase().trim()) && (
+                                                <p className="text-sm text-red-600 mb-2">⚠️ This word was previously skipped</p>
+                                            )}
                                         </div>
 
                                         <div>
@@ -556,6 +610,35 @@
                                         <button onClick={startRound} className="w-full px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700">
                                             Start Collecting Definitions
                                         </button>
+
+                                        <button onClick={skipWord} disabled={!currentWord.trim()} className="w-full px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 disabled:bg-gray-400">
+                                            Skip Word (Too Easy/Already Known)
+                                        </button>
+
+                                        {(usedWords.length > 0 || skippedWords.length > 0) && (
+                                            <div className="mt-4 p-3 bg-gray-50 rounded">
+                                                <div className="flex justify-between items-center mb-2">
+                                                    <span className="text-sm font-medium text-gray-700">
+                                                        Word History: {usedWords.length} used, {skippedWords.length} skipped
+                                                    </span>
+                                                    <button onClick={clearWordHistory} className="text-xs text-red-600 hover:text-red-700 underline">
+                                                        Clear History
+                                                    </button>
+                                                </div>
+                                                {usedWords.length > 0 && (
+                                                    <div className="mb-2">
+                                                        <p className="text-xs font-semibold text-gray-600">Used:</p>
+                                                        <p className="text-xs text-gray-600">{usedWords.slice(-10).reverse().join(', ')}{usedWords.length > 10 && '...'}</p>
+                                                    </div>
+                                                )}
+                                                {skippedWords.length > 0 && (
+                                                    <div>
+                                                        <p className="text-xs font-semibold text-gray-600">Skipped:</p>
+                                                        <p className="text-xs text-gray-600">{skippedWords.slice(-10).reverse().join(', ')}{skippedWords.length > 10 && '...'}</p>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             )}
