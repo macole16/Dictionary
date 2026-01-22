@@ -97,6 +97,40 @@
             const [gameHistory, setGameHistory] = useState([]);
             const [selectedAvatar, setSelectedAvatar] = useState('cat');
 
+            // Try to restore session from localStorage
+            useEffect(() => {
+                const savedGameCode = localStorage.getItem('dictionaryGame_code');
+                const savedPlayerId = localStorage.getItem('dictionaryGame_playerId');
+                const savedPlayerName = localStorage.getItem('dictionaryGame_playerName');
+
+                if (savedGameCode && savedPlayerId && savedPlayerName) {
+                    // Check if the game still exists
+                    database.ref(`games/${savedGameCode}`).once('value', (snapshot) => {
+                        if (snapshot.exists()) {
+                            const game = snapshot.val();
+                            if (game.players && game.players[savedPlayerId]) {
+                                // Player exists in game, reconnect
+                                setGameCode(savedGameCode);
+                                setPlayerId(savedPlayerId);
+                                setPlayerName(savedPlayerName);
+                                setView('game');
+                                console.log('Reconnected to game:', savedGameCode);
+                            } else {
+                                // Player no longer in game, clear storage
+                                localStorage.removeItem('dictionaryGame_code');
+                                localStorage.removeItem('dictionaryGame_playerId');
+                                localStorage.removeItem('dictionaryGame_playerName');
+                            }
+                        } else {
+                            // Game no longer exists, clear storage
+                            localStorage.removeItem('dictionaryGame_code');
+                            localStorage.removeItem('dictionaryGame_playerId');
+                            localStorage.removeItem('dictionaryGame_playerName');
+                        }
+                    });
+                }
+            }, []);
+
             const generateGameCode = () => {
                 return Math.random().toString(36).substring(2, 8).toUpperCase();
             };
@@ -121,6 +155,11 @@
                     }
                 });
 
+                // Save to localStorage for reconnection
+                localStorage.setItem('dictionaryGame_code', code);
+                localStorage.setItem('dictionaryGame_playerId', newPlayerId);
+                localStorage.setItem('dictionaryGame_playerName', playerName);
+
                 setGameCode(code);
                 setPlayerId(newPlayerId);
                 setView('game');
@@ -140,6 +179,19 @@
                     return;
                 }
 
+                const game = snapshot.val();
+
+                // Check for duplicate names
+                const existingPlayers = Object.values(game.players || {});
+                const nameTaken = existingPlayers.some(player =>
+                    player.name.toLowerCase() === inputPlayerName.trim().toLowerCase()
+                );
+
+                if (nameTaken) {
+                    alert(`The name "${inputPlayerName}" is already taken in this game. Please choose a different name.`);
+                    return;
+                }
+
                 const newPlayerId = Date.now().toString();
 
                 await database.ref(`games/${code}/players/${newPlayerId}`).set({
@@ -150,6 +202,11 @@
                 });
 
                 await database.ref(`games/${code}/lastActivity`).set(Date.now());
+
+                // Save to localStorage for reconnection
+                localStorage.setItem('dictionaryGame_code', code);
+                localStorage.setItem('dictionaryGame_playerId', newPlayerId);
+                localStorage.setItem('dictionaryGame_playerName', inputPlayerName);
 
                 setGameCode(code);
                 setPlayerId(newPlayerId);
@@ -491,6 +548,11 @@
                 // Delete active game
                 await database.ref(`games/${gameCode}`).remove();
 
+                // Clear localStorage
+                localStorage.removeItem('dictionaryGame_code');
+                localStorage.removeItem('dictionaryGame_playerId');
+                localStorage.removeItem('dictionaryGame_playerName');
+
                 alert('Game ended and saved to history!');
                 setView('home');
             };
@@ -778,6 +840,29 @@
                 const players = gameData.players || {};
                 const definitions = gameData.definitions || {};
                 const votes = gameData.votes || {};
+
+                // Check if current player still exists in the game
+                if (!players[playerId]) {
+                    return (
+                        <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 flex items-center justify-center p-4">
+                            <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full text-center">
+                                <h2 className="text-2xl font-bold text-red-600 mb-4">Disconnected</h2>
+                                <p className="text-gray-600 mb-4">You have been removed from this game or the game has ended.</p>
+                                <button
+                                    onClick={() => {
+                                        localStorage.removeItem('dictionaryGame_code');
+                                        localStorage.removeItem('dictionaryGame_playerId');
+                                        localStorage.removeItem('dictionaryGame_playerName');
+                                        setView('home');
+                                    }}
+                                    className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+                                >
+                                    Return to Home
+                                </button>
+                            </div>
+                        </div>
+                    );
+                }
 
                 return (
                     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 p-4">
