@@ -199,23 +199,70 @@
 
                 setLoadingDefinition(true);
                 try {
-                    const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${currentWord.toLowerCase()}`);
+                    let definition = null;
 
-                    if (!response.ok) {
-                        throw new Error('Word not found');
+                    // Try API 1: Free Dictionary API
+                    console.log('Trying Free Dictionary API...');
+                    try {
+                        const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${currentWord.toLowerCase()}`);
+
+                        if (response.ok) {
+                            const data = await response.json();
+                            if (data && data[0] && data[0].meanings && data[0].meanings[0]) {
+                                definition = data[0].meanings[0].definitions[0].definition;
+                                console.log('Found definition in Free Dictionary API');
+                            }
+                        }
+                    } catch (e) {
+                        console.log('Free Dictionary API failed:', e);
                     }
 
-                    const data = await response.json();
+                    // Try API 2: Wiktionary via MediaWiki API
+                    if (!definition) {
+                        console.log('Trying Wiktionary API...');
+                        try {
+                            const response = await fetch(`https://en.wiktionary.org/api/rest_v1/page/definition/${encodeURIComponent(currentWord.toLowerCase())}`);
 
-                    if (data && data[0] && data[0].meanings && data[0].meanings[0]) {
-                        const definition = data[0].meanings[0].definitions[0].definition;
+                            if (response.ok) {
+                                const data = await response.json();
+                                if (data && data.en && data.en[0] && data.en[0].definitions && data.en[0].definitions[0]) {
+                                    definition = data.en[0].definitions[0].definition;
+                                    // Clean up Wiktionary HTML/wiki markup
+                                    definition = definition.replace(/<[^>]*>/g, '').replace(/\[\[([^\]]+)\]\]/g, '$1');
+                                    console.log('Found definition in Wiktionary');
+                                }
+                            }
+                        } catch (e) {
+                            console.log('Wiktionary API failed:', e);
+                        }
+                    }
+
+                    // Try API 3: Dictionary API (dictionaryapi.com)
+                    if (!definition) {
+                        console.log('Trying DictionaryAPI.com...');
+                        try {
+                            const response = await fetch(`https://www.dictionaryapi.com/api/v3/references/collegiate/json/${currentWord.toLowerCase()}?f238ab7c-ef09-4f75-a5e7-8b2bf236a01e`);
+                            // Note: This requires an API key, but we'll try anyway in case it works
+                            if (response.ok) {
+                                const data = await response.json();
+                                if (data && data[0] && data[0].shortdef && data[0].shortdef[0]) {
+                                    definition = data[0].shortdef[0];
+                                    console.log('Found definition in DictionaryAPI.com');
+                                }
+                            }
+                        } catch (e) {
+                            console.log('DictionaryAPI.com failed:', e);
+                        }
+                    }
+
+                    if (definition) {
                         setRealDefinition(definition.charAt(0).toUpperCase() + definition.slice(1));
                     } else {
-                        alert('Could not find definition for "' + currentWord + '". Try another word or enter definition manually.');
+                        alert('Could not find definition for "' + currentWord + '" in any dictionary. Please enter the definition manually or search online (try Merriam-Webster.com or Dictionary.com).');
                     }
                 } catch (error) {
                     console.error('Definition fetch error:', error);
-                    alert('Could not fetch definition for "' + currentWord + '". Please enter the definition manually or try a different word.');
+                    alert('Error fetching definition. Please enter the definition manually or search online.');
                 }
                 setLoadingDefinition(false);
             };
@@ -430,16 +477,13 @@
                                         <p className="text-sm text-purple-600 font-medium">
                                             Dictionary Holder: {isDictionaryHolder ? 'You' : dictionaryHolderName}
                                         </p>
-                                        <p className="text-sm text-blue-600 font-semibold mt-1">
-                                            You are: {playerName || players[playerId]?.name}
-                                        </p>
                                     </div>
                                     <div className="text-right">
                                         <div className="flex items-center gap-2 bg-purple-100 px-4 py-2 rounded-lg">
                                             <span className="font-mono font-bold text-purple-900 text-xl">{gameCode}</span>
                                             <button onClick={copyGameCode} className="text-purple-600 hover:text-purple-800 text-sm">Copy</button>
                                         </div>
-                                        {isHost && gameData.state === 'setup' && (
+                                        {isDictionaryHolder && gameData.state === 'setup' && (
                                             <button onClick={restartRound} className="mt-2 px-3 py-1 bg-orange-500 text-white rounded text-sm hover:bg-orange-600">
                                                 Restart Round
                                             </button>
@@ -474,7 +518,7 @@
                                 </div>
                             </div>
 
-                            {isDictionaryHolder && gameData.state === 'setup' && (
+                            {isHost && gameData.state === 'setup' && (
                                 <div className="bg-white rounded-lg shadow-lg p-6 mb-4">
                                     <h2 className="text-xl font-semibold mb-4">Setup Round</h2>
 
@@ -518,7 +562,7 @@
 
                             {!isDictionaryHolder && gameData.state === 'setup' && (
                                 <div className="bg-white rounded-lg shadow-lg p-6 mb-4 text-center">
-                                    <p className="text-gray-600">Waiting for dictionary holder to start the round...</p>
+                                    <p className="text-gray-600">Waiting for host to start the round...</p>
                                 </div>
                             )}
 
