@@ -145,62 +145,74 @@
                 try {
                     let word = null;
                     
-                    // Use Datamuse API to get words by frequency
-                    // md=f gives us word frequency data
-                    let apiUrl = '';
-
-                    if (difficulty === 'kids') {
-                        // Get common words (high frequency)
-                        apiUrl = 'https://api.datamuse.com/words?sp=????????&md=f&max=100';
-                    } else if (difficulty === 'teen') {
-                        // Get medium frequency words
-                        apiUrl = 'https://api.datamuse.com/words?sp=?????????&md=f&max=100';
-                    } else {
-                        // Get rare/obscure words (low frequency)
-                        apiUrl = 'https://api.datamuse.com/words?sp=??????????&md=f&max=50';
-                    }
-
                     console.log('=== RANDOM WORD DEBUG ===');
                     console.log('Difficulty:', difficulty);
-                    console.log('API URL:', apiUrl);
 
-                    try {
-                        const response = await fetch(apiUrl);
-                        const data = await response.json();
+                    // Strategy: Use different approaches for each difficulty
+                    if (difficulty === 'kids') {
+                        // Kids: Use common vocabulary words
+                        const topics = ['animals', 'nature', 'school', 'sports', 'food'];
+                        const topic = topics[Math.floor(Math.random() * topics.length)];
+                        const apiUrl = `https://api.datamuse.com/words?topics=${topic}&max=100`;
 
-                        console.log('API Response length:', data?.length);
-                        console.log('First 10 words:', data?.slice(0, 10).map(w => w.word));
+                        console.log('API URL:', apiUrl);
 
-                        if (data && data.length > 0) {
-                            // For kids: pick from most frequent
-                            // For teens: pick from middle range
-                            // For adults: pick from least frequent
-                            let wordIndex;
+                        try {
+                            const response = await fetch(apiUrl);
+                            const data = await response.json();
+                            console.log('API Response length:', data?.length);
+                            console.log('First 10 words:', data?.slice(0, 10).map(w => w.word));
 
-                            if (difficulty === 'kids') {
-                                // Pick from top 30% (most common)
-                                wordIndex = Math.floor(Math.random() * Math.min(30, data.length));
-                            } else if (difficulty === 'teen') {
-                                // Pick from middle range
-                                const start = Math.floor(data.length * 0.3);
-                                const end = Math.floor(data.length * 0.7);
-                                wordIndex = start + Math.floor(Math.random() * (end - start));
-                            } else {
-                                // Pick from bottom 50% (least common)
-                                const start = Math.floor(data.length * 0.5);
-                                wordIndex = start + Math.floor(Math.random() * (data.length - start));
+                            if (data && data.length > 0) {
+                                // Filter for appropriate length (5-9 letters)
+                                const filtered = data.filter(w => w.word.length >= 5 && w.word.length <= 9);
+                                if (filtered.length > 0) {
+                                    const wordIndex = Math.floor(Math.random() * Math.min(30, filtered.length));
+                                    word = filtered[wordIndex]?.word;
+                                    console.log('Selected word:', word);
+                                }
                             }
-
-                            console.log('Selected index:', wordIndex, 'out of', data.length);
-                            word = data[wordIndex]?.word;
-                            console.log('Selected word:', word);
-                            console.log('Word frequency:', data[wordIndex]?.tags);
+                        } catch (e) {
+                            console.log('Datamuse API failed:', e);
                         }
-                    } catch (e) {
-                        console.log('Datamuse API failed:', e);
+                    } else if (difficulty === 'teen') {
+                        // Teens: Use less common words with specific characteristics
+                        const apiUrl = 'https://api.datamuse.com/words?sp=?????????*&md=f&max=200';
+
+                        console.log('API URL:', apiUrl);
+
+                        try {
+                            const response = await fetch(apiUrl);
+                            const data = await response.json();
+                            console.log('API Response length:', data?.length);
+
+                            if (data && data.length > 0) {
+                                // Filter out very common words and pick from middle-to-uncommon range
+                                const filtered = data.filter(w => {
+                                    const freq = w.tags?.[0]?.replace('f:', '') || '0';
+                                    return parseFloat(freq) < 20; // Less common words
+                                });
+                                console.log('Filtered to less common:', filtered.length);
+                                console.log('Sample filtered words:', filtered.slice(0, 10).map(w => w.word));
+
+                                if (filtered.length > 0) {
+                                    const wordIndex = Math.floor(Math.random() * filtered.length);
+                                    word = filtered[wordIndex]?.word;
+                                    console.log('Selected word:', word);
+                                }
+                            }
+                        } catch (e) {
+                            console.log('Datamuse API failed:', e);
+                        }
+                    } else {
+                        // Adults: Use the curated obscure word list since APIs don't provide truly obscure words
+                        console.log('Using curated obscure word list for adults');
+                        const wordList = wordLists.adult;
+                        word = wordList[Math.floor(Math.random() * wordList.length)];
+                        console.log('Selected word from curated list:', word);
                     }
 
-                    // Fallback to curated lists if API fails
+                    // Fallback to curated lists if API fails or no word found
                     if (!word) {
                         console.log('Using fallback word list');
                         const wordList = wordLists[difficulty];
