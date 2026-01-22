@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dictionary Game</title>
+    <title>Dictionary Game - Multiplayer</title>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script>
-        // Suppress Tailwind CDN warning
         const originalWarn = console.warn;
         console.warn = function(...args) {
             if (args[0]?.includes?.('cdn.tailwindcss.com')) return;
@@ -19,11 +20,27 @@
 </head>
 <body>
     <div id="root"></div>
-    
-    <script type="text/babel">
-        const { useState, useEffect } = React;
 
-        // Lucide icons as inline SVGs
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // Initialize Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDFlzHW747uu1p1TdqWbdFM_omkjORRht4",
+            authDomain: "dictionary-5fae9.firebaseapp.com",
+            databaseURL: "https://dictionary-5fae9-default-rtdb.firebaseio.com",
+            projectId: "dictionary-5fae9",
+            storageBucket: "dictionary-5fae9.firebasestorage.app",
+            messagingSenderId: "615496664058",
+            appId: "1:615496664058:web:0ea7b1bd792d230cbf1a43"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const database = firebase.database();
+
+        // Lucide icons
         const BookOpen = () => (
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
@@ -51,673 +68,595 @@
             </svg>
         );
 
-        const Play = () => (
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <polygon points="5 3 19 12 5 21 5 3"></polygon>
-            </svg>
-        );
-
-        const RotateCcw = () => (
+        const Copy = () => (
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="1 4 1 10 7 10"></polyline>
-                <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
             </svg>
         );
 
-        function DictionaryGame() {
-            const [gameState, setGameState] = useState('setup');
-            const [players, setPlayers] = useState([]);
-            const [newPlayerName, setNewPlayerName] = useState('');
-            const [dictionaryHolder, setDictionaryHolder] = useState('');
+        function MultiplayerDictionaryGame() {
+            const [view, setView] = useState('home'); // home, host, join, game
+            const [gameCode, setGameCode] = useState('');
+            const [playerName, setPlayerName] = useState('');
+            const [playerId, setPlayerId] = useState(null);
+            const [gameData, setGameData] = useState(null);
+            const [inputGameCode, setInputGameCode] = useState('');
+            const [inputPlayerName, setInputPlayerName] = useState('');
+            const [difficulty, setDifficulty] = useState('adult');
             const [currentWord, setCurrentWord] = useState('');
             const [realDefinition, setRealDefinition] = useState('');
-            const [definitions, setDefinitions] = useState([]);
-            const [newDefinition, setNewDefinition] = useState('');
-            const [currentPlayer, setCurrentPlayer] = useState('');
-            const [votes, setVotes] = useState({});
-            const [roundHistory, setRoundHistory] = useState([]);
+            const [myDefinition, setMyDefinition] = useState('');
+            const [myVote, setMyVote] = useState(null);
             const [loadingWord, setLoadingWord] = useState(false);
-            const [loadingDefinition, setLoadingDefinition] = useState(false);
-            const [usedWords, setUsedWords] = useState([]);
-            const [storageLoaded, setStorageLoaded] = useState(false);
-            const [difficulty, setDifficulty] = useState('adult');
+            const gameRef = useRef(null);
 
-            // Word lists by difficulty
             const wordLists = {
-                kids: [
-                    'canopy', 'whimsy', 'gadget', 'mosaic', 'nimble', 'frolic', 'plume', 'burrow',
-                    'ember', 'marvel', 'riddle', 'bristle', 'forage', 'huddle', 'tangle', 'gleam',
-                    'perch', 'shuffle', 'sprout', 'wiggle', 'crater', 'beacon', 'crevice', 'dapple',
-                    'flutter', 'grumble', 'jostle', 'meddle', 'nestle', 'ponder', 'quiver', 'rustle',
-                    'spiral', 'topple', 'waddle', 'baffled', 'bewilder', 'confound', 'dwindle', 'fickle',
-                    'glimmer', 'hasten', 'kindle', 'linger', 'meager', 'ominous', 'peculiar', 'rickety'
-                ],
-                teen: [
-                    'ambiguous', 'benevolent', 'candor', 'diligent', 'ephemeral', 'facetious', 'gregarious',
-                    'haphazard', 'impetuous', 'juxtapose', 'kinetic', 'loquacious', 'melancholy', 'nebulous',
-                    'obstinate', 'pervasive', 'querulous', 'reclusive', 'superfluous', 'tenacious', 'ubiquitous',
-                    'verbose', 'whimsical', 'zealous', 'apathy', 'brevity', 'contempt', 'deference', 'elusive',
-                    'frivolous', 'nostalgia', 'opulent', 'prudent', 'resilient', 'skeptical', 'trivial', 'exemplary',
-                    'frivolity', 'lucrative', 'pragmatic', 'audacious', 'meticulous', 'obsolete', 'plausible', 'vivacious'
-                ],
-                adult: [
-                    'absquatulate', 'bumfuzzle', 'callipygian', 'defenestrate', 'erinaceous',
-                    'floccinaucinihilipilification', 'gobemouche', 'higgler', 'impignorate',
-                    'jentacular', 'kakistocracy', 'lollygag', 'malarkey', 'nudiustertian',
-                    'octothorpe', 'pauciloquent', 'quomodocunquize', 'rhadamanthine',
-                    'smellfungus', 'taradiddle', 'ulotrichous', 'vomitory', 'wabbit',
-                    'xertz', 'yarborough', 'zenzizenzizenzic', 'borborygmus', 'collywobbles',
-                    'donnybrook', 'fartlek', 'gardyloo', 'hobbledehoy', 'kerfuffle',
-                    'lollop', 'meldrop', 'nidificate', 'obnubilate', 'panjandrum',
-                    'quockerwodger', 'ratoon', 'skirr', 'tittynope', 'ugsome',
-                    'vagarious', 'widdershins', 'xyst', 'zoanthropy', 'abligurition'
-                ]
+                kids: ['canopy', 'whimsy', 'gadget', 'mosaic', 'nimble', 'frolic', 'plume', 'burrow', 'ember', 'marvel'],
+                teen: ['ambiguous', 'benevolent', 'candor', 'diligent', 'ephemeral', 'facetious', 'gregarious', 'haphazard'],
+                adult: ['absquatulate', 'bumfuzzle', 'callipygian', 'defenestrate', 'erinaceous', 'gobemouche', 'kakistocracy']
             };
 
-            // Load used words from localStorage
-            useEffect(() => {
-                const loadUsedWords = () => {
-                    try {
-                        const stored = localStorage.getItem('balderdash-used-words');
-                        if (stored) {
-                            setUsedWords(JSON.parse(stored));
+            // Generate random game code
+            const generateGameCode = () => {
+                return Math.random().toString(36).substring(2, 8).toUpperCase();
+            };
+
+            // Create new game
+            const createGame = async () => {
+                const code = generateGameCode();
+                const newPlayerId = Date.now().toString();
+
+                await database.ref(`games/${code}`).set({
+                    host: newPlayerId,
+                    hostName: playerName,
+                    state: 'setup',
+                    difficulty: 'adult',
+                    players: {
+                        [newPlayerId]: {
+                            name: playerName,
+                            score: 0,
+                            isHost: true,
+                            joinedAt: Date.now()
                         }
-                    } catch (error) {
-                        console.log('No previous words found or error loading:', error);
-                    }
-                    setStorageLoaded(true);
-                };
-                loadUsedWords();
-            }, []);
+                    },
+                    createdAt: Date.now()
+                });
 
-            // Save used words to localStorage
-            const saveUsedWords = (words) => {
-                try {
-                    localStorage.setItem('balderdash-used-words', JSON.stringify(words));
-                } catch (error) {
-                    console.error('Error saving used words:', error);
-                }
+                setGameCode(code);
+                setPlayerId(newPlayerId);
+                setView('game');
             };
+
+            // Join existing game
+            const joinGame = async () => {
+                if (!inputGameCode || !inputPlayerName) {
+                    alert('Please enter both game code and your name');
+                    return;
+                }
+
+                const code = inputGameCode.toUpperCase();
+                const snapshot = await database.ref(`games/${code}`).once('value');
+
+                if (!snapshot.exists()) {
+                    alert('Game not found. Check the code and try again.');
+                    return;
+                }
+
+                const newPlayerId = Date.now().toString();
+
+                await database.ref(`games/${code}/players/${newPlayerId}`).set({
+                    name: inputPlayerName,
+                    score: 0,
+                    isHost: false,
+                    joinedAt: Date.now()
+                });
+
+                setGameCode(code);
+                setPlayerId(newPlayerId);
+                setPlayerName(inputPlayerName);
+                setView('game');
+            };
+
+            // Listen to game updates
+            useEffect(() => {
+                if (gameCode && view === 'game') {
+                    gameRef.current = database.ref(`games/${gameCode}`);
+
+                    gameRef.current.on('value', (snapshot) => {
+                        const data = snapshot.val();
+                        if (data) {
+                            setGameData(data);
+                        }
+                    });
+
+                    return () => {
+                        if (gameRef.current) {
+                            gameRef.current.off();
+                        }
+                    };
+                }
+            }, [gameCode, view]);
 
             // Get random word
             const getRandomWord = async () => {
                 setLoadingWord(true);
                 try {
                     let word = null;
-                    
-                    console.log('=== RANDOM WORD DEBUG ===');
-                    console.log('Difficulty:', difficulty);
 
-                    // Strategy: Use different approaches for each difficulty
                     if (difficulty === 'kids') {
-                        // Kids: Use common vocabulary words
                         const topics = ['animals', 'nature', 'school', 'sports', 'food'];
                         const topic = topics[Math.floor(Math.random() * topics.length)];
-                        const apiUrl = `https://api.datamuse.com/words?topics=${topic}&max=100`;
+                        const response = await fetch(`https://api.datamuse.com/words?topics=${topic}&max=100`);
+                        const data = await response.json();
 
-                        console.log('API URL:', apiUrl);
-
-                        try {
-                            const response = await fetch(apiUrl);
-                            const data = await response.json();
-                            console.log('API Response length:', data?.length);
-                            console.log('First 10 words:', data?.slice(0, 10).map(w => w.word));
-
-                            if (data && data.length > 0) {
-                                // Filter for appropriate length (5-9 letters)
-                                const filtered = data.filter(w => w.word.length >= 5 && w.word.length <= 9);
-                                if (filtered.length > 0) {
-                                    const wordIndex = Math.floor(Math.random() * Math.min(30, filtered.length));
-                                    word = filtered[wordIndex]?.word;
-                                    console.log('Selected word:', word);
-                                }
+                        if (data && data.length > 0) {
+                            const filtered = data.filter(w => w.word.length >= 5 && w.word.length <= 9);
+                            if (filtered.length > 0) {
+                                word = filtered[Math.floor(Math.random() * Math.min(30, filtered.length))]?.word;
                             }
-                        } catch (e) {
-                            console.log('Datamuse API failed:', e);
                         }
                     } else if (difficulty === 'teen') {
-                        // Teens: Use less common words with specific characteristics
-                        const apiUrl = 'https://api.datamuse.com/words?sp=?????????*&md=f&max=200';
+                        const response = await fetch('https://api.datamuse.com/words?sp=?????????*&md=f&max=200');
+                        const data = await response.json();
 
-                        console.log('API URL:', apiUrl);
-
-                        try {
-                            const response = await fetch(apiUrl);
-                            const data = await response.json();
-                            console.log('API Response length:', data?.length);
-
-                            if (data && data.length > 0) {
-                                // Filter out very common words and pick from middle-to-uncommon range
-                                const filtered = data.filter(w => {
-                                    const freq = w.tags?.[0]?.replace('f:', '') || '0';
-                                    return parseFloat(freq) < 20; // Less common words
-                                });
-                                console.log('Filtered to less common:', filtered.length);
-                                console.log('Sample filtered words:', filtered.slice(0, 10).map(w => w.word));
-
-                                if (filtered.length > 0) {
-                                    const wordIndex = Math.floor(Math.random() * filtered.length);
-                                    word = filtered[wordIndex]?.word;
-                                    console.log('Selected word:', word);
-                                }
+                        if (data && data.length > 0) {
+                            const filtered = data.filter(w => {
+                                const freq = w.tags?.[0]?.replace('f:', '') || '0';
+                                return parseFloat(freq) < 20;
+                            });
+                            if (filtered.length > 0) {
+                                word = filtered[Math.floor(Math.random() * filtered.length)]?.word;
                             }
-                        } catch (e) {
-                            console.log('Datamuse API failed:', e);
                         }
                     } else {
-                        // Adults: Use the curated obscure word list since APIs don't provide truly obscure words
-                        console.log('Using curated obscure word list for adults');
-                        const wordList = wordLists.adult;
-                        word = wordList[Math.floor(Math.random() * wordList.length)];
-                        console.log('Selected word from curated list:', word);
+                        word = wordLists.adult[Math.floor(Math.random() * wordLists.adult.length)];
                     }
 
-                    // Fallback to curated lists if API fails or no word found
                     if (!word) {
-                        console.log('Using fallback word list');
-                        const wordList = wordLists[difficulty];
-                        word = wordList[Math.floor(Math.random() * wordList.length)];
+                        word = wordLists[difficulty][Math.floor(Math.random() * wordLists[difficulty].length)];
                     }
-
-                    console.log('Final word chosen:', word);
-                    console.log('======================');
 
                     setCurrentWord(word);
                 } catch (error) {
-                    console.error('Error in getRandomWord:', error);
-                    alert('Could not fetch random word. Please try again or enter one manually.');
+                    console.error('Error getting word:', error);
                 }
                 setLoadingWord(false);
             };
 
-            // Get definition for current word
-            const getDefinition = async () => {
-                if (!currentWord.trim()) {
-                    alert('Please enter a word first');
+            // Start round (host only)
+            const startRound = async () => {
+                if (!currentWord || !realDefinition) {
+                    alert('Please enter word and definition');
                     return;
                 }
 
-                setLoadingDefinition(true);
-                try {
-                    const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${currentWord.toLowerCase()}`);
-
-                    if (!response.ok) {
-                        throw new Error('Word not found');
-                    }
-
-                    const data = await response.json();
-
-                    if (data && data[0] && data[0].meanings && data[0].meanings[0]) {
-                        const definition = data[0].meanings[0].definitions[0].definition;
-                        setRealDefinition(definition.charAt(0).toUpperCase() + definition.slice(1));
-                    } else {
-                        alert('Could not find definition for "' + currentWord + '". Try another word or enter definition manually.');
-                    }
-                } catch (error) {
-                    console.error('Definition fetch error:', error);
-                    alert('Could not fetch definition for "' + currentWord + '". The word might not be in the dictionary, or there may be a connection issue. Please enter the definition manually or try a different word.');
-                }
-                setLoadingDefinition(false);
+                await database.ref(`games/${gameCode}`).update({
+                    state: 'collecting',
+                    currentWord: currentWord,
+                    realDefinition: realDefinition,
+                    difficulty: difficulty,
+                    definitions: {},
+                    votes: {},
+                    roundStarted: Date.now()
+                });
             };
 
-            const addPlayer = () => {
-                if (newPlayerName.trim() && !players.find(p => p.name === newPlayerName.trim())) {
-                    setPlayers([...players, { name: newPlayerName.trim(), score: 0 }]);
-                    setNewPlayerName('');
+            // Submit definition
+            const submitDefinition = async () => {
+                if (!myDefinition.trim()) {
+                    alert('Please enter a definition');
+                    return;
                 }
+
+                await database.ref(`games/${gameCode}/definitions/${playerId}`).set({
+                    text: myDefinition.trim(),
+                    submittedAt: Date.now()
+                });
+
+                setMyDefinition('');
             };
 
-            const startRound = () => {
-                if (!dictionaryHolder || !currentWord.trim() || !realDefinition.trim()) {
-                    alert('Please fill in dictionary holder, word, and real definition');
-                    return;
-                }
-
-                const wordLower = currentWord.toLowerCase().trim();
-                if (usedWords.includes(wordLower)) {
-                    if (!confirm(`"${currentWord}" has been used before. Use it anyway?`)) {
-                        return;
-                    }
-                } else {
-                    const updatedWords = [...usedWords, wordLower];
-                    setUsedWords(updatedWords);
-                    saveUsedWords(updatedWords);
-                }
-
-                setGameState('collecting');
-                setDefinitions([]);
-                setVotes({});
+            // Start voting (host only)
+            const startVoting = async () => {
+                await database.ref(`games/${gameCode}`).update({
+                    state: 'voting'
+                });
             };
 
-            const submitDefinition = () => {
-                if (!currentPlayer || !newDefinition.trim()) {
-                    alert('Please select your name and enter a definition');
-                    return;
-                }
-                if (currentPlayer === dictionaryHolder) {
-                    alert('Dictionary holder cannot submit a fake definition!');
-                    return;
-                }
-                if (definitions.find(d => d.player === currentPlayer)) {
-                    alert('You already submitted a definition!');
-                    return;
-                }
-                setDefinitions([...definitions, { player: currentPlayer, text: newDefinition.trim() }]);
-                setNewDefinition('');
-                setCurrentPlayer('');
+            // Cast vote
+            const castVote = async (defId) => {
+                await database.ref(`games/${gameCode}/votes/${playerId}`).set(defId);
+                setMyVote(defId);
             };
 
-            const startVoting = () => {
-                if (definitions.length === 0) {
-                    alert('Need at least one fake definition to start voting');
-                    return;
-                }
-                setGameState('voting');
-            };
+            // Show results (host only)
+            const showResults = async () => {
+                const votes = gameData.votes || {};
+                const definitions = gameData.definitions || {};
+                const players = gameData.players || {};
 
-            const castVote = (defIndex, voterName) => {
-                if (voterName === dictionaryHolder) {
-                    alert('Dictionary holder cannot vote!');
-                    return;
-                }
-                const def = defIndex === 'real' ? { player: 'REAL' } : definitions[defIndex];
-                if (def.player === voterName) {
-                    alert('You cannot vote for your own definition!');
-                    return;
-                }
-                setVotes({...votes, [voterName]: defIndex});
-            };
-
-            const showResults = () => {
+                // Count votes
                 const voteCounts = {};
-                Object.values(votes).forEach(defIndex => {
-                    voteCounts[defIndex] = (voteCounts[defIndex] || 0) + 1;
+                Object.values(votes).forEach(defId => {
+                    voteCounts[defId] = (voteCounts[defId] || 0) + 1;
                 });
 
-                const updatedPlayers = [...players];
+                // Update scores
+                const updates = {};
 
-                definitions.forEach((def, idx) => {
-                    const playerIndex = updatedPlayers.findIndex(p => p.name === def.player);
-                    if (playerIndex !== -1 && voteCounts[idx]) {
-                        updatedPlayers[playerIndex].score += voteCounts[idx];
+                // Points for fake definitions
+                Object.keys(definitions).forEach(defPlayerId => {
+                    if (voteCounts[defPlayerId]) {
+                        const currentScore = players[defPlayerId]?.score || 0;
+                        updates[`players/${defPlayerId}/score`] = currentScore + voteCounts[defPlayerId];
                     }
                 });
 
+                // Points for host if people voted for real definition
                 if (voteCounts['real']) {
-                    const holderIndex = updatedPlayers.findIndex(p => p.name === dictionaryHolder);
-                    if (holderIndex !== -1) {
-                        updatedPlayers[holderIndex].score += voteCounts['real'];
-                    }
+                    const hostId = gameData.host;
+                    const currentScore = players[hostId]?.score || 0;
+                    updates[`players/${hostId}/score`] = currentScore + voteCounts['real'];
                 }
 
-                setPlayers(updatedPlayers);
-                setRoundHistory([...roundHistory, {
-                    word: currentWord,
-                    real: realDefinition,
-                    definitions,
-                    votes: voteCounts
-                }]);
-                setGameState('results');
+                updates.state = 'results';
+                updates.voteCounts = voteCounts;
+
+                await database.ref(`games/${gameCode}`).update(updates);
             };
 
-            const newRound = () => {
-                setGameState('setup');
+            // New round (host only)
+            const newRound = async () => {
+                await database.ref(`games/${gameCode}`).update({
+                    state: 'setup',
+                    currentWord: null,
+                    realDefinition: null,
+                    definitions: null,
+                    votes: null,
+                    voteCounts: null
+                });
                 setCurrentWord('');
                 setRealDefinition('');
-                setDefinitions([]);
-                setVotes({});
+                setMyDefinition('');
+                setMyVote(null);
             };
 
-            const restartToSetup = () => {
-                newRound();
+            // Copy game code
+            const copyGameCode = () => {
+                navigator.clipboard.writeText(gameCode);
+                alert('Game code copied!');
             };
 
-            const resetGame = () => {
-                if (confirm('Reset entire game? All scores will be lost.')) {
-                    setPlayers(players.map(p => ({...p, score: 0})));
-                    setRoundHistory([]);
-                    newRound();
-                }
-            };
+            const isHost = gameData?.host === playerId;
+            const players = gameData?.players || {};
+            const definitions = gameData?.definitions || {};
+            const votes = gameData?.votes || {};
 
-            const clearWordHistory = () => {
-                if (confirm('Clear all previously used words? This cannot be undone.')) {
-                    setUsedWords([]);
-                    try {
-                        localStorage.removeItem('balderdash-used-words');
-                        alert('Word history cleared!');
-                    } catch (error) {
-                        console.error('Error clearing word history:', error);
-                    }
-                }
-            };
-
-            return (
-                <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 p-4">
-                    <div className="max-w-4xl mx-auto">
-                        <div className="bg-white rounded-lg shadow-lg p-6 mb-4">
-                            <div className="flex justify-between items-start mb-2">
-                                <div>
-                                    <h1 className="text-3xl font-bold text-purple-900 flex items-center gap-2">
-                                        <BookOpen />
-                                        Dictionary Game
-                                    </h1>
-                                    <p className="text-gray-600 text-sm">Dictionary bluffing game scorer</p>
+            // Home screen
+            if (view === 'home') {
+                return (
+                    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 flex items-center justify-center p-4">
+                        <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full">
+                            <div className="text-center mb-8">
+                                <div className="flex justify-center mb-4">
+                                    <BookOpen />
                                 </div>
-                                {gameState !== 'setup' && (
-                                    <button
-                                        onClick={restartToSetup}
-                                        className="px-3 py-1.5 bg-orange-600 text-white rounded text-sm hover:bg-orange-700 flex items-center gap-1"
-                                    >
-                                        <RotateCcw />
-                                        Restart Round
-                                    </button>
-                                )}
+                                <h1 className="text-3xl font-bold text-purple-900 mb-2">Dictionary Game</h1>
+                                <p className="text-gray-600">Multiplayer word bluffing game</p>
                             </div>
-                        </div>
 
-                        <div className="bg-white rounded-lg shadow-lg p-6 mb-4">
-                            <h2 className="text-xl font-semibold mb-3 flex items-center gap-2">
-                                <Users />
-                                Players
-                            </h2>
+                            <div className="space-y-4">
+                                <button
+                                    onClick={() => setView('host')}
+                                    className="w-full px-6 py-4 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-semibold text-lg"
+                                >
+                                    Host New Game
+                                </button>
 
-                            <div className="flex gap-2 mb-4">
-                                <input
-                                    type="text"
-                                    value={newPlayerName}
-                                    onChange={(e) => setNewPlayerName(e.target.value)}
-                                    onKeyPress={(e) => e.key === 'Enter' && addPlayer()}
-                                    placeholder="Player name"
-                                    className="flex-1 px-3 py-2 border rounded"
-                                />
-                                <button onClick={addPlayer} className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700">
-                                    Add
+                                <button
+                                    onClick={() => setView('join')}
+                                    className="w-full px-6 py-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold text-lg"
+                                >
+                                    Join Game
                                 </button>
                             </div>
+                        </div>
+                    </div>
+                );
+            }
 
-                            <div className="grid grid-cols-2 gap-2">
-                                {players.map((player, idx) => (
-                                    <div key={idx} className="flex justify-between items-center bg-purple-50 p-3 rounded">
-                                        <span className="font-medium">{player.name}</span>
-                                        <span className="flex items-center gap-1 text-purple-700">
-                                            <Trophy />
-                                            {player.score}
-                                        </span>
-                                    </div>
-                                ))}
+            // Host setup screen
+            if (view === 'host') {
+                return (
+                    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 flex items-center justify-center p-4">
+                        <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full">
+                            <h2 className="text-2xl font-bold text-purple-900 mb-6">Host New Game</h2>
+
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium mb-2">Your Name</label>
+                                    <input
+                                        type="text"
+                                        value={playerName}
+                                        onChange={(e) => setPlayerName(e.target.value)}
+                                        placeholder="Enter your name"
+                                        className="w-full px-4 py-2 border rounded-lg"
+                                    />
+                                </div>
+
+                                <button
+                                    onClick={createGame}
+                                    disabled={!playerName.trim()}
+                                    className="w-full px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:bg-gray-400"
+                                >
+                                    Create Game
+                                </button>
+
+                                <button
+                                    onClick={() => setView('home')}
+                                    className="w-full px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
+                                >
+                                    Back
+                                </button>
                             </div>
                         </div>
+                    </div>
+                );
+            }
 
-                        {gameState === 'setup' && (
+            // Join game screen
+            if (view === 'join') {
+                return (
+                    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 flex items-center justify-center p-4">
+                        <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full">
+                            <h2 className="text-2xl font-bold text-purple-900 mb-6">Join Game</h2>
+
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium mb-2">Game Code</label>
+                                    <input
+                                        type="text"
+                                        value={inputGameCode}
+                                        onChange={(e) => setInputGameCode(e.target.value.toUpperCase())}
+                                        placeholder="Enter 6-digit code"
+                                        maxLength="6"
+                                        className="w-full px-4 py-2 border rounded-lg uppercase"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium mb-2">Your Name</label>
+                                    <input
+                                        type="text"
+                                        value={inputPlayerName}
+                                        onChange={(e) => setInputPlayerName(e.target.value)}
+                                        placeholder="Enter your name"
+                                        className="w-full px-4 py-2 border rounded-lg"
+                                    />
+                                </div>
+
+                                <button
+                                    onClick={joinGame}
+                                    disabled={!inputGameCode.trim() || !inputPlayerName.trim()}
+                                    className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400"
+                                >
+                                    Join Game
+                                </button>
+
+                                <button
+                                    onClick={() => setView('home')}
+                                    className="w-full px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
+                                >
+                                    Back
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+
+            // Game screen
+            if (view === 'game' && gameData) {
+                return (
+                    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 p-4">
+                        <div className="max-w-4xl mx-auto">
+                            {/* Header */}
                             <div className="bg-white rounded-lg shadow-lg p-6 mb-4">
-                                <h2 className="text-xl font-semibold mb-4">Setup Round</h2>
-
-                                <div className="space-y-4">
+                                <div className="flex justify-between items-start">
                                     <div>
-                                        <label className="block text-sm font-medium mb-1">Dictionary Holder</label>
-                                        <select
-                                            value={dictionaryHolder}
-                                            onChange={(e) => setDictionaryHolder(e.target.value)}
-                                            className="w-full px-3 py-2 border rounded"
-                                        >
-                                            <option value="">Select player...</option>
-                                            {players.map((p, idx) => (
-                                                <option key={idx} value={p.name}>{p.name}</option>
-                                            ))}
-                                        </select>
+                                        <h1 className="text-2xl font-bold text-purple-900">Dictionary Game</h1>
+                                        <p className="text-sm text-gray-600">
+                                            {isHost ? 'You are the host' : `Host: ${gameData.hostName}`}
+                                        </p>
                                     </div>
+                                    <div className="text-right">
+                                        <div className="flex items-center gap-2 bg-purple-100 px-4 py-2 rounded-lg">
+                                            <span className="font-mono font-bold text-purple-900 text-xl">{gameCode}</span>
+                                            <button onClick={copyGameCode} className="text-purple-600 hover:text-purple-800">
+                                                <Copy />
+                                            </button>
+                                        </div>
+                                        <p className="text-xs text-gray-500 mt-1">Share this code</p>
+                                    </div>
+                                </div>
+                            </div>
 
-                                    <div>
-                                        <label className="block text-sm font-medium mb-1">Word</label>
-                                        <div className="space-y-2">
-                                            <div className="flex gap-2">
-                                                <select
-                                                    value={difficulty}
-                                                    onChange={(e) => setDifficulty(e.target.value)}
-                                                    className="px-3 py-2 border rounded"
-                                                >
-                                                    <option value="kids">Kids (8-12)</option>
-                                                    <option value="teen">Teens</option>
-                                                    <option value="adult">Adults</option>
-                                                </select>
+                            {/* Players */}
+                            <div className="bg-white rounded-lg shadow-lg p-6 mb-4">
+                                <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                                    <Users />
+                                    Players ({Object.keys(players).length})
+                                </h2>
+                                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                                    {Object.entries(players).map(([id, player]) => (
+                                        <div key={id} className="flex justify-between items-center bg-purple-50 p-3 rounded">
+                                            <span className="font-medium">{player.name}</span>
+                                            <span className="flex items-center gap-1 text-purple-700">
+                                                <Trophy />
+                                                {player.score}
+                                            </span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Setup (Host Only) */}
+                            {isHost && gameData.state === 'setup' && (
+                                <div className="bg-white rounded-lg shadow-lg p-6 mb-4">
+                                    <h2 className="text-xl font-semibold mb-4">Setup Round</h2>
+
+                                    <div className="space-y-4">
+                                        <div>
+                                            <label className="block text-sm font-medium mb-2">Difficulty</label>
+                                            <select
+                                                value={difficulty}
+                                                onChange={(e) => setDifficulty(e.target.value)}
+                                                className="w-full px-3 py-2 border rounded"
+                                            >
+                                                <option value="kids">Kids (8-12)</option>
+                                                <option value="teen">Teens</option>
+                                                <option value="adult">Adults</option>
+                                            </select>
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-sm font-medium mb-2">Word</label>
+                                            <div className="flex gap-2 mb-2">
+                                                <input
+                                                    type="text"
+                                                    value={currentWord}
+                                                    onChange={(e) => setCurrentWord(e.target.value)}
+                                                    placeholder="Enter word"
+                                                    className="flex-1 px-3 py-2 border rounded"
+                                                />
                                                 <button
                                                     onClick={getRandomWord}
                                                     disabled={loadingWord}
-                                                    className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 disabled:bg-gray-400 whitespace-nowrap"
+                                                    className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700"
                                                 >
-                                                    {loadingWord ? 'Loading...' : 'Random Word'}
+                                                    {loadingWord ? 'Loading...' : 'Random'}
                                                 </button>
                                             </div>
-                                            <input
-                                                type="text"
-                                                value={currentWord}
-                                                onChange={(e) => setCurrentWord(e.target.value)}
-                                                placeholder="Or enter your own word"
-                                                className="w-full px-3 py-2 border rounded"
-                                            />
                                         </div>
-                                        {currentWord && usedWords.includes(currentWord.toLowerCase().trim()) && (
-                                            <p className="text-sm text-orange-600 mt-1">⚠️ This word has been used before</p>
-                                        )}
-                                        <p className="text-xs text-gray-500 mt-1">Select difficulty level and click "Random Word"</p>
-                                    </div>
 
-                                    <div>
-                                        <label className="block text-sm font-medium mb-1">Real Definition</label>
-                                        <div className="space-y-2">
+                                        <div>
+                                            <label className="block text-sm font-medium mb-2">Real Definition</label>
                                             <textarea
                                                 value={realDefinition}
                                                 onChange={(e) => setRealDefinition(e.target.value)}
                                                 placeholder="Enter the real definition"
                                                 className="w-full px-3 py-2 border rounded h-24"
                                             />
-                                            <button
-                                                onClick={getDefinition}
-                                                disabled={loadingDefinition || !currentWord.trim()}
-                                                className="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-gray-400"
-                                            >
-                                                {loadingDefinition ? 'Loading...' : 'Get Definition'}
-                                            </button>
-                                            <p className="text-xs text-gray-500">Click "Get Definition" to auto-fill from online dictionary</p>
                                         </div>
+
+                                        <button
+                                            onClick={startRound}
+                                            className="w-full px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                                        >
+                                            Start Collecting Definitions
+                                        </button>
                                     </div>
+                                </div>
+                            )}
 
-                                    <button
-                                        onClick={startRound}
-                                        className="w-full px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center justify-center gap-2"
-                                    >
-                                        <Play />
-                                        Start Collecting Definitions
-                                    </button>
+                            {/* Waiting (Non-Host during setup) */}
+                            {!isHost && gameData.state === 'setup' && (
+                                <div className="bg-white rounded-lg shadow-lg p-6 mb-4 text-center">
+                                    <p className="text-gray-600">Waiting for host to start the round...</p>
+                                </div>
+                            )}
 
-                                    {usedWords.length > 0 && (
-                                        <div className="mt-4 p-3 bg-gray-50 rounded">
-                                            <div className="flex justify-between items-center mb-2">
-                                                <span className="text-sm font-medium text-gray-700">
-                                                    Words used: {usedWords.length}
-                                                </span>
+                            {/* Collecting Definitions */}
+                            {gameData.state === 'collecting' && (
+                                <div className="bg-white rounded-lg shadow-lg p-6 mb-4">
+                                    <h2 className="text-xl font-semibold mb-2">
+                                        {isHost ? 'Definitions Coming In' : 'Submit Your Definition'}
+                                    </h2>
+                                    <p className="text-gray-600 mb-4">
+                                        Word: <span className="font-bold text-lg">{gameData.currentWord}</span>
+                                    </p>
+
+                                    {!isHost && !definitions[playerId] && (
+                                        <div className="space-y-3">
+                                            <textarea
+                                                value={myDefinition}
+                                                onChange={(e) => setMyDefinition(e.target.value)}
+                                                placeholder="Write a fake definition that sounds believable..."
+                                                className="w-full px-3 py-2 border rounded h-24"
+                                            />
+                                            <button
+                                                onClick={submitDefinition}
+                                                className="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                                            >
+                                                Submit Definition
+                                            </button>
+                                        </div>
+                                    )}
+
+                                    {!isHost && definitions[playerId] && (
+                                        <div className="bg-green-50 p-4 rounded">
+                                            <p className="text-green-800 font-semibold">✓ Your definition has been submitted!</p>
+                                            <p className="text-sm text-green-600 mt-1">Waiting for other players...</p>
+                                        </div>
+                                    )}
+
+                                    {isHost && (
+                                        <div className="space-y-3">
+                                            <p className="text-sm text-gray-600">
+                                                Definitions received: {Object.keys(definitions).length} / {Object.keys(players).length - 1}
+                                            </p>
+                                            {Object.keys(definitions).map((defId, idx) => (
+                                                <div key={defId} className="bg-gray-50 p-3 rounded">
+                                                    <p className="text-sm font-medium text-gray-600">Definition {idx + 1}</p>
+                                                    <p className="text-gray-800">{definitions[defId].text}</p>
+                                                </div>
+                                            ))}
+                                            {Object.keys(definitions).length > 0 && (
                                                 <button
-                                                    onClick={clearWordHistory}
-                                                    className="text-xs text-red-600 hover:text-red-700 underline"
+                                                    onClick={startVoting}
+                                                    className="w-full px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
                                                 >
-                                                    Clear history
+                                                    Start Voting
                                                 </button>
-                                            </div>
-                                            <div className="text-xs text-gray-600 max-h-20 overflow-y-auto">
-                                                {usedWords.slice(-10).reverse().join(', ')}
-                                                {usedWords.length > 10 && '...'}
-                                            </div>
+                                            )}
                                         </div>
                                     )}
                                 </div>
-                            </div>
-                        )}
+                            )}
 
-                        {gameState === 'collecting' && (
-                            <div className="bg-white rounded-lg shadow-lg p-6 mb-4">
-                                <h2 className="text-xl font-semibold mb-2">Submit Your Fake Definition</h2>
-                                <p className="text-sm text-gray-600 mb-4">Word: <span className="font-bold text-lg">{currentWord}</span></p>
-
-                                <div className="space-y-4">
-                                    <div>
-                                        <label className="block text-sm font-medium mb-1">Your Name</label>
-                                        <select
-                                            value={currentPlayer}
-                                            onChange={(e) => setCurrentPlayer(e.target.value)}
-                                            className="w-full px-3 py-2 border rounded"
-                                        >
-                                            <option value="">Select your name...</option>
-                                            {players.filter(p => p.name !== dictionaryHolder).map((p, idx) => (
-                                                <option key={idx} value={p.name}>{p.name}</option>
-                                            ))}
-                                        </select>
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-sm font-medium mb-1">Your Definition</label>
-                                        <textarea
-                                            value={newDefinition}
-                                            onChange={(e) => setNewDefinition(e.target.value)}
-                                            placeholder="Make it sound believable!"
-                                            className="w-full px-3 py-2 border rounded h-24"
-                                        />
-                                    </div>
-
-                                    <button
-                                        onClick={submitDefinition}
-                                        className="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                                    >
-                                        Submit Definition
-                                    </button>
-                                </div>
-
-                                <div className="mt-6">
-                                    <h3 className="font-semibold mb-2">Submitted ({definitions.length}):</h3>
-                                    <div className="space-y-2">
-                                        {definitions.map((def, idx) => (
-                                            <div key={idx} className="bg-gray-50 p-2 rounded text-sm">
-                                                ✓ {def.player}
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                <button
-                                    onClick={startVoting}
-                                    className="w-full mt-4 px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
-                                >
-                                    Start Voting
-                                </button>
-                            </div>
-                        )}
-
-                        {gameState === 'voting' && (
-                            <div className="bg-white rounded-lg shadow-lg p-6 mb-4">
-                                <h2 className="text-xl font-semibold mb-2">Vote for the Real Definition</h2>
-                                <p className="text-sm text-gray-600 mb-4">Word: <span className="font-bold text-lg">{currentWord}</span></p>
-
-                                <div className="mb-4">
-                                    <label className="block text-sm font-medium mb-1">Your Name</label>
-                                    <select
-                                        value={currentPlayer}
-                                        onChange={(e) => setCurrentPlayer(e.target.value)}
-                                        className="w-full px-3 py-2 border rounded"
-                                    >
-                                        <option value="">Select your name...</option>
-                                        {players.filter(p => p.name !== dictionaryHolder).map((p, idx) => (
-                                            <option key={idx} value={p.name}>{p.name}</option>
-                                        ))}
-                                    </select>
-                                </div>
-
-                                <div className="space-y-3">
-                                    {[...definitions, { player: 'REAL', text: realDefinition }]
-                                        .sort(() => Math.random() - 0.5)
-                                        .map((def, idx) => {
-                                            const defIndex = def.player === 'REAL' ? 'real' : definitions.findIndex(d => d.player === def.player);
-                                            const voted = votes[currentPlayer] === defIndex;
-
-                                            return (
-                                                <button
-                                                    key={idx}
-                                                    onClick={() => currentPlayer && castVote(defIndex, currentPlayer)}
-                                                    disabled={!currentPlayer}
-                                                    className={`w-full text-left p-4 rounded-lg border-2 transition ${
-                                                        voted
-                                                            ? 'border-green-500 bg-green-50'
-                                                            : 'border-gray-200 hover:border-purple-300'
-                                                    } ${!currentPlayer ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
-                                                >
-                                                    {def.text}
-                                                    {voted && <span className="ml-2 text-green-600 font-semibold">✓ Your vote</span>}
-                                                </button>
-                                            );
-                                        })}
-                                </div>
-
-                                <div className="mt-4 text-sm text-gray-600">
-                                    Votes cast: {Object.keys(votes).length} / {players.length - 1}
-                                </div>
-
-                                <button
-                                    onClick={showResults}
-                                    className="w-full mt-4 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700"
-                                >
-                                    Show Results
-                                </button>
-                            </div>
-                        )}
-
-                        {gameState === 'results' && (
-                            <div className="bg-white rounded-lg shadow-lg p-6 mb-4">
-                                <h2 className="text-xl font-semibold mb-4">Round Results</h2>
-
-                                <div className="mb-6 p-4 bg-green-50 rounded-lg">
-                                    <h3 className="font-semibold text-green-900 mb-2">Real Definition:</h3>
-                                    <p className="text-gray-800">{realDefinition}</p>
-                                    <p className="text-sm text-green-700 mt-2">
-                                        Votes: {Object.values(votes).filter(v => v === 'real').length}
+                            {/* Voting */}
+                            {gameData.state === 'voting' && (
+                                <div className="bg-white rounded-lg shadow-lg p-6 mb-4">
+                                    <h2 className="text-xl font-semibold mb-2">Vote for the Real Definition</h2>
+                                    <p className="text-gray-600 mb-4">
+                                        Word: <span className="font-bold text-lg">{gameData.currentWord}</span>
                                     </p>
-                                </div>
 
-                                <div className="space-y-3 mb-6">
-                                    {definitions.map((def, idx) => {
-                                        const voteCount = Object.values(votes).filter(v => v === idx).length;
-                                        return (
-                                            <div key={idx} className="p-4 bg-purple-50 rounded-lg">
-                                                <p className="font-semibold text-purple-900">{def.player}'s definition:</p>
-                                                <p className="text-gray-800 mt-1">{def.text}</p>
-                                                <p className="text-sm text-purple-700 mt-2">Votes: {voteCount}</p>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
+                                    {!isHost && (
+                                        <div className="space-y-3">
+                                            {[...Object.entries(definitions).filter(([id]) => id !== playerId), ['real', { text: gameData.realDefinition }]]
+                                                .sort(() => Math.random() - 0.5)
+                                                .map(([id, def]) => {
+                                                    const voted = myVote === id;
+                                                    return (
+                                                        <button
+                                                            key={id}
+                                                            onClick={() => castVote(id)}
+                                                            className={`w-full text-left p-4 rounded-lg border-2 transition ${
+                                                                voted ? 'border-green-500 bg-green-50' : 'border-gray-200 hover:border-purple-300'
+                                                            }`}
+                                                        >
+                                                            {def.text}
+                                                            {voted && <span className="ml-2 text-green-600 font-semibold">✓ Your vote</span>}
+                                                        </button>
+                                                    );
+                                                })}
+                                        </div>
+                                    )}
 
-                                <div className="flex gap-2">
-                                    <button
-                                        onClick={newRound}
-                                        className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center justify-center gap-2"
-                                    >
-                                        <RotateCcw />
-                                        New Round
-                                    </button>
-                                    <button
-                                        onClick={resetGame}
-                                        className="px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700"
-                                    >
-                                        Reset Game
-                                    </button>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            );
-        }
-
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<DictionaryGame />);
-    </script>
-</body>
-</html>
+                                    {isHost && (
+                                        <div className="space-y-3">
+                                            <p className="text-sm text-gray-600">
+                                                Votes cast: {Object.keys(votes).length} / {Object.keys(players).length - 1}
+                                            </p>
