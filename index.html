@@ -683,6 +683,80 @@
                 alert('Game code copied!');
             };
 
+            const addBotPlayers = async () => {
+                const botNames = ['Alice', 'Bob', 'Charlie', 'Diana'];
+                const botAvatars = ['dog', 'bird', 'snake', 'scholar'];
+
+                for (let i = 0; i < 4; i++) {
+                    const botId = `bot_${Date.now()}_${i}`;
+                    await database.ref(`games/${gameCode}/players/${botId}`).set({
+                        name: botNames[i],
+                        score: 0,
+                        isHost: false,
+                        avatar: botAvatars[i],
+                        isBot: true
+                    });
+                }
+
+                await database.ref(`games/${gameCode}/lastActivity`).set(Date.now());
+            };
+
+            // Bot AI - monitors game state and responds
+            useEffect(() => {
+                if (!gameCode || !gameData) return;
+
+                const players = gameData.players || {};
+                const bots = Object.entries(players).filter(([id, p]) => p.isBot);
+
+                if (bots.length === 0) return;
+
+                // Bots submit definitions
+                if (gameData.state === 'collecting') {
+                    const definitions = gameData.definitions || {};
+
+                    bots.forEach(([botId, bot]) => {
+                        if (!definitions[botId]) {
+                            // Delay bot response to simulate thinking
+                            setTimeout(async () => {
+                                const fakeDefinitions = [
+                                    `A type of ${gameData.currentWord} commonly found in ancient texts`,
+                                    `The act or process of ${gameData.currentWord}ing something thoroughly`,
+                                    `A rare condition characterized by excessive ${gameData.currentWord}`,
+                                    `An obsolete term for a person who ${gameData.currentWord}s professionally`,
+                                    `A small tool used for ${gameData.currentWord} in medieval times`,
+                                    `The study or science of ${gameData.currentWord} and its applications`,
+                                    `A decorative pattern featuring ${gameData.currentWord} motifs`,
+                                    `The quality or state of being ${gameData.currentWord}`,
+                                ];
+                                const randomDef = fakeDefinitions[Math.floor(Math.random() * fakeDefinitions.length)];
+
+                                await database.ref(`games/${gameCode}/definitions/${botId}`).set({
+                                    text: randomDef
+                                });
+                            }, Math.random() * 3000 + 1000); // 1-4 seconds
+                        }
+                    });
+                }
+
+                // Bots cast votes
+                if (gameData.state === 'voting') {
+                    const votes = gameData.votes || {};
+                    const definitions = gameData.definitions || {};
+
+                    bots.forEach(([botId, bot]) => {
+                        if (!votes[botId]) {
+                            setTimeout(async () => {
+                                // Get all available choices (other bots' definitions + real)
+                                const choices = [...Object.keys(definitions).filter(id => id !== botId), 'real'];
+                                const randomChoice = choices[Math.floor(Math.random() * choices.length)];
+
+                                await database.ref(`games/${gameCode}/votes/${botId}`).set(randomChoice);
+                            }, Math.random() * 3000 + 1000); // 1-4 seconds
+                        }
+                    });
+                }
+            }, [gameData?.state, gameData?.definitions, gameData?.votes, gameCode]);
+
             const leaveGame = async () => {
                 if (!confirm('Are you sure you want to leave this game? This cannot be undone.')) {
                     return;
@@ -1181,6 +1255,11 @@
                                             <button onClick={copyGameCode} className="text-purple-600 hover:text-purple-800 text-sm">Copy</button>
                                         </div>
                                         <div className="flex gap-2">
+                                            {isHost && gameData.state === 'setup' && Object.keys(players).length === 1 && (
+                                                <button onClick={addBotPlayers} className="px-3 py-1 bg-green-500 text-white rounded text-sm hover:bg-green-600">
+                                                    🤖 Add Bots
+                                                </button>
+                                            )}
                                             {isDictionaryHolder && gameData.state === 'setup' && (
                                                 <button onClick={restartRound} className="px-3 py-1 bg-orange-500 text-white rounded text-sm hover:bg-orange-600">
                                                     Restart Round
@@ -1211,15 +1290,23 @@
                                     </div>
                                 )}
                                 <div className="grid grid-cols-2 gap-2">
-                                    {Object.entries(players).map(([id, player]) => {
+                                    {Object.entries(players)
+                                        .sort(([, a], [, b]) => (b.score || 0) - (a.score || 0))
+                                        .map(([id, player], index) => {
                                         const avatar = avatarOptions.find(a => a.id === player.avatar);
+                                        const isMe = id === playerId;
+                                        const medals = ['🥇', '🥈', '🥉'];
                                         return (
-                                            <div key={id} className="flex justify-between items-center bg-purple-50 p-3 rounded">
+                                            <div key={id} className={`flex justify-between items-center p-3 rounded ${isMe ? 'bg-purple-100 border-2 border-purple-400' : 'bg-purple-50'}`}>
                                                 <div className="flex items-center gap-2">
+                                                    {index < 3 && player.score > 0 && <span className="text-xl">{medals[index]}</span>}
                                                     <span className="text-2xl">{avatar?.emoji || '👤'}</span>
-                                                    <span className="font-medium">{player.name}</span>
+                                                    <span className={`font-medium ${isMe ? 'text-purple-900' : ''}`}>
+                                                        {player.name}
+                                                        {player.isBot && <span className="ml-1 text-xs text-gray-500">🤖</span>}
+                                                    </span>
                                                 </div>
-                                                <span className="text-purple-700">{player.score}</span>
+                                                <span className="text-purple-700 font-bold">{player.score || 0}</span>
                                             </div>
                                         );
                                     })}
