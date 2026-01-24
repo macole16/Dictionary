@@ -600,6 +600,7 @@
                 const votes = gameData.votes || {};
                 const definitions = gameData.definitions || {};
                 const players = gameData.players || {};
+                const dictionaryHolderId = gameData.dictionaryHolder || gameData.host;
 
                 const voteCounts = {};
                 Object.values(votes).forEach(defId => {
@@ -608,6 +609,7 @@
 
                 const updates = {};
 
+                // Award points to players whose definitions were voted for
                 Object.keys(definitions).forEach(defPlayerId => {
                     if (voteCounts[defPlayerId]) {
                         const currentScore = players[defPlayerId]?.score || 0;
@@ -615,11 +617,19 @@
                     }
                 });
 
+                // Award points to dictionary holder for each vote on the real definition
                 if (voteCounts['real']) {
-                    const hostId = gameData.host;
-                    const currentScore = players[hostId]?.score || 0;
-                    updates[`players/${hostId}/score`] = currentScore + voteCounts['real'];
+                    const currentScore = players[dictionaryHolderId]?.score || 0;
+                    updates[`players/${dictionaryHolderId}/score`] = currentScore + voteCounts['real'];
                 }
+
+                // Award 1 point to each player who voted for the real definition
+                Object.entries(votes).forEach(([voterId, defId]) => {
+                    if (defId === 'real') {
+                        const currentScore = players[voterId]?.score || 0;
+                        updates[`players/${voterId}/score`] = (updates[`players/${voterId}/score`] || currentScore) + 1;
+                    }
+                });
 
                 updates.state = 'results';
                 updates.voteCounts = voteCounts;
