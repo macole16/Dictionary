@@ -1057,20 +1057,26 @@
                         const gameData = snapshot.val();
                         const players = gameData.players || {};
                         const sortedPlayers = Object.entries(players)
-                            .map(([id, player]) => ({ name: player.name, score: player.score }))
+                            .map(([id, player]) => ({ name: player?.name || 'Unknown', score: player?.score || 0 }))
                             .sort((a, b) => b.score - a.score);
 
                         // Save to history as terminated game
                         const historyId = `${gameCode}_terminated_${Date.now()}`;
-                        await database.ref(`gameHistory/${historyId}`).set({
+                        const historyData = {
                             gameCode,
                             players: sortedPlayers,
                             winner: sortedPlayers[0] || null,
                             endedAt: Date.now(),
-                            hostName: gameData.hostName,
                             roundsPlayed: gameData.roundsPlayed || 0,
                             terminated: true
-                        });
+                        };
+
+                        // Only add hostName if it exists
+                        if (gameData.hostName) {
+                            historyData.hostName = gameData.hostName;
+                        }
+
+                        await database.ref(`gameHistory/${historyId}`).set(historyData);
                     }
 
                     // Delete the game
