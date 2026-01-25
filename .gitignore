@@ -1,0 +1,23 @@
+# Dependencies
+node_modules/
+
+# Build output - Don't ignore dist/ since Vercel needs the compiled files
+# dist/
+
+# Backup files
+index_old.html
+
+# OS files
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Environment variables
+.env
+.env.local
