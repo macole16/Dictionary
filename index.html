@@ -141,6 +141,20 @@
                 return Math.random().toString(36).substring(2, 8).toUpperCase();
             };
 
+            // Get session information
+            const getSessionInfo = () => {
+                const browserInfo = navigator.userAgent;
+                const platform = navigator.platform;
+                const language = navigator.language;
+
+                return {
+                    browser: browserInfo,
+                    platform: platform,
+                    language: language,
+                    joinedAt: Date.now()
+                };
+            };
+
             const createGame = async () => {
                 const code = generateGameCode();
                 const newPlayerId = Date.now().toString();
@@ -156,7 +170,8 @@
                             name: playerName,
                             score: 0,
                             isHost: true,
-                            avatar: selectedAvatar
+                            avatar: selectedAvatar,
+                            sessionInfo: getSessionInfo()
                         }
                     }
                 });
@@ -209,7 +224,8 @@
                     name: inputPlayerName,
                     score: 0,
                     isHost: false,
-                    avatar: selectedAvatar
+                    avatar: selectedAvatar,
+                    sessionInfo: getSessionInfo()
                 });
 
                 await database.ref(`games/${code}/lastActivity`).set(Date.now());
