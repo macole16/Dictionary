@@ -66,11 +66,14 @@
   "devDependencies": {
     "@babel/cli": "^7.28.6",
     "@babel/core": "^7.28.6",
-    "@babel/preset-react": "^7.28.5"
+    "@babel/preset-react": "^7.28.5",
+    "http-server": "^14.1.1"
   },
   "scripts": {
     "build": "babel src --out-dir dist",
     "watch": "babel src --out-dir dist --watch",
+    "start": "http-server -p 8080 -o",
+    "dev": "npm run build && npm run start",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
