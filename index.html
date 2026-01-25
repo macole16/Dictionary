@@ -1890,19 +1890,22 @@
                                     <div className="space-y-2 mb-6 max-h-64 overflow-y-auto">
                                         {Object.entries(players).filter(([id, player]) =>
                                             id !== playerId && !player.isBot
-                                        ).map(([id, player]) => (
-                                            <button
-                                                key={id}
-                                                onClick={() => passDictionary(id)}
-                                                className="w-full p-3 bg-blue-50 hover:bg-blue-100 rounded-lg text-left flex items-center gap-3 transition-colors"
-                                            >
-                                                <span className="text-2xl">{avatarEmojis[player.avatar]}</span>
-                                                <div>
-                                                    <p className="font-semibold text-gray-900">{player.name}</p>
-                                                    <p className="text-sm text-gray-600">Score: {player.score}</p>
-                                                </div>
-                                            </button>
-                                        ))}
+                                        ).map(([id, player]) => {
+                                            const avatar = avatarOptions.find(a => a.id === player.avatar);
+                                            return (
+                                                <button
+                                                    key={id}
+                                                    onClick={() => passDictionary(id)}
+                                                    className="w-full p-3 bg-blue-50 hover:bg-blue-100 rounded-lg text-left flex items-center gap-3 transition-colors"
+                                                >
+                                                    <span className="text-2xl">{avatar?.emoji || '👤'}</span>
+                                                    <div>
+                                                        <p className="font-semibold text-gray-900">{player.name}</p>
+                                                        <p className="text-sm text-gray-600">Score: {player.score}</p>
+                                                    </div>
+                                                </button>
+                                            );
+                                        })}
                                         {Object.entries(players).filter(([id, player]) =>
                                             id !== playerId && !player.isBot
                                         ).length === 0 && (
