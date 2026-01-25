@@ -99,6 +99,8 @@
             const [myCreatedGames, setMyCreatedGames] = useState([]);
             const [liveGames, setLiveGames] = useState([]);
             const [allGameHistory, setAllGameHistory] = useState([]);
+            const [pronunciation, setPronunciation] = useState('');
+            const [wordFact, setWordFact] = useState('');
 
             // Try to restore session from localStorage
             useEffect(() => {
@@ -410,6 +412,7 @@
                 setLoadingDefinition(true);
                 try {
                     let definition = null;
+                    let phonetic = '';
 
                     // Try API 1: Free Dictionary API
                     console.log('Trying Free Dictionary API...');
@@ -418,9 +421,21 @@
 
                         if (response.ok) {
                             const data = await response.json();
-                            if (data && data[0] && data[0].meanings && data[0].meanings[0]) {
-                                definition = data[0].meanings[0].definitions[0].definition;
-                                console.log('Found definition in Free Dictionary API');
+                            if (data && data[0]) {
+                                if (data[0].meanings && data[0].meanings[0]) {
+                                    definition = data[0].meanings[0].definitions[0].definition;
+                                    console.log('Found definition in Free Dictionary API');
+                                }
+                                // Get phonetic pronunciation
+                                if (data[0].phonetic) {
+                                    phonetic = data[0].phonetic;
+                                } else if (data[0].phonetics && data[0].phonetics[0]?.text) {
+                                    phonetic = data[0].phonetics[0].text;
+                                }
+                                // Extract word origin if available
+                                if (data[0].origin) {
+                                    setWordFact(`Origin: ${data[0].origin}`);
+                                }
                             }
                         }
                     } catch (e) {
@@ -467,6 +482,18 @@
 
                     if (definition) {
                         setRealDefinition(definition.charAt(0).toUpperCase() + definition.slice(1));
+                        if (phonetic) {
+                            setPronunciation(phonetic);
+                        }
+                        // Generate a fun fact if we don't have one from origin
+                        if (!wordFact) {
+                            const facts = [
+                                `The word "${currentWord}" has ${currentWord.length} letters.`,
+                                `This is a ${difficulty}-level word!`,
+                                `Challenge your friends with this word.`
+                            ];
+                            setWordFact(facts[Math.floor(Math.random() * facts.length)]);
+                        }
                     } else {
                         alert('Could not find definition for "' + currentWord + '" in any dictionary. Please enter the definition manually or search online (try Merriam-Webster.com or Dictionary.com).');
                     }
@@ -475,6 +502,15 @@
                     alert('Error fetching definition. Please enter the definition manually or search online.');
                 }
                 setLoadingDefinition(false);
+            };
+
+            const speakWord = () => {
+                if ('speechSynthesis' in window && currentWord) {
+                    const utterance = new SpeechSynthesisUtterance(currentWord);
+                    utterance.rate = 0.8;
+                    utterance.pitch = 1;
+                    window.speechSynthesis.speak(utterance);
+                }
             };
 
             const startRound = async () => {
@@ -538,16 +574,28 @@
                 }
 
                 const players = gameData.players || {};
-                const sortedPlayers = Object.entries(players)
-                    .map(([id, player]) => ({ name: player.name, score: player.score }))
-                    .sort((a, b) => b.score - a.score);
+                const leftPlayers = gameData.leftPlayers || {};
+
+                // Combine active and left players
+                const allPlayers = [
+                    ...Object.entries(players).map(([id, player]) => ({
+                        name: player.name,
+                        score: player.score,
+                        active: true
+                    })),
+                    ...Object.entries(leftPlayers).map(([id, player]) => ({
+                        name: player.name,
+                        score: player.score,
+                        active: false
+                    }))
+                ].sort((a, b) => b.score - a.score);
 
                 // Save to history
                 const historyId = `${gameCode}_${Date.now()}`;
                 await database.ref(`gameHistory/${historyId}`).set({
                     gameCode,
-                    players: sortedPlayers,
-                    winner: sortedPlayers[0],
+                    players: allPlayers,
+                    winner: allPlayers[0],
                     endedAt: Date.now(),
                     hostName: gameData.hostName,
                     roundsPlayed: gameData.roundsPlayed || 0
@@ -720,17 +768,31 @@
                         if (!definitions[botId]) {
                             // Delay bot response to simulate thinking
                             setTimeout(async () => {
-                                const fakeDefinitions = [
-                                    `A type of ${gameData.currentWord} commonly found in ancient texts`,
-                                    `The act or process of ${gameData.currentWord}ing something thoroughly`,
-                                    `A rare condition characterized by excessive ${gameData.currentWord}`,
-                                    `An obsolete term for a person who ${gameData.currentWord}s professionally`,
-                                    `A small tool used for ${gameData.currentWord} in medieval times`,
-                                    `The study or science of ${gameData.currentWord} and its applications`,
-                                    `A decorative pattern featuring ${gameData.currentWord} motifs`,
-                                    `The quality or state of being ${gameData.currentWord}`,
+                                const word = gameData.currentWord;
+
+                                // Smarter definition templates based on word structure
+                                const definitionTemplates = [
+                                    // Noun templates
+                                    `A ${['small', 'large', 'rare', 'common', 'unusual'][Math.floor(Math.random() * 5)]} object or substance used in ${['ancient', 'medieval', 'traditional', 'modern'][Math.floor(Math.random() * 4)]} ${['ceremonies', 'practices', 'crafts', 'medicine'][Math.floor(Math.random() * 4)]}`,
+                                    `The ${['process', 'art', 'practice', 'technique'][Math.floor(Math.random() * 4)]} of ${['creating', 'producing', 'forming', 'shaping'][Math.floor(Math.random() * 4)]} something through ${['careful', 'precise', 'deliberate', 'systematic'][Math.floor(Math.random() * 4)]} means`,
+                                    `A ${['medical', 'botanical', 'geological', 'astronomical'][Math.floor(Math.random() * 4)]} term for a ${['condition', 'phenomenon', 'formation', 'pattern'][Math.floor(Math.random() * 4)]} ${['characterized by', 'resulting from', 'associated with', 'marked by'][Math.floor(Math.random() * 4)]} ${['unusual', 'specific', 'distinct', 'particular'][Math.floor(Math.random() * 4)]} properties`,
+
+                                    // Verb templates
+                                    `To ${['carefully', 'deliberately', 'systematically', 'thoroughly'][Math.floor(Math.random() * 4)]} ${['arrange', 'organize', 'prepare', 'modify'][Math.floor(Math.random() * 4)]} something in a ${['specific', 'particular', 'prescribed', 'traditional'][Math.floor(Math.random() * 4)]} manner`,
+                                    `The act of ${['moving', 'transferring', 'converting', 'transforming'][Math.floor(Math.random() * 4)]} something from one ${['state', 'form', 'position', 'condition'][Math.floor(Math.random() * 4)]} to another`,
+
+                                    // Adjective templates
+                                    `Having the ${['quality', 'characteristic', 'property', 'nature'][Math.floor(Math.random() * 4)]} of being ${['exceptionally', 'particularly', 'remarkably', 'notably'][Math.floor(Math.random() * 4)]} ${['complex', 'simple', 'delicate', 'robust'][Math.floor(Math.random() * 4)]}`,
+                                    `${['Relating to', 'Pertaining to', 'Associated with', 'Connected with'][Math.floor(Math.random() * 4)]} ${['ancient', 'historical', 'traditional', 'cultural'][Math.floor(Math.random() * 4)]} ${['beliefs', 'practices', 'customs', 'traditions'][Math.floor(Math.random() * 4)]}`,
+
+                                    // Professional/occupation templates
+                                    `A person who ${['specializes in', 'practices', 'studies', 'engages in'][Math.floor(Math.random() * 4)]} the ${['art', 'science', 'craft', 'skill'][Math.floor(Math.random() * 4)]} of ${['creating', 'maintaining', 'analyzing', 'interpreting'][Math.floor(Math.random() * 4)]} ${['complex', 'intricate', 'detailed', 'specialized'][Math.floor(Math.random() * 4)]} ${['works', 'systems', 'structures', 'patterns'][Math.floor(Math.random() * 4)]}`,
+
+                                    // Archaic/historical templates
+                                    `An ${['archaic', 'obsolete', 'antiquated', 'historical'][Math.floor(Math.random() * 4)]} term ${['formerly', 'originally', 'traditionally', 'historically'][Math.floor(Math.random() * 4)]} used to ${['describe', 'denote', 'refer to', 'indicate'][Math.floor(Math.random() * 4)]} ${['persons', 'objects', 'practices', 'conditions'][Math.floor(Math.random() * 4)]} of ${['particular', 'special', 'significant', 'notable'][Math.floor(Math.random() * 4)]} importance`
                                 ];
-                                const randomDef = fakeDefinitions[Math.floor(Math.random() * fakeDefinitions.length)];
+
+                                const randomDef = definitionTemplates[Math.floor(Math.random() * definitionTemplates.length)];
 
                                 await database.ref(`games/${gameCode}/definitions/${botId}`).set({
                                     text: randomDef
@@ -749,10 +811,47 @@
                         if (!votes[botId]) {
                             setTimeout(async () => {
                                 // Get all available choices (other bots' definitions + real)
-                                const choices = [...Object.keys(definitions).filter(id => id !== botId), 'real'];
-                                const randomChoice = choices[Math.floor(Math.random() * choices.length)];
+                                const availableChoices = [
+                                    ...Object.entries(definitions).filter(([id]) => id !== botId).map(([id, def]) => ({
+                                        id,
+                                        text: def.text,
+                                        // Score based on length and complexity markers
+                                        score: def.text.length +
+                                               (def.text.includes('characterized by') ? 10 : 0) +
+                                               (def.text.includes('traditionally') ? 10 : 0) +
+                                               (def.text.includes('archaic') ? 10 : 0) +
+                                               (def.text.includes('obsolete') ? 10 : 0)
+                                    })),
+                                    {
+                                        id: 'real',
+                                        text: gameData.realDefinition || '',
+                                        score: (gameData.realDefinition || '').length +
+                                               ((gameData.realDefinition || '').includes('characterized by') ? 10 : 0) +
+                                               ((gameData.realDefinition || '').includes('traditionally') ? 10 : 0)
+                                    }
+                                ];
 
-                                await database.ref(`games/${gameCode}/votes/${botId}`).set(randomChoice);
+                                // 70% of the time, pick a weighted random choice (smarter)
+                                // 30% of the time, pick completely randomly (to add variety)
+                                let choice;
+                                if (Math.random() < 0.7) {
+                                    // Weighted selection - prefer definitions with higher scores
+                                    const totalScore = availableChoices.reduce((sum, c) => sum + c.score, 0);
+                                    let random = Math.random() * totalScore;
+                                    choice = availableChoices[0].id;
+                                    for (const c of availableChoices) {
+                                        random -= c.score;
+                                        if (random <= 0) {
+                                            choice = c.id;
+                                            break;
+                                        }
+                                    }
+                                } else {
+                                    // Random selection
+                                    choice = availableChoices[Math.floor(Math.random() * availableChoices.length)].id;
+                                }
+
+                                await database.ref(`games/${gameCode}/votes/${botId}`).set(choice);
                             }, Math.random() * 3000 + 1000); // 1-4 seconds
                         }
                     });
@@ -767,8 +866,19 @@
                 const players = gameData.players || {};
                 const isHost = gameData.host === playerId;
                 const playerCount = Object.keys(players).length;
+                const leavingPlayer = players[playerId];
 
-                // Remove the player from the game
+                // Store player info in leftPlayers for history
+                const leftPlayers = gameData.leftPlayers || {};
+                leftPlayers[playerId] = {
+                    name: leavingPlayer.name,
+                    score: leavingPlayer.score,
+                    avatar: leavingPlayer.avatar,
+                    leftAt: Date.now()
+                };
+
+                // Update game with left player info and remove from active players
+                await database.ref(`games/${gameCode}/leftPlayers`).set(leftPlayers);
                 await database.ref(`games/${gameCode}/players/${playerId}`).remove();
                 await database.ref(`games/${gameCode}/lastActivity`).set(Date.now());
 
@@ -1440,7 +1550,7 @@
                                             <span className="font-mono font-bold text-purple-900 text-xl">{gameCode}</span>
                                             <button onClick={copyGameCode} className="text-purple-600 hover:text-purple-800 text-sm">Copy</button>
                                         </div>
-                                        <div className="flex gap-2">
+                                        <div className="flex gap-2 flex-wrap">
                                             {isHost && gameData.state === 'setup' && Object.keys(players).length === 1 && (
                                                 <button onClick={addBotPlayers} className="px-3 py-1 bg-green-500 text-white rounded text-sm hover:bg-green-600">
                                                     🤖 Add Bots
@@ -1449,6 +1559,11 @@
                                             {isDictionaryHolder && gameData.state === 'setup' && (
                                                 <button onClick={restartRound} className="px-3 py-1 bg-orange-500 text-white rounded text-sm hover:bg-orange-600">
                                                     Restart Round
+                                                </button>
+                                            )}
+                                            {isHost && (
+                                                <button onClick={endGame} className="px-3 py-1 bg-purple-600 text-white rounded text-sm hover:bg-purple-700">
+                                                    End Game
                                                 </button>
                                             )}
                                             <button onClick={leaveGame} className="px-3 py-1 bg-red-500 text-white rounded text-sm hover:bg-red-600">
@@ -1520,7 +1635,18 @@
                                                 <button onClick={getRandomWord} disabled={loadingWord} className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700">
                                                     {loadingWord ? 'Loading...' : 'Random'}
                                                 </button>
+                                                {currentWord && (
+                                                    <button onClick={speakWord} className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600" title="Pronounce word">
+                                                        🔊
+                                                    </button>
+                                                )}
                                             </div>
+                                            {pronunciation && (
+                                                <p className="text-sm text-purple-600 mb-2">📢 Pronunciation: <span className="font-mono">{pronunciation}</span></p>
+                                            )}
+                                            {wordFact && (
+                                                <p className="text-sm text-blue-600 mb-2">💡 {wordFact}</p>
+                                            )}
                                             {currentWord && usedWords.includes(currentWord.toLowerCase().trim()) && (
                                                 <p className="text-sm text-orange-600 mb-2">⚠️ This word has been used before</p>
                                             )}
