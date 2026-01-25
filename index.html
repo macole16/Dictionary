@@ -955,14 +955,17 @@
                     const gamesRef = database.ref('games');
                     gamesRef.once('value', (snapshot) => {
                         const data = snapshot.val();
+                        console.log('Manage Games - Firebase data:', data);
                         if (data) {
                             const games = Object.entries(data).map(([code, gameData]) => ({
                                 code,
                                 ...gameData,
                                 playerCount: Object.keys(gameData.players || {}).length
                             }));
+                            console.log('Manage Games - Processed games:', games);
                             setMyCreatedGames(games);
                         } else {
+                            console.log('Manage Games - No data found');
                             setMyCreatedGames([]);
                         }
                     });
