@@ -737,10 +737,18 @@
             };
 
             const addBotPlayers = async () => {
-                const botNames = ['Alice', 'Bob', 'Charlie', 'Diana'];
-                const botAvatars = ['dog', 'bird', 'snake', 'scholar'];
+                const numBots = prompt('How many bots would you like to add? (1-8)', '4');
+                if (!numBots) return;
 
-                for (let i = 0; i < 4; i++) {
+                const count = Math.min(Math.max(parseInt(numBots) || 4, 1), 8);
+
+                const botNames = [
+                    'Shakespeare', 'Einstein', 'Cleopatra', 'Tesla',
+                    'Darwin', 'Curie', 'Napoleon', 'Socrates'
+                ];
+                const botAvatars = ['scholar', 'dog', 'bird', 'snake', 'cat', 'hat', 'car', 'tree'];
+
+                for (let i = 0; i < count; i++) {
                     const botId = `bot_${Date.now()}_${i}`;
                     await database.ref(`games/${gameCode}/players/${botId}`).set({
                         name: botNames[i],
@@ -749,6 +757,8 @@
                         avatar: botAvatars[i],
                         isBot: true
                     });
+                    // Small delay to ensure unique timestamps
+                    await new Promise(resolve => setTimeout(resolve, 10));
                 }
 
                 await database.ref(`games/${gameCode}/lastActivity`).set(Date.now());
