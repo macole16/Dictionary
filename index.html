@@ -951,28 +951,42 @@
             // Load created games for management
             useEffect(() => {
                 if (view === 'manage') {
-                    const currentPlayerId = localStorage.getItem('dictionaryGame_playerId');
+                    // Get list of created games from localStorage
+                    const createdGames = JSON.parse(localStorage.getItem('dictionaryGame_createdGames') || '[]');
 
-                    // Load all active games and filter for ones where current user is host
-                    const gamesRef = database.ref('games');
-                    gamesRef.once('value', (snapshot) => {
-                        const data = snapshot.val();
-                        const hostedGames = [];
+                    if (createdGames.length === 0) {
+                        setMyCreatedGames([]);
+                        return;
+                    }
 
-                        if (data) {
-                            Object.entries(data).forEach(([code, gameData]) => {
-                                // Check if current player is the host
-                                if (gameData.host === currentPlayerId) {
-                                    hostedGames.push({
-                                        code,
-                                        ...gameData,
-                                        playerCount: Object.keys(gameData.players || {}).length
-                                    });
-                                }
-                            });
+                    // Fetch each game from Firebase to get current state
+                    const gamePromises = createdGames.map(async (createdGame) => {
+                        const snapshot = await database.ref(`games/${createdGame.code}`).once('value');
+                        if (snapshot.exists()) {
+                            const gameData = snapshot.val();
+                            return {
+                                code: createdGame.code,
+                                createdAt: createdGame.createdAt,
+                                ...gameData,
+                                playerCount: Object.keys(gameData.players || {}).length,
+                                exists: true
+                            };
+                        } else {
+                            return { code: createdGame.code, exists: false };
+                        }
+                    });
+
+                    Promise.all(gamePromises).then(games => {
+                        const activeGames = games.filter(game => game.exists);
+                        const inactiveGameCodes = games.filter(game => !game.exists).map(game => game.code);
+
+                        // Clean up localStorage of inactive games
+                        if (inactiveGameCodes.length > 0) {
+                            const updatedCreatedGames = createdGames.filter(game => !inactiveGameCodes.includes(game.code));
+                            localStorage.setItem('dictionaryGame_createdGames', JSON.stringify(updatedCreatedGames));
                         }
 
-                        setMyCreatedGames(hostedGames);
+                        setMyCreatedGames(activeGames);
                     });
                 }
             }, [view]);
@@ -1299,6 +1313,27 @@
                             )}
 
                             <div className="mt-6 space-y-2">
+                                <button
+                                    onClick={() => {
+                                        const code = prompt('Enter game code to add to management:');
+                                        if (code && code.trim()) {
+                                            const createdGames = JSON.parse(localStorage.getItem('dictionaryGame_createdGames') || '[]');
+                                            const exists = createdGames.find(g => g.code === code.trim().toUpperCase());
+                                            if (!exists) {
+                                                createdGames.push({ code: code.trim().toUpperCase(), createdAt: Date.now() });
+                                                localStorage.setItem('dictionaryGame_createdGames', JSON.stringify(createdGames));
+                                                setView('home');
+                                                setTimeout(() => setView('manage'), 100);
+                                            } else {
+                                                alert('Game already in list');
+                                            }
+                                        }
+                                    }}
+                                    className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm"
+                                >
+                                    ➕ Add Game to List
+                                </button>
+
                                 <button onClick={() => setView('home')} className="w-full px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">
                                     Back to Home
                                 </button>
