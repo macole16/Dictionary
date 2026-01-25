@@ -4,11 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dictionary Game - Multiplayer</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>📚</text></svg>">
+
+    <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+    <!-- React -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+
+    <!-- Babel (Development only - for production, precompile JSX: https://babeljs.io/docs/setup/) -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- Tailwind CSS (Development only - for production, use PostCSS or CLI: https://tailwindcss.com/docs/installation) -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* 3D Card Effects */
@@ -99,6 +108,17 @@
             firebase.initializeApp(firebaseConfig);
         }
         const database = firebase.database();
+
+        /* Firebase Database Index Configuration:
+         * To improve performance, add this to your Firebase Database Rules:
+         * {
+         *   "rules": {
+         *     "gameHistory": {
+         *       ".indexOn": "endedAt"
+         *     }
+         *   }
+         * }
+         */
 
         // Logo Component - Open Dictionary Book
         const DictionaryLogo = ({ size = 64 }) => (
@@ -410,8 +430,8 @@
                 try {
                     let word = null;
 
-                    console.log('=== RANDOM WORD DEBUG ===');
-                    console.log('Difficulty:', difficulty);
+                    // console.log('=== RANDOM WORD DEBUG ===');
+                    // console.log('Difficulty:', difficulty);
 
                     if (difficulty === 'kids') {
                         const topics = ['animals', 'nature', 'school', 'food', 'sports', 'weather'];
@@ -448,7 +468,7 @@
                                 'habitat', 'mammal', 'reptile', 'migrate', 'gravity', 'energy'
                             ];
                             word = fallbackWords[Math.floor(Math.random() * fallbackWords.length)];
-                            console.log('Using fallback kid word');
+                            // console.log('Using fallback kid word');
                         }
                     } else if (difficulty === 'teen') {
                         const apiUrl = 'https://api.datamuse.com/words?sp=?????????*&md=f&max=200';
@@ -477,7 +497,7 @@
                                 'gregarious', 'haphazard', 'impetuous', 'juxtapose', 'loquacious', 'melancholy'
                             ];
                             word = fallbackWords[Math.floor(Math.random() * fallbackWords.length)];
-                            console.log('Using fallback teen word');
+                            // console.log('Using fallback teen word');
                         }
                     } else {
                         // For adults, use curated obscure words since APIs don't provide truly bizarre words
@@ -491,11 +511,11 @@
                             'donnybrook', 'fartlek', 'gardyloo', 'hobbledehoy', 'kerfuffle'
                         ];
                         word = obscureWords[Math.floor(Math.random() * obscureWords.length)];
-                        console.log('Using curated obscure word for adults');
+                        // console.log('Using curated obscure word for adults');
                     }
 
-                    console.log('Selected word:', word);
-                    console.log('======================');
+                    // console.log('Selected word:', word);
+                    // console.log('======================');
 
                     if (word) {
                         setCurrentWord(word);
@@ -521,7 +541,7 @@
                     let phonetic = '';
 
                     // Try API 1: Free Dictionary API
-                    console.log('Trying Free Dictionary API...');
+                    // console.log('Trying Free Dictionary API...');
                     try {
                         const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${currentWord.toLowerCase()}`);
 
@@ -530,7 +550,7 @@
                             if (data && data[0]) {
                                 if (data[0].meanings && data[0].meanings[0]) {
                                     definition = data[0].meanings[0].definitions[0].definition;
-                                    console.log('Found definition in Free Dictionary API');
+                                    // console.log('Found definition in Free Dictionary API');
                                 }
                                 // Get phonetic pronunciation
                                 if (data[0].phonetic) {
@@ -1070,17 +1090,17 @@
                     const gamesRef = database.ref('games');
                     gamesRef.once('value', (snapshot) => {
                         const data = snapshot.val();
-                        console.log('Manage Games - Firebase data:', data);
+                        // console.log('Manage Games - Firebase data:', data);
                         if (data) {
                             const games = Object.entries(data).map(([code, gameData]) => ({
                                 code,
                                 ...gameData,
                                 playerCount: Object.keys(gameData.players || {}).length
                             }));
-                            console.log('Manage Games - Processed games:', games);
+                            // console.log('Manage Games - Processed games:', games);
                             setMyCreatedGames(games);
                         } else {
-                            console.log('Manage Games - No data found');
+                            // console.log('Manage Games - No data found');
                             setMyCreatedGames([]);
                         }
                     });
