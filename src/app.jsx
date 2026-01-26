@@ -29,31 +29,73 @@
         // Logo Component - Open Dictionary Book
         const DictionaryLogo = ({ size = 64 }) => (
             <svg width={size} height={size} viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-                {/* Book pages */}
-                <path d="M30 50 L30 150 L95 160 L95 60 Z" fill="#f0f0f0" stroke="#8b5cf6" strokeWidth="3"/>
-                <path d="M170 50 L170 150 L105 160 L105 60 Z" fill="#f0f0f0" stroke="#8b5cf6" strokeWidth="3"/>
+                <defs>
+                    {/* Gradient for leather book cover */}
+                    <linearGradient id="bookCover" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style={{stopColor: "#7c3aed", stopOpacity: 1}} />
+                        <stop offset="50%" style={{stopColor: "#6d28d9", stopOpacity: 1}} />
+                        <stop offset="100%" style={{stopColor: "#5b21b6", stopOpacity: 1}} />
+                    </linearGradient>
+                    {/* Gradient for pages */}
+                    <linearGradient id="pageGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" style={{stopColor: "#fefefe", stopOpacity: 1}} />
+                        <stop offset="100%" style={{stopColor: "#f5f5f5", stopOpacity: 1}} />
+                    </linearGradient>
+                    {/* Shadow gradient */}
+                    <linearGradient id="shadowGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" style={{stopColor: "#000", stopOpacity: 0.3}} />
+                        <stop offset="100%" style={{stopColor: "#000", stopOpacity: 0}} />
+                    </linearGradient>
+                </defs>
 
-                {/* Book spine shadow */}
-                <path d="M95 60 L105 60 L105 160 L95 160 Z" fill="#c4b5fd"/>
+                {/* Shadow beneath book */}
+                <ellipse cx="100" cy="165" rx="70" ry="8" fill="url(#shadowGrad)" opacity="0.3"/>
 
-                {/* Left page text lines */}
-                <line x1="40" y1="75" x2="85" y2="75" stroke="#9333ea" strokeWidth="2"/>
-                <line x1="40" y1="85" x2="80" y2="85" stroke="#9333ea" strokeWidth="2"/>
-                <line x1="40" y1="95" x2="85" y2="95" stroke="#9333ea" strokeWidth="2"/>
-                <line x1="40" y1="105" x2="75" y2="105" stroke="#9333ea" strokeWidth="2"/>
+                {/* Book cover - back */}
+                <path d="M 35 40 L 35 155 Q 35 160 40 160 L 95 160 L 95 40 Z" fill="url(#bookCover)" stroke="#5b21b6" strokeWidth="1.5"/>
 
-                {/* Right page text lines */}
-                <line x1="115" y1="75" x2="160" y2="75" stroke="#9333ea" strokeWidth="2"/>
-                <line x1="115" y1="85" x2="155" y2="85" stroke="#9333ea" strokeWidth="2"/>
-                <line x1="115" y1="95" x2="160" y2="95" stroke="#9333ea" strokeWidth="2"/>
-                <line x1="115" y1="105" x2="150" y2="105" stroke="#9333ea" strokeWidth="2"/>
+                {/* Book pages on left side */}
+                <path d="M 38 43 L 38 156 L 92 156 L 92 43 Z" fill="url(#pageGradient)"/>
+                <path d="M 41 46 L 41 153 L 89 153 L 89 46 Z" fill="#ffffff"/>
 
-                {/* Decorative stars/sparkles */}
-                <path d="M50 130 L52 135 L57 135 L53 138 L55 143 L50 140 L45 143 L47 138 L43 135 L48 135 Z" fill="#fbbf24"/>
-                <path d="M150 130 L152 135 L157 135 L153 138 L155 143 L150 140 L145 143 L147 138 L143 135 L148 135 Z" fill="#fbbf24"/>
+                {/* Text on left page */}
+                <line x1="48" y1="60" x2="82" y2="60" stroke="#9333ea" strokeWidth="1.5" opacity="0.7"/>
+                <line x1="48" y1="70" x2="80" y2="70" stroke="#9333ea" strokeWidth="1.5" opacity="0.7"/>
+                <line x1="48" y1="80" x2="82" y2="80" stroke="#9333ea" strokeWidth="1.5" opacity="0.7"/>
+                <line x1="48" y1="90" x2="75" y2="90" stroke="#9333ea" strokeWidth="1.5" opacity="0.7"/>
+                <line x1="48" y1="100" x2="82" y2="100" stroke="#9333ea" strokeWidth="1.5" opacity="0.5"/>
+                <line x1="48" y1="110" x2="78" y2="110" stroke="#9333ea" strokeWidth="1.5" opacity="0.5"/>
 
-                {/* Book cover border */}
-                <rect x="28" y="48" width="144" height="4" fill="#8b5cf6" rx="2"/>
+                {/* Book spine */}
+                <path d="M 95 40 L 105 40 L 105 160 L 95 160 Z" fill="#5b21b6"/>
+                <rect x="97" y="70" width="6" height="60" fill="#7c3aed" opacity="0.5" rx="1"/>
+
+                {/* Book pages on right side */}
+                <path d="M 108 43 L 108 156 L 162 156 L 162 43 Z" fill="url(#pageGradient)"/>
+                <path d="M 111 46 L 111 153 L 159 153 L 159 46 Z" fill="#ffffff"/>
+
+                {/* Text on right page */}
+                <line x1="118" y1="60" x2="152" y2="60" stroke="#9333ea" strokeWidth="1.5" opacity="0.7"/>
+                <line x1="118" y1="70" x2="150" y2="70" stroke="#9333ea" strokeWidth="1.5" opacity="0.7"/>
+                <line x1="118" y1="80" x2="152" y2="80" stroke="#9333ea" strokeWidth="1.5" opacity="0.7"/>
+                <line x1="118" y1="90" x2="145" y2="90" stroke="#9333ea" strokeWidth="1.5" opacity="0.7"/>
+                <line x1="118" y1="100" x2="152" y2="100" stroke="#9333ea" strokeWidth="1.5" opacity="0.5"/>
+                <line x1="118" y1="110" x2="148" y2="110" stroke="#9333ea" strokeWidth="1.5" opacity="0.5"/>
+
+                {/* Book cover - front */}
+                <path d="M 105 40 L 165 40 Q 170 40 170 45 L 170 155 Q 170 160 165 160 L 105 160 Z" fill="url(#bookCover)" stroke="#5b21b6" strokeWidth="1.5"/>
+
+                {/* Decorative gold embossing on cover */}
+                <path d="M 120 55 L 155 55 L 155 58 L 120 58 Z" fill="#fbbf24" opacity="0.8"/>
+                <circle cx="137.5" cy="100" r="15" stroke="#fbbf24" strokeWidth="2" fill="none" opacity="0.6"/>
+                <path d="M 137.5 90 L 137.5 110 M 127.5 100 L 147.5 100" stroke="#fbbf24" strokeWidth="2" opacity="0.6"/>
+
+                {/* Book title embossing */}
+                <text x="137.5" y="135" fontSize="10" fontWeight="bold" fill="#fbbf24" opacity="0.8" textAnchor="middle" fontFamily="serif">DICT</text>
+
+                {/* Leather texture details */}
+                <path d="M 110 50 Q 115 48 120 50" stroke="#5b21b6" strokeWidth="0.5" opacity="0.3"/>
+                <path d="M 110 145 Q 115 143 120 145" stroke="#5b21b6" strokeWidth="0.5" opacity="0.3"/>
             </svg>
         );
 
