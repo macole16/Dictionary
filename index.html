@@ -83,6 +83,80 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
+
+        /* Mobile Optimizations */
+        @media (max-width: 768px) {
+            /* Ensure all interactive elements are at least 44px for touch targets */
+            button, a, input[type="button"], input[type="submit"] {
+                min-height: 44px;
+                min-width: 44px;
+            }
+
+            /* Responsive text sizing */
+            .text-3xl {
+                font-size: 1.75rem;
+            }
+
+            .text-2xl {
+                font-size: 1.5rem;
+            }
+
+            /* Adjust padding for mobile */
+            .p-8 {
+                padding: 1.5rem;
+            }
+
+            .px-6 {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+
+            /* Stack buttons vertically on small screens */
+            .flex-wrap {
+                flex-wrap: wrap;
+            }
+        }
+
+        /* Landscape orientation on mobile */
+        @media (max-width: 896px) and (orientation: landscape) {
+            .min-h-screen {
+                min-height: 100vh;
+            }
+
+            /* Reduce vertical padding in landscape */
+            .p-8 {
+                padding: 1rem;
+            }
+
+            /* Make cards scrollable if needed */
+            .overflow-y-auto {
+                max-height: 80vh;
+            }
+        }
+
+        /* Touch-friendly hover states */
+        @media (hover: none) and (pointer: coarse) {
+            .btn-3d:hover:not(:disabled) {
+                transform: perspective(500px) translateZ(0);
+            }
+
+            .card-3d:hover {
+                transform: perspective(1000px) rotateX(0deg) rotateY(0deg);
+            }
+        }
+
+        /* Prevent text selection on buttons for better mobile experience */
+        button {
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        /* Smooth scrolling for better mobile UX */
+        html {
+            scroll-behavior: smooth;
+        }
     </style>
 </head>
 <body>

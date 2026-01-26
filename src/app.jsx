@@ -159,36 +159,44 @@
             const [pronunciation, setPronunciation] = useState('');
             const [wordFact, setWordFact] = useState('');
             const [showPassDictionary, setShowPassDictionary] = useState(false);
+            const [activeGames, setActiveGames] = useState([]);
+            const [showReconnectModal, setShowReconnectModal] = useState(false);
 
-            // Try to restore session from localStorage
+            // Try to restore session - check for multiple active games
             useEffect(() => {
-                const savedGameCode = localStorage.getItem('dictionaryGame_code');
-                const savedPlayerId = localStorage.getItem('dictionaryGame_playerId');
                 const savedPlayerName = localStorage.getItem('dictionaryGame_playerName');
+                const savedGameHistory = JSON.parse(localStorage.getItem('dictionaryGame_history') || '[]');
 
-                if (savedGameCode && savedPlayerId && savedPlayerName) {
-                    // Check if the game still exists
-                    database.ref(`games/${savedGameCode}`).once('value', (snapshot) => {
-                        if (snapshot.exists()) {
-                            const game = snapshot.val();
-                            if (game.players && game.players[savedPlayerId]) {
-                                // Player exists in game, reconnect
-                                setGameCode(savedGameCode);
-                                setPlayerId(savedPlayerId);
-                                setPlayerName(savedPlayerName);
-                                setView('game');
-                                console.log('Reconnected to game:', savedGameCode);
-                            } else {
-                                // Player no longer in game, clear storage
-                                localStorage.removeItem('dictionaryGame_code');
-                                localStorage.removeItem('dictionaryGame_playerId');
-                                localStorage.removeItem('dictionaryGame_playerName');
+                if (savedGameHistory.length > 0) {
+                    // Check which games are still active
+                    const checkGames = savedGameHistory.map(({ code, playerId, joinedAt }) =>
+                        database.ref(`games/${code}`).once('value').then(snapshot => {
+                            if (snapshot.exists()) {
+                                const game = snapshot.val();
+                                if (game.players && game.players[playerId]) {
+                                    return {
+                                        code,
+                                        playerId,
+                                        playerName: game.players[playerId].name,
+                                        hostName: game.hostName,
+                                        state: game.state,
+                                        playerCount: Object.keys(game.players || {}).length,
+                                        joinedAt,
+                                        lastActivity: game.lastActivity
+                                    };
+                                }
                             }
-                        } else {
-                            // Game no longer exists, clear storage
-                            localStorage.removeItem('dictionaryGame_code');
-                            localStorage.removeItem('dictionaryGame_playerId');
-                            localStorage.removeItem('dictionaryGame_playerName');
+                            return null;
+                        })
+                    );
+
+                    Promise.all(checkGames).then(games => {
+                        const activeGames = games.filter(g => g !== null)
+                            .sort((a, b) => (b.lastActivity || b.joinedAt) - (a.lastActivity || a.joinedAt));
+
+                        if (activeGames.length > 0) {
+                            setActiveGames(activeGames);
+                            setShowReconnectModal(true);
                         }
                     });
                 }
@@ -237,6 +245,11 @@
                 localStorage.setItem('dictionaryGame_code', code);
                 localStorage.setItem('dictionaryGame_playerId', newPlayerId);
                 localStorage.setItem('dictionaryGame_playerName', playerName);
+
+                // Add to game history
+                const gameHistory = JSON.parse(localStorage.getItem('dictionaryGame_history') || '[]');
+                gameHistory.push({ code, playerId: newPlayerId, joinedAt: Date.now() });
+                localStorage.setItem('dictionaryGame_history', JSON.stringify(gameHistory));
 
                 // Add to created games list
                 const createdGames = JSON.parse(localStorage.getItem('dictionaryGame_createdGames') || '[]');
@@ -291,6 +304,11 @@
                 localStorage.setItem('dictionaryGame_code', code);
                 localStorage.setItem('dictionaryGame_playerId', newPlayerId);
                 localStorage.setItem('dictionaryGame_playerName', inputPlayerName);
+
+                // Add to game history
+                const gameHistory = JSON.parse(localStorage.getItem('dictionaryGame_history') || '[]');
+                gameHistory.push({ code, playerId: newPlayerId, joinedAt: Date.now() });
+                localStorage.setItem('dictionaryGame_history', JSON.stringify(gameHistory));
 
                 setGameCode(code);
                 setPlayerId(newPlayerId);
@@ -809,6 +827,12 @@
                 alert('Game code copied!');
             };
 
+            const [showQRCode, setShowQRCode] = useState(false);
+
+            const shareGameCode = () => {
+                setShowQRCode(!showQRCode);
+            };
+
             const addBotPlayers = async () => {
                 const numBots = prompt('How many bots would you like to add? (1-8)', '4');
                 if (!numBots) return;
@@ -1183,6 +1207,53 @@
             if (view === 'home') {
                 return (
                     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 flex items-center justify-center p-4">
+                        {/* Reconnect Modal */}
+                        {showReconnectModal && activeGames.length > 0 && (
+                            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+                                <div className="bg-white rounded-lg shadow-2xl p-6 max-w-lg w-full card-3d">
+                                    <h2 className="text-2xl font-bold text-purple-900 mb-4">Welcome Back!</h2>
+                                    <p className="text-gray-600 mb-4">You have {activeGames.length} active game{activeGames.length > 1 ? 's' : ''}. Would you like to rejoin?</p>
+
+                                    <div className="space-y-3 mb-4 max-h-96 overflow-y-auto">
+                                        {activeGames.map((game, idx) => (
+                                            <button
+                                                key={game.code}
+                                                onClick={() => {
+                                                    setGameCode(game.code);
+                                                    setPlayerId(game.playerId);
+                                                    setPlayerName(game.playerName);
+                                                    setView('game');
+                                                    setShowReconnectModal(false);
+                                                }}
+                                                className={`w-full text-left p-4 rounded-lg border-2 transition-all btn-3d ${
+                                                    idx === 0
+                                                        ? 'border-purple-500 bg-purple-50'
+                                                        : 'border-gray-200 hover:border-purple-300'
+                                                }`}
+                                            >
+                                                <div className="flex justify-between items-start mb-2">
+                                                    <div>
+                                                        <span className="font-mono font-bold text-lg text-purple-900">{game.code}</span>
+                                                        {idx === 0 && <span className="ml-2 text-xs bg-green-500 text-white px-2 py-1 rounded">Most Recent</span>}
+                                                    </div>
+                                                    <span className="text-sm text-gray-500">{game.playerCount} players</span>
+                                                </div>
+                                                <p className="text-sm text-gray-600">Host: {game.hostName}</p>
+                                                <p className="text-xs text-purple-600 mt-1">State: {game.state}</p>
+                                            </button>
+                                        ))}
+                                    </div>
+
+                                    <button
+                                        onClick={() => setShowReconnectModal(false)}
+                                        className="w-full px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 btn-3d"
+                                    >
+                                        Start New Game Instead
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
                         <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full card-3d">
                             <div className="text-center mb-8">
                                 <div className="flex justify-center mb-4 float-animation">
@@ -1664,8 +1735,19 @@
                                     <div className="text-right">
                                         <div className="flex items-center gap-2 bg-purple-100 px-4 py-2 rounded-lg mb-2">
                                             <span className="font-mono font-bold text-purple-900 text-xl">{gameCode}</span>
-                                            <button onClick={copyGameCode} className="text-purple-600 hover:text-purple-800 text-sm">Copy</button>
+                                            <button onClick={copyGameCode} className="text-purple-600 hover:text-purple-800 text-sm font-semibold btn-3d px-2 py-1">📋 Copy</button>
+                                            <button onClick={shareGameCode} className="text-purple-600 hover:text-purple-800 text-sm font-semibold btn-3d px-2 py-1">🔗 QR</button>
                                         </div>
+                                        {showQRCode && (
+                                            <div className="mb-2 p-3 bg-white rounded-lg shadow-lg depth-layer-3">
+                                                <img
+                                                    src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(window.location.origin + '?join=' + gameCode)}`}
+                                                    alt="QR Code"
+                                                    className="mx-auto"
+                                                />
+                                                <p className="text-xs text-gray-600 mt-2 text-center">Scan to join game</p>
+                                            </div>
+                                        )}
                                         <div className="flex gap-2 flex-wrap justify-end">
                                             {isHost && gameData.state === 'setup' && (
                                                 <button onClick={addBotPlayers} className="px-3 py-1 bg-green-500 text-white rounded text-sm hover:bg-green-600 btn-3d">
@@ -1897,10 +1979,24 @@
                                                 .sort(() => Math.random() - 0.5)
                                                 .map(([id, def]) => {
                                                     const voted = myVote === id;
+                                                    const player = id === 'real' ? null : players[id];
+                                                    const avatar = player ? avatarOptions.find(a => a.id === player.avatar) : null;
                                                     return (
-                                                        <button key={id} onClick={() => castVote(id)} className={`w-full text-left p-4 rounded-lg border-2 ${voted ? 'border-green-500 bg-green-50' : 'border-gray-200 hover:border-purple-300'}`}>
-                                                            {def.text}
-                                                            {voted && <span className="ml-2 text-green-600 font-semibold">✓</span>}
+                                                        <button key={id} onClick={() => castVote(id)} className={`w-full text-left p-4 rounded-lg border-2 transition-all ${voted ? 'border-green-500 bg-green-50' : 'border-gray-200 hover:border-purple-300 hover:shadow-md'} btn-3d`}>
+                                                            <div className="flex items-start gap-3">
+                                                                {id === 'real' ? (
+                                                                    <span className="text-3xl flex-shrink-0">📖</span>
+                                                                ) : (
+                                                                    <span className="text-3xl flex-shrink-0">{avatar?.emoji || '👤'}</span>
+                                                                )}
+                                                                <div className="flex-1">
+                                                                    {id !== 'real' && player && (
+                                                                        <p className="text-xs text-gray-500 mb-1 font-semibold">{player.name}</p>
+                                                                    )}
+                                                                    <p className="text-gray-800">{def.text}</p>
+                                                                </div>
+                                                                {voted && <span className="ml-2 text-green-600 font-semibold text-xl flex-shrink-0">✓</span>}
+                                                            </div>
                                                         </button>
                                                     );
                                                 })}
@@ -1926,22 +2022,64 @@
                                 <div className="bg-white rounded-lg shadow-lg p-6 mb-4">
                                     <h2 className="text-xl font-semibold mb-4">Round Results</h2>
 
-                                    <div className="mb-6 p-4 bg-green-50 rounded-lg">
-                                        <h3 className="font-semibold text-green-900 mb-2">Real Definition:</h3>
-                                        <p className="text-gray-800">{gameData.realDefinition}</p>
-                                        <p className="text-sm text-green-700 mt-2">Votes: {gameData.voteCounts?.real || 0}</p>
+                                    <div className="mb-6 p-4 bg-green-50 rounded-lg depth-layer-2">
+                                        <div className="flex items-start gap-3 mb-3">
+                                            <span className="text-3xl">📖</span>
+                                            <div className="flex-1">
+                                                <h3 className="font-semibold text-green-900 mb-2">Real Definition:</h3>
+                                                <p className="text-gray-800">{gameData.realDefinition}</p>
+                                            </div>
+                                        </div>
+                                        {(() => {
+                                            const totalVotes = Object.values(gameData.voteCounts || {}).reduce((a, b) => a + b, 0) || 1;
+                                            const voteCount = gameData.voteCounts?.real || 0;
+                                            const percentage = (voteCount / totalVotes * 100).toFixed(0);
+                                            return (
+                                                <div className="mt-3">
+                                                    <div className="flex justify-between text-sm text-green-700 mb-1">
+                                                        <span>Votes: {voteCount}</span>
+                                                        <span>{percentage}%</span>
+                                                    </div>
+                                                    <div className="w-full bg-green-200 rounded-full h-3 overflow-hidden">
+                                                        <div
+                                                            className="bg-green-600 h-full rounded-full transition-all duration-1000 ease-out"
+                                                            style={{width: `${percentage}%`}}
+                                                        ></div>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })()}
                                     </div>
 
                                     <div className="space-y-3 mb-6">
                                         <h3 className="font-semibold">Player Definitions:</h3>
                                         {Object.entries(definitions).map(([defId, def]) => {
                                             const playerInfo = players[defId];
+                                            const avatar = playerInfo ? avatarOptions.find(a => a.id === playerInfo.avatar) : null;
                                             const voteCount = gameData.voteCounts?.[defId] || 0;
+                                            const totalVotes = Object.values(gameData.voteCounts || {}).reduce((a, b) => a + b, 0) || 1;
+                                            const percentage = (voteCount / totalVotes * 100).toFixed(0);
                                             return (
-                                                <div key={defId} className="p-4 bg-purple-50 rounded-lg">
-                                                    <p className="font-semibold text-purple-900">{playerInfo?.name}:</p>
-                                                    <p className="text-gray-800 mt-1">{def.text}</p>
-                                                    <p className="text-sm text-purple-700 mt-2">Votes: {voteCount}</p>
+                                                <div key={defId} className="p-4 bg-purple-50 rounded-lg depth-layer-2">
+                                                    <div className="flex items-start gap-3 mb-2">
+                                                        <span className="text-3xl">{avatar?.emoji || '👤'}</span>
+                                                        <div className="flex-1">
+                                                            <p className="font-semibold text-purple-900">{playerInfo?.name}:</p>
+                                                            <p className="text-gray-800 mt-1">{def.text}</p>
+                                                        </div>
+                                                    </div>
+                                                    <div className="mt-3">
+                                                        <div className="flex justify-between text-sm text-purple-700 mb-1">
+                                                            <span>Votes: {voteCount}</span>
+                                                            <span>{percentage}%</span>
+                                                        </div>
+                                                        <div className="w-full bg-purple-200 rounded-full h-3 overflow-hidden">
+                                                            <div
+                                                                className="bg-purple-600 h-full rounded-full transition-all duration-1000 ease-out"
+                                                                style={{width: `${percentage}%`}}
+                                                            ></div>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             );
                                         })}

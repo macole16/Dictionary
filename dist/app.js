@@ -36,88 +36,238 @@ const DictionaryLogo = ({
   viewBox: "0 0 200 200",
   fill: "none",
   xmlns: "http://www.w3.org/2000/svg"
-}, /*#__PURE__*/React.createElement("path", {
-  d: "M30 50 L30 150 L95 160 L95 60 Z",
-  fill: "#f0f0f0",
-  stroke: "#8b5cf6",
-  strokeWidth: "3"
+}, /*#__PURE__*/React.createElement("defs", null, /*#__PURE__*/React.createElement("linearGradient", {
+  id: "bookCover",
+  x1: "0%",
+  y1: "0%",
+  x2: "100%",
+  y2: "100%"
+}, /*#__PURE__*/React.createElement("stop", {
+  offset: "0%",
+  style: {
+    stopColor: "#7c3aed",
+    stopOpacity: 1
+  }
+}), /*#__PURE__*/React.createElement("stop", {
+  offset: "50%",
+  style: {
+    stopColor: "#6d28d9",
+    stopOpacity: 1
+  }
+}), /*#__PURE__*/React.createElement("stop", {
+  offset: "100%",
+  style: {
+    stopColor: "#5b21b6",
+    stopOpacity: 1
+  }
+})), /*#__PURE__*/React.createElement("linearGradient", {
+  id: "pageGradient",
+  x1: "0%",
+  y1: "0%",
+  x2: "100%",
+  y2: "0%"
+}, /*#__PURE__*/React.createElement("stop", {
+  offset: "0%",
+  style: {
+    stopColor: "#fefefe",
+    stopOpacity: 1
+  }
+}), /*#__PURE__*/React.createElement("stop", {
+  offset: "100%",
+  style: {
+    stopColor: "#f5f5f5",
+    stopOpacity: 1
+  }
+})), /*#__PURE__*/React.createElement("linearGradient", {
+  id: "shadowGrad",
+  x1: "0%",
+  y1: "0%",
+  x2: "0%",
+  y2: "100%"
+}, /*#__PURE__*/React.createElement("stop", {
+  offset: "0%",
+  style: {
+    stopColor: "#000",
+    stopOpacity: 0.3
+  }
+}), /*#__PURE__*/React.createElement("stop", {
+  offset: "100%",
+  style: {
+    stopColor: "#000",
+    stopOpacity: 0
+  }
+}))), /*#__PURE__*/React.createElement("ellipse", {
+  cx: "100",
+  cy: "165",
+  rx: "70",
+  ry: "8",
+  fill: "url(#shadowGrad)",
+  opacity: "0.3"
 }), /*#__PURE__*/React.createElement("path", {
-  d: "M170 50 L170 150 L105 160 L105 60 Z",
-  fill: "#f0f0f0",
-  stroke: "#8b5cf6",
-  strokeWidth: "3"
+  d: "M 35 40 L 35 155 Q 35 160 40 160 L 95 160 L 95 40 Z",
+  fill: "url(#bookCover)",
+  stroke: "#5b21b6",
+  strokeWidth: "1.5"
 }), /*#__PURE__*/React.createElement("path", {
-  d: "M95 60 L105 60 L105 160 L95 160 Z",
-  fill: "#c4b5fd"
+  d: "M 38 43 L 38 156 L 92 156 L 92 43 Z",
+  fill: "url(#pageGradient)"
+}), /*#__PURE__*/React.createElement("path", {
+  d: "M 41 46 L 41 153 L 89 153 L 89 46 Z",
+  fill: "#ffffff"
 }), /*#__PURE__*/React.createElement("line", {
-  x1: "40",
-  y1: "75",
-  x2: "85",
-  y2: "75",
+  x1: "48",
+  y1: "60",
+  x2: "82",
+  y2: "60",
   stroke: "#9333ea",
-  strokeWidth: "2"
+  strokeWidth: "1.5",
+  opacity: "0.7"
 }), /*#__PURE__*/React.createElement("line", {
-  x1: "40",
-  y1: "85",
+  x1: "48",
+  y1: "70",
   x2: "80",
-  y2: "85",
+  y2: "70",
   stroke: "#9333ea",
-  strokeWidth: "2"
+  strokeWidth: "1.5",
+  opacity: "0.7"
 }), /*#__PURE__*/React.createElement("line", {
-  x1: "40",
-  y1: "95",
-  x2: "85",
-  y2: "95",
+  x1: "48",
+  y1: "80",
+  x2: "82",
+  y2: "80",
   stroke: "#9333ea",
-  strokeWidth: "2"
+  strokeWidth: "1.5",
+  opacity: "0.7"
 }), /*#__PURE__*/React.createElement("line", {
-  x1: "40",
-  y1: "105",
+  x1: "48",
+  y1: "90",
   x2: "75",
-  y2: "105",
+  y2: "90",
   stroke: "#9333ea",
-  strokeWidth: "2"
+  strokeWidth: "1.5",
+  opacity: "0.7"
 }), /*#__PURE__*/React.createElement("line", {
-  x1: "115",
-  y1: "75",
-  x2: "160",
-  y2: "75",
+  x1: "48",
+  y1: "100",
+  x2: "82",
+  y2: "100",
   stroke: "#9333ea",
-  strokeWidth: "2"
+  strokeWidth: "1.5",
+  opacity: "0.5"
 }), /*#__PURE__*/React.createElement("line", {
-  x1: "115",
-  y1: "85",
-  x2: "155",
-  y2: "85",
+  x1: "48",
+  y1: "110",
+  x2: "78",
+  y2: "110",
   stroke: "#9333ea",
-  strokeWidth: "2"
-}), /*#__PURE__*/React.createElement("line", {
-  x1: "115",
-  y1: "95",
-  x2: "160",
-  y2: "95",
-  stroke: "#9333ea",
-  strokeWidth: "2"
-}), /*#__PURE__*/React.createElement("line", {
-  x1: "115",
-  y1: "105",
-  x2: "150",
-  y2: "105",
-  stroke: "#9333ea",
-  strokeWidth: "2"
+  strokeWidth: "1.5",
+  opacity: "0.5"
 }), /*#__PURE__*/React.createElement("path", {
-  d: "M50 130 L52 135 L57 135 L53 138 L55 143 L50 140 L45 143 L47 138 L43 135 L48 135 Z",
-  fill: "#fbbf24"
-}), /*#__PURE__*/React.createElement("path", {
-  d: "M150 130 L152 135 L157 135 L153 138 L155 143 L150 140 L145 143 L147 138 L143 135 L148 135 Z",
-  fill: "#fbbf24"
+  d: "M 95 40 L 105 40 L 105 160 L 95 160 Z",
+  fill: "#5b21b6"
 }), /*#__PURE__*/React.createElement("rect", {
-  x: "28",
-  y: "48",
-  width: "144",
-  height: "4",
-  fill: "#8b5cf6",
-  rx: "2"
+  x: "97",
+  y: "70",
+  width: "6",
+  height: "60",
+  fill: "#7c3aed",
+  opacity: "0.5",
+  rx: "1"
+}), /*#__PURE__*/React.createElement("path", {
+  d: "M 108 43 L 108 156 L 162 156 L 162 43 Z",
+  fill: "url(#pageGradient)"
+}), /*#__PURE__*/React.createElement("path", {
+  d: "M 111 46 L 111 153 L 159 153 L 159 46 Z",
+  fill: "#ffffff"
+}), /*#__PURE__*/React.createElement("line", {
+  x1: "118",
+  y1: "60",
+  x2: "152",
+  y2: "60",
+  stroke: "#9333ea",
+  strokeWidth: "1.5",
+  opacity: "0.7"
+}), /*#__PURE__*/React.createElement("line", {
+  x1: "118",
+  y1: "70",
+  x2: "150",
+  y2: "70",
+  stroke: "#9333ea",
+  strokeWidth: "1.5",
+  opacity: "0.7"
+}), /*#__PURE__*/React.createElement("line", {
+  x1: "118",
+  y1: "80",
+  x2: "152",
+  y2: "80",
+  stroke: "#9333ea",
+  strokeWidth: "1.5",
+  opacity: "0.7"
+}), /*#__PURE__*/React.createElement("line", {
+  x1: "118",
+  y1: "90",
+  x2: "145",
+  y2: "90",
+  stroke: "#9333ea",
+  strokeWidth: "1.5",
+  opacity: "0.7"
+}), /*#__PURE__*/React.createElement("line", {
+  x1: "118",
+  y1: "100",
+  x2: "152",
+  y2: "100",
+  stroke: "#9333ea",
+  strokeWidth: "1.5",
+  opacity: "0.5"
+}), /*#__PURE__*/React.createElement("line", {
+  x1: "118",
+  y1: "110",
+  x2: "148",
+  y2: "110",
+  stroke: "#9333ea",
+  strokeWidth: "1.5",
+  opacity: "0.5"
+}), /*#__PURE__*/React.createElement("path", {
+  d: "M 105 40 L 165 40 Q 170 40 170 45 L 170 155 Q 170 160 165 160 L 105 160 Z",
+  fill: "url(#bookCover)",
+  stroke: "#5b21b6",
+  strokeWidth: "1.5"
+}), /*#__PURE__*/React.createElement("path", {
+  d: "M 120 55 L 155 55 L 155 58 L 120 58 Z",
+  fill: "#fbbf24",
+  opacity: "0.8"
+}), /*#__PURE__*/React.createElement("circle", {
+  cx: "137.5",
+  cy: "100",
+  r: "15",
+  stroke: "#fbbf24",
+  strokeWidth: "2",
+  fill: "none",
+  opacity: "0.6"
+}), /*#__PURE__*/React.createElement("path", {
+  d: "M 137.5 90 L 137.5 110 M 127.5 100 L 147.5 100",
+  stroke: "#fbbf24",
+  strokeWidth: "2",
+  opacity: "0.6"
+}), /*#__PURE__*/React.createElement("text", {
+  x: "137.5",
+  y: "135",
+  fontSize: "10",
+  fontWeight: "bold",
+  fill: "#fbbf24",
+  opacity: "0.8",
+  textAnchor: "middle",
+  fontFamily: "serif"
+}, "DICT"), /*#__PURE__*/React.createElement("path", {
+  d: "M 110 50 Q 115 48 120 50",
+  stroke: "#5b21b6",
+  strokeWidth: "0.5",
+  opacity: "0.3"
+}), /*#__PURE__*/React.createElement("path", {
+  d: "M 110 145 Q 115 143 120 145",
+  stroke: "#5b21b6",
+  strokeWidth: "0.5",
+  opacity: "0.3"
 }));
 
 // Avatar options with emojis
@@ -268,35 +418,42 @@ function MultiplayerDictionaryGame() {
   const [pronunciation, setPronunciation] = useState('');
   const [wordFact, setWordFact] = useState('');
   const [showPassDictionary, setShowPassDictionary] = useState(false);
+  const [activeGames, setActiveGames] = useState([]);
+  const [showReconnectModal, setShowReconnectModal] = useState(false);
 
-  // Try to restore session from localStorage
+  // Try to restore session - check for multiple active games
   useEffect(() => {
-    const savedGameCode = localStorage.getItem('dictionaryGame_code');
-    const savedPlayerId = localStorage.getItem('dictionaryGame_playerId');
     const savedPlayerName = localStorage.getItem('dictionaryGame_playerName');
-    if (savedGameCode && savedPlayerId && savedPlayerName) {
-      // Check if the game still exists
-      database.ref(`games/${savedGameCode}`).once('value', snapshot => {
+    const savedGameHistory = JSON.parse(localStorage.getItem('dictionaryGame_history') || '[]');
+    if (savedGameHistory.length > 0) {
+      // Check which games are still active
+      const checkGames = savedGameHistory.map(({
+        code,
+        playerId,
+        joinedAt
+      }) => database.ref(`games/${code}`).once('value').then(snapshot => {
         if (snapshot.exists()) {
           const game = snapshot.val();
-          if (game.players && game.players[savedPlayerId]) {
-            // Player exists in game, reconnect
-            setGameCode(savedGameCode);
-            setPlayerId(savedPlayerId);
-            setPlayerName(savedPlayerName);
-            setView('game');
-            console.log('Reconnected to game:', savedGameCode);
-          } else {
-            // Player no longer in game, clear storage
-            localStorage.removeItem('dictionaryGame_code');
-            localStorage.removeItem('dictionaryGame_playerId');
-            localStorage.removeItem('dictionaryGame_playerName');
+          if (game.players && game.players[playerId]) {
+            return {
+              code,
+              playerId,
+              playerName: game.players[playerId].name,
+              hostName: game.hostName,
+              state: game.state,
+              playerCount: Object.keys(game.players || {}).length,
+              joinedAt,
+              lastActivity: game.lastActivity
+            };
           }
-        } else {
-          // Game no longer exists, clear storage
-          localStorage.removeItem('dictionaryGame_code');
-          localStorage.removeItem('dictionaryGame_playerId');
-          localStorage.removeItem('dictionaryGame_playerName');
+        }
+        return null;
+      }));
+      Promise.all(checkGames).then(games => {
+        const activeGames = games.filter(g => g !== null).sort((a, b) => (b.lastActivity || b.joinedAt) - (a.lastActivity || a.joinedAt));
+        if (activeGames.length > 0) {
+          setActiveGames(activeGames);
+          setShowReconnectModal(true);
         }
       });
     }
@@ -341,6 +498,15 @@ function MultiplayerDictionaryGame() {
     localStorage.setItem('dictionaryGame_code', code);
     localStorage.setItem('dictionaryGame_playerId', newPlayerId);
     localStorage.setItem('dictionaryGame_playerName', playerName);
+
+    // Add to game history
+    const gameHistory = JSON.parse(localStorage.getItem('dictionaryGame_history') || '[]');
+    gameHistory.push({
+      code,
+      playerId: newPlayerId,
+      joinedAt: Date.now()
+    });
+    localStorage.setItem('dictionaryGame_history', JSON.stringify(gameHistory));
 
     // Add to created games list
     const createdGames = JSON.parse(localStorage.getItem('dictionaryGame_createdGames') || '[]');
@@ -388,6 +554,15 @@ function MultiplayerDictionaryGame() {
     localStorage.setItem('dictionaryGame_code', code);
     localStorage.setItem('dictionaryGame_playerId', newPlayerId);
     localStorage.setItem('dictionaryGame_playerName', inputPlayerName);
+
+    // Add to game history
+    const gameHistory = JSON.parse(localStorage.getItem('dictionaryGame_history') || '[]');
+    gameHistory.push({
+      code,
+      playerId: newPlayerId,
+      joinedAt: Date.now()
+    });
+    localStorage.setItem('dictionaryGame_history', JSON.stringify(gameHistory));
     setGameCode(code);
     setPlayerId(newPlayerId);
     setPlayerName(inputPlayerName);
@@ -829,6 +1004,10 @@ function MultiplayerDictionaryGame() {
     navigator.clipboard.writeText(gameCode);
     alert('Game code copied!');
   };
+  const [showQRCode, setShowQRCode] = useState(false);
+  const shareGameCode = () => {
+    setShowQRCode(!showQRCode);
+  };
   const addBotPlayers = async () => {
     const numBots = prompt('How many bots would you like to add? (1-8)', '4');
     if (!numBots) return;
@@ -1155,7 +1334,42 @@ function MultiplayerDictionaryGame() {
   if (view === 'home') {
     return /*#__PURE__*/React.createElement("div", {
       className: "min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 flex items-center justify-center p-4"
+    }, showReconnectModal && activeGames.length > 0 && /*#__PURE__*/React.createElement("div", {
+      className: "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
     }, /*#__PURE__*/React.createElement("div", {
+      className: "bg-white rounded-lg shadow-2xl p-6 max-w-lg w-full card-3d"
+    }, /*#__PURE__*/React.createElement("h2", {
+      className: "text-2xl font-bold text-purple-900 mb-4"
+    }, "Welcome Back!"), /*#__PURE__*/React.createElement("p", {
+      className: "text-gray-600 mb-4"
+    }, "You have ", activeGames.length, " active game", activeGames.length > 1 ? 's' : '', ". Would you like to rejoin?"), /*#__PURE__*/React.createElement("div", {
+      className: "space-y-3 mb-4 max-h-96 overflow-y-auto"
+    }, activeGames.map((game, idx) => /*#__PURE__*/React.createElement("button", {
+      key: game.code,
+      onClick: () => {
+        setGameCode(game.code);
+        setPlayerId(game.playerId);
+        setPlayerName(game.playerName);
+        setView('game');
+        setShowReconnectModal(false);
+      },
+      className: `w-full text-left p-4 rounded-lg border-2 transition-all btn-3d ${idx === 0 ? 'border-purple-500 bg-purple-50' : 'border-gray-200 hover:border-purple-300'}`
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "flex justify-between items-start mb-2"
+    }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("span", {
+      className: "font-mono font-bold text-lg text-purple-900"
+    }, game.code), idx === 0 && /*#__PURE__*/React.createElement("span", {
+      className: "ml-2 text-xs bg-green-500 text-white px-2 py-1 rounded"
+    }, "Most Recent")), /*#__PURE__*/React.createElement("span", {
+      className: "text-sm text-gray-500"
+    }, game.playerCount, " players")), /*#__PURE__*/React.createElement("p", {
+      className: "text-sm text-gray-600"
+    }, "Host: ", game.hostName), /*#__PURE__*/React.createElement("p", {
+      className: "text-xs text-purple-600 mt-1"
+    }, "State: ", game.state)))), /*#__PURE__*/React.createElement("button", {
+      onClick: () => setShowReconnectModal(false),
+      className: "w-full px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 btn-3d"
+    }, "Start New Game Instead"))), /*#__PURE__*/React.createElement("div", {
       className: "bg-white rounded-lg shadow-xl p-8 max-w-md w-full card-3d"
     }, /*#__PURE__*/React.createElement("div", {
       className: "text-center mb-8"
@@ -1568,8 +1782,19 @@ function MultiplayerDictionaryGame() {
       className: "font-mono font-bold text-purple-900 text-xl"
     }, gameCode), /*#__PURE__*/React.createElement("button", {
       onClick: copyGameCode,
-      className: "text-purple-600 hover:text-purple-800 text-sm"
-    }, "Copy")), /*#__PURE__*/React.createElement("div", {
+      className: "text-purple-600 hover:text-purple-800 text-sm font-semibold btn-3d px-2 py-1"
+    }, "\uD83D\uDCCB Copy"), /*#__PURE__*/React.createElement("button", {
+      onClick: shareGameCode,
+      className: "text-purple-600 hover:text-purple-800 text-sm font-semibold btn-3d px-2 py-1"
+    }, "\uD83D\uDD17 QR")), showQRCode && /*#__PURE__*/React.createElement("div", {
+      className: "mb-2 p-3 bg-white rounded-lg shadow-lg depth-layer-3"
+    }, /*#__PURE__*/React.createElement("img", {
+      src: `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(window.location.origin + '?join=' + gameCode)}`,
+      alt: "QR Code",
+      className: "mx-auto"
+    }), /*#__PURE__*/React.createElement("p", {
+      className: "text-xs text-gray-600 mt-2 text-center"
+    }, "Scan to join game")), /*#__PURE__*/React.createElement("div", {
       className: "flex gap-2 flex-wrap justify-end"
     }, isHost && gameData.state === 'setup' && /*#__PURE__*/React.createElement("button", {
       onClick: addBotPlayers,
@@ -1776,13 +2001,27 @@ function MultiplayerDictionaryGame() {
       text: gameData.realDefinition
     }]].sort(() => Math.random() - 0.5).map(([id, def]) => {
       const voted = myVote === id;
+      const player = id === 'real' ? null : players[id];
+      const avatar = player ? avatarOptions.find(a => a.id === player.avatar) : null;
       return /*#__PURE__*/React.createElement("button", {
         key: id,
         onClick: () => castVote(id),
-        className: `w-full text-left p-4 rounded-lg border-2 ${voted ? 'border-green-500 bg-green-50' : 'border-gray-200 hover:border-purple-300'}`
-      }, def.text, voted && /*#__PURE__*/React.createElement("span", {
-        className: "ml-2 text-green-600 font-semibold"
-      }, "\u2713"));
+        className: `w-full text-left p-4 rounded-lg border-2 transition-all ${voted ? 'border-green-500 bg-green-50' : 'border-gray-200 hover:border-purple-300 hover:shadow-md'} btn-3d`
+      }, /*#__PURE__*/React.createElement("div", {
+        className: "flex items-start gap-3"
+      }, id === 'real' ? /*#__PURE__*/React.createElement("span", {
+        className: "text-3xl flex-shrink-0"
+      }, "\uD83D\uDCD6") : /*#__PURE__*/React.createElement("span", {
+        className: "text-3xl flex-shrink-0"
+      }, avatar?.emoji || '👤'), /*#__PURE__*/React.createElement("div", {
+        className: "flex-1"
+      }, id !== 'real' && player && /*#__PURE__*/React.createElement("p", {
+        className: "text-xs text-gray-500 mb-1 font-semibold"
+      }, player.name), /*#__PURE__*/React.createElement("p", {
+        className: "text-gray-800"
+      }, def.text)), voted && /*#__PURE__*/React.createElement("span", {
+        className: "ml-2 text-green-600 font-semibold text-xl flex-shrink-0"
+      }, "\u2713")));
     })), isDictionaryHolder && /*#__PURE__*/React.createElement("div", {
       className: "space-y-3"
     }, /*#__PURE__*/React.createElement("p", {
@@ -1795,30 +2034,68 @@ function MultiplayerDictionaryGame() {
     }, /*#__PURE__*/React.createElement("h2", {
       className: "text-xl font-semibold mb-4"
     }, "Round Results"), /*#__PURE__*/React.createElement("div", {
-      className: "mb-6 p-4 bg-green-50 rounded-lg"
+      className: "mb-6 p-4 bg-green-50 rounded-lg depth-layer-2"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "flex items-start gap-3 mb-3"
+    }, /*#__PURE__*/React.createElement("span", {
+      className: "text-3xl"
+    }, "\uD83D\uDCD6"), /*#__PURE__*/React.createElement("div", {
+      className: "flex-1"
     }, /*#__PURE__*/React.createElement("h3", {
       className: "font-semibold text-green-900 mb-2"
     }, "Real Definition:"), /*#__PURE__*/React.createElement("p", {
       className: "text-gray-800"
-    }, gameData.realDefinition), /*#__PURE__*/React.createElement("p", {
-      className: "text-sm text-green-700 mt-2"
-    }, "Votes: ", gameData.voteCounts?.real || 0)), /*#__PURE__*/React.createElement("div", {
+    }, gameData.realDefinition))), (() => {
+      const totalVotes = Object.values(gameData.voteCounts || {}).reduce((a, b) => a + b, 0) || 1;
+      const voteCount = gameData.voteCounts?.real || 0;
+      const percentage = (voteCount / totalVotes * 100).toFixed(0);
+      return /*#__PURE__*/React.createElement("div", {
+        className: "mt-3"
+      }, /*#__PURE__*/React.createElement("div", {
+        className: "flex justify-between text-sm text-green-700 mb-1"
+      }, /*#__PURE__*/React.createElement("span", null, "Votes: ", voteCount), /*#__PURE__*/React.createElement("span", null, percentage, "%")), /*#__PURE__*/React.createElement("div", {
+        className: "w-full bg-green-200 rounded-full h-3 overflow-hidden"
+      }, /*#__PURE__*/React.createElement("div", {
+        className: "bg-green-600 h-full rounded-full transition-all duration-1000 ease-out",
+        style: {
+          width: `${percentage}%`
+        }
+      })));
+    })()), /*#__PURE__*/React.createElement("div", {
       className: "space-y-3 mb-6"
     }, /*#__PURE__*/React.createElement("h3", {
       className: "font-semibold"
     }, "Player Definitions:"), Object.entries(definitions).map(([defId, def]) => {
       const playerInfo = players[defId];
+      const avatar = playerInfo ? avatarOptions.find(a => a.id === playerInfo.avatar) : null;
       const voteCount = gameData.voteCounts?.[defId] || 0;
+      const totalVotes = Object.values(gameData.voteCounts || {}).reduce((a, b) => a + b, 0) || 1;
+      const percentage = (voteCount / totalVotes * 100).toFixed(0);
       return /*#__PURE__*/React.createElement("div", {
         key: defId,
-        className: "p-4 bg-purple-50 rounded-lg"
+        className: "p-4 bg-purple-50 rounded-lg depth-layer-2"
+      }, /*#__PURE__*/React.createElement("div", {
+        className: "flex items-start gap-3 mb-2"
+      }, /*#__PURE__*/React.createElement("span", {
+        className: "text-3xl"
+      }, avatar?.emoji || '👤'), /*#__PURE__*/React.createElement("div", {
+        className: "flex-1"
       }, /*#__PURE__*/React.createElement("p", {
         className: "font-semibold text-purple-900"
       }, playerInfo?.name, ":"), /*#__PURE__*/React.createElement("p", {
         className: "text-gray-800 mt-1"
-      }, def.text), /*#__PURE__*/React.createElement("p", {
-        className: "text-sm text-purple-700 mt-2"
-      }, "Votes: ", voteCount));
+      }, def.text))), /*#__PURE__*/React.createElement("div", {
+        className: "mt-3"
+      }, /*#__PURE__*/React.createElement("div", {
+        className: "flex justify-between text-sm text-purple-700 mb-1"
+      }, /*#__PURE__*/React.createElement("span", null, "Votes: ", voteCount), /*#__PURE__*/React.createElement("span", null, percentage, "%")), /*#__PURE__*/React.createElement("div", {
+        className: "w-full bg-purple-200 rounded-full h-3 overflow-hidden"
+      }, /*#__PURE__*/React.createElement("div", {
+        className: "bg-purple-600 h-full rounded-full transition-all duration-1000 ease-out",
+        style: {
+          width: `${percentage}%`
+        }
+      }))));
     })), isHost && /*#__PURE__*/React.createElement("button", {
       onClick: newRound,
       className: "w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
