@@ -15,6 +15,15 @@
         }
         const database = firebase.database();
 
+        // Initialize Firebase App Check for DDoS protection
+        // Replace 'YOUR_RECAPTCHA_SITE_KEY' with your actual reCAPTCHA v3 site key
+        // Get it from: https://www.google.com/recaptcha/admin
+        const appCheck = firebase.appCheck();
+        appCheck.activate(
+            'YOUR_RECAPTCHA_SITE_KEY', // Replace this with your reCAPTCHA v3 site key
+            true // Pass true to allow auto-refresh of tokens
+        );
+
         /* Firebase Database Index Configuration:
          * To improve performance, add this to your Firebase Database Rules:
          * {
