@@ -420,6 +420,27 @@ function MultiplayerDictionaryGame() {
   const [showPassDictionary, setShowPassDictionary] = useState(false);
   const [activeGames, setActiveGames] = useState([]);
   const [showReconnectModal, setShowReconnectModal] = useState(false);
+  const [toast, setToast] = useState({
+    show: false,
+    message: '',
+    type: 'info'
+  });
+
+  // Toast notification function
+  const showToast = (message, type = 'info') => {
+    setToast({
+      show: true,
+      message,
+      type
+    });
+    setTimeout(() => {
+      setToast({
+        show: false,
+        message: '',
+        type: 'info'
+      });
+    }, 3000);
+  };
 
   // Try to restore session - check for multiple active games
   useEffect(() => {
@@ -522,13 +543,13 @@ function MultiplayerDictionaryGame() {
   };
   const joinGame = async () => {
     if (!inputGameCode || !inputPlayerName) {
-      alert('Please enter both game code and your name');
+      showToast('Please enter both game code and your name', 'error');
       return;
     }
     const code = inputGameCode.toUpperCase();
     const snapshot = await database.ref(`games/${code}`).once('value');
     if (!snapshot.exists()) {
-      alert('Game not found');
+      showToast('Game not found', 'error');
       return;
     }
     const game = snapshot.val();
@@ -537,7 +558,7 @@ function MultiplayerDictionaryGame() {
     const existingPlayers = Object.values(game.players || {});
     const nameTaken = existingPlayers.some(player => player.name.toLowerCase() === inputPlayerName.trim().toLowerCase());
     if (nameTaken) {
-      alert(`The name "${inputPlayerName}" is already taken in this game. Please choose a different name.`);
+      showToast(`The name "${inputPlayerName}" is already taken`, 'error');
       return;
     }
     const newPlayerId = Date.now().toString();
@@ -1002,7 +1023,7 @@ function MultiplayerDictionaryGame() {
   };
   const copyGameCode = () => {
     navigator.clipboard.writeText(gameCode);
-    alert('Game code copied!');
+    showToast('Game code copied!', 'success');
   };
   const [showQRCode, setShowQRCode] = useState(false);
   const shareGameCode = () => {
@@ -1332,8 +1353,8 @@ function MultiplayerDictionaryGame() {
     }
   };
   if (view === 'home') {
-    return /*#__PURE__*/React.createElement("div", {
-      className: "min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 flex items-center justify-center p-4"
+    return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+      className: "min-h-screen gradient-bg-animated flex items-center justify-center p-4"
     }, showReconnectModal && activeGames.length > 0 && /*#__PURE__*/React.createElement("div", {
       className: "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
     }, /*#__PURE__*/React.createElement("div", {
@@ -1370,7 +1391,7 @@ function MultiplayerDictionaryGame() {
       onClick: () => setShowReconnectModal(false),
       className: "w-full px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 btn-3d"
     }, "Start New Game Instead"))), /*#__PURE__*/React.createElement("div", {
-      className: "bg-white rounded-lg shadow-xl p-8 max-w-md w-full card-3d"
+      className: "glass-card rounded-2xl shadow-2xl p-8 max-w-md w-full card-3d fade-in"
     }, /*#__PURE__*/React.createElement("div", {
       className: "text-center mb-8"
     }, /*#__PURE__*/React.createElement("div", {
@@ -1385,16 +1406,16 @@ function MultiplayerDictionaryGame() {
       className: "space-y-4"
     }, /*#__PURE__*/React.createElement("button", {
       onClick: () => setView('host'),
-      className: "w-full px-6 py-4 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-semibold text-lg btn-3d"
+      className: "w-full px-6 py-4 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-semibold text-lg btn-3d fade-in-delay-1"
     }, "Host New Game"), /*#__PURE__*/React.createElement("button", {
       onClick: () => setView('join'),
-      className: "w-full px-6 py-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold text-lg btn-3d"
+      className: "w-full px-6 py-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold text-lg btn-3d fade-in-delay-2"
     }, "Join Game"), /*#__PURE__*/React.createElement("button", {
       onClick: () => setView('manage'),
-      className: "w-full px-6 py-4 bg-orange-600 text-white rounded-lg hover:bg-orange-700 font-semibold text-lg btn-3d"
+      className: "w-full px-6 py-4 bg-orange-600 text-white rounded-lg hover:bg-orange-700 font-semibold text-lg btn-3d fade-in-delay-3"
     }, "Manage My Games"), /*#__PURE__*/React.createElement("button", {
       onClick: () => setView('stats'),
-      className: "w-full px-6 py-4 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold text-lg btn-3d"
+      className: "w-full px-6 py-4 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold text-lg btn-3d fade-in-delay-4"
     }, "\uD83D\uDCCA Game Stats")), /*#__PURE__*/React.createElement("div", {
       className: "mt-8 text-center"
     }, /*#__PURE__*/React.createElement("button", {
@@ -1432,7 +1453,9 @@ function MultiplayerDictionaryGame() {
       className: "text-xs text-gray-500"
     }, new Date(game.endedAt).toLocaleDateString())), /*#__PURE__*/React.createElement("div", {
       className: "text-xs text-gray-600"
-    }, game.players?.slice(0, 3).map(p => `${p.name} (${p.score})`).join(', '), game.players?.length > 3 && '...')))))));
+    }, game.players?.slice(0, 3).map(p => `${p.name} (${p.score})`).join(', '), game.players?.length > 3 && '...'))))))), toast.show && /*#__PURE__*/React.createElement("div", {
+      className: `toast show ${toast.type}`
+    }, toast.message));
   }
   if (view === 'host') {
     return /*#__PURE__*/React.createElement("div", {
@@ -1761,20 +1784,20 @@ function MultiplayerDictionaryGame() {
       }, "Return to Home")));
     }
     return /*#__PURE__*/React.createElement("div", {
-      className: "min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 p-4"
+      className: "min-h-screen gradient-bg-animated"
     }, /*#__PURE__*/React.createElement("div", {
       className: "max-w-4xl mx-auto"
     }, /*#__PURE__*/React.createElement("div", {
-      className: "bg-white rounded-lg shadow-lg p-6 mb-4"
+      className: "sticky-header glass-card rounded-b-2xl p-4 mb-4 fade-in"
     }, /*#__PURE__*/React.createElement("div", {
       className: "flex justify-between items-start"
     }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", {
-      className: "text-2xl font-bold text-purple-900"
+      className: "text-xl font-bold text-purple-900"
     }, "Dictionary Game"), /*#__PURE__*/React.createElement("p", {
-      className: "text-sm text-gray-600"
-    }, isHost ? 'You are the host' : `Host: ${gameData.hostName}`), /*#__PURE__*/React.createElement("p", {
-      className: "text-sm text-purple-600 font-medium"
-    }, "Dictionary Holder: ", isDictionaryHolder ? 'You' : dictionaryHolderName)), /*#__PURE__*/React.createElement("div", {
+      className: "text-xs text-gray-600"
+    }, isHost ? '👑 Host' : `Host: ${gameData.hostName}`), /*#__PURE__*/React.createElement("p", {
+      className: "text-xs text-purple-600 font-medium"
+    }, "\uD83D\uDCD6 ", isDictionaryHolder ? 'You hold the dictionary' : dictionaryHolderName)), /*#__PURE__*/React.createElement("div", {
       className: "text-right"
     }, /*#__PURE__*/React.createElement("div", {
       className: "flex items-center gap-2 bg-purple-100 px-4 py-2 rounded-lg mb-2"
@@ -1812,7 +1835,7 @@ function MultiplayerDictionaryGame() {
       onClick: leaveGame,
       className: "px-3 py-1 bg-red-500 text-white rounded text-sm hover:bg-red-600"
     }, "Leave Game"))))), /*#__PURE__*/React.createElement("div", {
-      className: "bg-white rounded-lg shadow-lg p-6 mb-4"
+      className: "glass-card rounded-2xl shadow-lg p-6 mb-4 slide-in"
     }, /*#__PURE__*/React.createElement("h2", {
       className: "text-lg font-semibold mb-3"
     }, "Players (", Object.keys(players).length, ")"), isHost && gameData.state === 'setup' && /*#__PURE__*/React.createElement("div", {
@@ -1849,7 +1872,7 @@ function MultiplayerDictionaryGame() {
         className: "text-purple-700 font-bold"
       }, player.score || 0));
     }))), isDictionaryHolder && gameData.state === 'setup' && /*#__PURE__*/React.createElement("div", {
-      className: "bg-white rounded-lg shadow-lg p-6 mb-4"
+      className: "glass-card rounded-2xl shadow-lg p-6 mb-4 fade-in"
     }, /*#__PURE__*/React.createElement("h2", {
       className: "text-xl font-semibold mb-4"
     }, "Setup Round"), /*#__PURE__*/React.createElement("div", {
@@ -1940,7 +1963,7 @@ function MultiplayerDictionaryGame() {
     }, /*#__PURE__*/React.createElement("p", {
       className: "text-gray-600"
     }, "Waiting for host to start the round...")), gameData.state === 'collecting' && /*#__PURE__*/React.createElement("div", {
-      className: "bg-white rounded-lg shadow-lg p-6 mb-4"
+      className: "glass-card rounded-2xl shadow-lg p-6 mb-4 fade-in"
     }, /*#__PURE__*/React.createElement("h2", {
       className: "text-xl font-semibold mb-2"
     }, isDictionaryHolder ? 'Definitions Coming In' : 'Submit Your Definition'), /*#__PURE__*/React.createElement("div", {
@@ -1982,7 +2005,7 @@ function MultiplayerDictionaryGame() {
       onClick: startVoting,
       className: "w-full px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
     }, "Start Voting"))), gameData.state === 'voting' && /*#__PURE__*/React.createElement("div", {
-      className: "bg-white rounded-lg shadow-lg p-6 mb-4"
+      className: "glass-card rounded-2xl shadow-lg p-6 mb-4 fade-in"
     }, /*#__PURE__*/React.createElement("h2", {
       className: "text-xl font-semibold mb-2"
     }, "Vote for the Real Definition"), /*#__PURE__*/React.createElement("div", {
@@ -2030,7 +2053,7 @@ function MultiplayerDictionaryGame() {
       onClick: showResults,
       className: "w-full px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700"
     }, "Show Results"))), gameData.state === 'results' && /*#__PURE__*/React.createElement("div", {
-      className: "bg-white rounded-lg shadow-lg p-6 mb-4"
+      className: "glass-card rounded-2xl shadow-lg p-6 mb-4 fade-in"
     }, /*#__PURE__*/React.createElement("h2", {
       className: "text-xl font-semibold mb-4"
     }, "Round Results"), /*#__PURE__*/React.createElement("div", {
@@ -2129,13 +2152,17 @@ function MultiplayerDictionaryGame() {
     }, "No other human players available")), /*#__PURE__*/React.createElement("button", {
       onClick: () => setShowPassDictionary(false),
       className: "w-full px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
-    }, "Cancel"))));
+    }, "Cancel"))), toast.show && /*#__PURE__*/React.createElement("div", {
+      className: `toast show ${toast.type}`
+    }, toast.message));
   }
-  return /*#__PURE__*/React.createElement("div", {
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
     className: "min-h-screen flex items-center justify-center"
   }, /*#__PURE__*/React.createElement("p", {
     className: "text-gray-600"
-  }, "Loading..."));
+  }, "Loading...")), toast.show && /*#__PURE__*/React.createElement("div", {
+    className: `toast show ${toast.type}`
+  }, toast.message));
 }
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(/*#__PURE__*/React.createElement(MultiplayerDictionaryGame, null));
