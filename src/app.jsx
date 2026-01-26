@@ -161,6 +161,15 @@
             const [showPassDictionary, setShowPassDictionary] = useState(false);
             const [activeGames, setActiveGames] = useState([]);
             const [showReconnectModal, setShowReconnectModal] = useState(false);
+            const [toast, setToast] = useState({ show: false, message: '', type: 'info' });
+
+            // Toast notification function
+            const showToast = (message, type = 'info') => {
+                setToast({ show: true, message, type });
+                setTimeout(() => {
+                    setToast({ show: false, message: '', type: 'info' });
+                }, 3000);
+            };
 
             // Try to restore session - check for multiple active games
             useEffect(() => {
@@ -263,7 +272,7 @@
 
             const joinGame = async () => {
                 if (!inputGameCode || !inputPlayerName) {
-                    alert('Please enter both game code and your name');
+                    showToast('Please enter both game code and your name', 'error');
                     return;
                 }
 
@@ -271,7 +280,7 @@
                 const snapshot = await database.ref(`games/${code}`).once('value');
 
                 if (!snapshot.exists()) {
-                    alert('Game not found');
+                    showToast('Game not found', 'error');
                     return;
                 }
 
@@ -284,7 +293,7 @@
                 );
 
                 if (nameTaken) {
-                    alert(`The name "${inputPlayerName}" is already taken in this game. Please choose a different name.`);
+                    showToast(`The name "${inputPlayerName}" is already taken`, 'error');
                     return;
                 }
 
@@ -824,7 +833,7 @@
 
             const copyGameCode = () => {
                 navigator.clipboard.writeText(gameCode);
-                alert('Game code copied!');
+                showToast('Game code copied!', 'success');
             };
 
             const [showQRCode, setShowQRCode] = useState(false);
@@ -1206,7 +1215,8 @@
 
             if (view === 'home') {
                 return (
-                    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 flex items-center justify-center p-4">
+                    <>
+                    <div className="min-h-screen gradient-bg-animated flex items-center justify-center p-4">
                         {/* Reconnect Modal */}
                         {showReconnectModal && activeGames.length > 0 && (
                             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
@@ -1254,7 +1264,7 @@
                             </div>
                         )}
 
-                        <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full card-3d">
+                        <div className="glass-card rounded-2xl shadow-2xl p-8 max-w-md w-full card-3d fade-in">
                             <div className="text-center mb-8">
                                 <div className="flex justify-center mb-4 float-animation">
                                     <DictionaryLogo size={80} />
@@ -1264,19 +1274,19 @@
                             </div>
 
                             <div className="space-y-4">
-                                <button onClick={() => setView('host')} className="w-full px-6 py-4 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-semibold text-lg btn-3d">
+                                <button onClick={() => setView('host')} className="w-full px-6 py-4 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-semibold text-lg btn-3d fade-in-delay-1">
                                     Host New Game
                                 </button>
 
-                                <button onClick={() => setView('join')} className="w-full px-6 py-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold text-lg btn-3d">
+                                <button onClick={() => setView('join')} className="w-full px-6 py-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold text-lg btn-3d fade-in-delay-2">
                                     Join Game
                                 </button>
 
-                                <button onClick={() => setView('manage')} className="w-full px-6 py-4 bg-orange-600 text-white rounded-lg hover:bg-orange-700 font-semibold text-lg btn-3d">
+                                <button onClick={() => setView('manage')} className="w-full px-6 py-4 bg-orange-600 text-white rounded-lg hover:bg-orange-700 font-semibold text-lg btn-3d fade-in-delay-3">
                                     Manage My Games
                                 </button>
 
-                                <button onClick={() => setView('stats')} className="w-full px-6 py-4 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold text-lg btn-3d">
+                                <button onClick={() => setView('stats')} className="w-full px-6 py-4 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold text-lg btn-3d fade-in-delay-4">
                                     📊 Game Stats
                                 </button>
                             </div>
@@ -1327,6 +1337,13 @@
                             )}
                         </div>
                     </div>
+                    {/* Toast Notification */}
+                    {toast.show && (
+                        <div className={`toast show ${toast.type}`}>
+                            {toast.message}
+                        </div>
+                    )}
+                    </>
                 );
             }
 
@@ -1721,15 +1738,16 @@
                 }
 
                 return (
-                    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 p-4">
+                    <div className="min-h-screen gradient-bg-animated">
                         <div className="max-w-4xl mx-auto">
-                            <div className="bg-white rounded-lg shadow-lg p-6 mb-4">
+                            {/* Sticky Header */}
+                            <div className="sticky-header glass-card rounded-b-2xl p-4 mb-4 fade-in">
                                 <div className="flex justify-between items-start">
                                     <div>
-                                        <h1 className="text-2xl font-bold text-purple-900">Dictionary Game</h1>
-                                        <p className="text-sm text-gray-600">{isHost ? 'You are the host' : `Host: ${gameData.hostName}`}</p>
-                                        <p className="text-sm text-purple-600 font-medium">
-                                            Dictionary Holder: {isDictionaryHolder ? 'You' : dictionaryHolderName}
+                                        <h1 className="text-xl font-bold text-purple-900">Dictionary Game</h1>
+                                        <p className="text-xs text-gray-600">{isHost ? '👑 Host' : `Host: ${gameData.hostName}`}</p>
+                                        <p className="text-xs text-purple-600 font-medium">
+                                            📖 {isDictionaryHolder ? 'You hold the dictionary' : dictionaryHolderName}
                                         </p>
                                     </div>
                                     <div className="text-right">
@@ -1777,7 +1795,7 @@
                                 </div>
                             </div>
 
-                            <div className="bg-white rounded-lg shadow-lg p-6 mb-4">
+                            <div className="glass-card rounded-2xl shadow-lg p-6 mb-4 slide-in">
                                 <h2 className="text-lg font-semibold mb-3">Players ({Object.keys(players).length})</h2>
                                 {isHost && gameData.state === 'setup' && (
                                     <div className="mb-3 p-3 bg-blue-50 rounded">
@@ -1818,7 +1836,7 @@
                             </div>
 
                             {isDictionaryHolder && gameData.state === 'setup' && (
-                                <div className="bg-white rounded-lg shadow-lg p-6 mb-4">
+                                <div className="glass-card rounded-2xl shadow-lg p-6 mb-4 fade-in">
                                     <h2 className="text-xl font-semibold mb-4">Setup Round</h2>
 
                                     <div className="space-y-4">
@@ -1912,7 +1930,7 @@
                             )}
 
                             {gameData.state === 'collecting' && (
-                                <div className="bg-white rounded-lg shadow-lg p-6 mb-4">
+                                <div className="glass-card rounded-2xl shadow-lg p-6 mb-4 fade-in">
                                     <h2 className="text-xl font-semibold mb-2">{isDictionaryHolder ? 'Definitions Coming In' : 'Submit Your Definition'}</h2>
                                     <div className="mb-4">
                                         <p className="text-gray-600">Word: <span className="font-bold text-lg">{gameData.currentWord}</span></p>
@@ -1961,7 +1979,7 @@
                             )}
 
                             {gameData.state === 'voting' && (
-                                <div className="bg-white rounded-lg shadow-lg p-6 mb-4">
+                                <div className="glass-card rounded-2xl shadow-lg p-6 mb-4 fade-in">
                                     <h2 className="text-xl font-semibold mb-2">Vote for the Real Definition</h2>
                                     <div className="mb-4">
                                         <p className="text-gray-600">Word: <span className="font-bold text-lg">{gameData.currentWord}</span></p>
@@ -2019,7 +2037,7 @@
                             )}
 
                             {gameData.state === 'results' && (
-                                <div className="bg-white rounded-lg shadow-lg p-6 mb-4">
+                                <div className="glass-card rounded-2xl shadow-lg p-6 mb-4 fade-in">
                                     <h2 className="text-xl font-semibold mb-4">Round Results</h2>
 
                                     <div className="mb-6 p-4 bg-green-50 rounded-lg depth-layer-2">
@@ -2138,13 +2156,29 @@
                                 </div>
                             </div>
                         )}
+                        {/* Toast Notification */}
+                        {toast.show && (
+                            <div className={`toast show ${toast.type}`}>
+                                {toast.message}
+                            </div>
+                        )}
                     </div>
                 );
             }
 
-            return <div className="min-h-screen flex items-center justify-center">
-                <p className="text-gray-600">Loading...</p>
-            </div>;
+            return (
+                <div>
+                    <div className="min-h-screen flex items-center justify-center">
+                        <p className="text-gray-600">Loading...</p>
+                    </div>
+                    {/* Toast Notification */}
+                    {toast.show && (
+                        <div className={`toast show ${toast.type}`}>
+                            {toast.message}
+                        </div>
+                    )}
+                </div>
+            );
         }
 
         const root = ReactDOM.createRoot(document.getElementById('root'));
