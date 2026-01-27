@@ -17,9 +17,10 @@
 
         // Initialize Firebase App Check for DDoS protection
         // Site key registered at: https://www.google.com/recaptcha/admin
+        // Domain: dictionary.shaolinux.com
         const appCheck = firebase.appCheck();
         appCheck.activate(
-            '6LeITVcsAAAAAA-XCxi4RoWWYCEwUc821d2kBipN',
+            '6LeITVcsAAAAAMuNPzlkqa2-1yo78z1YSJEnVhRk',
             true // Pass true to allow auto-refresh of tokens
         );
 
