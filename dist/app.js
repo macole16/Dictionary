@@ -16,6 +16,12 @@ if (!firebase.apps.length) {
 }
 const database = firebase.database();
 
+// Initialize Firebase App Check for DDoS protection
+// reCAPTCHA v3 site key for dictionary.shaolinux.com
+const appCheck = firebase.appCheck();
+appCheck.activate('6LedM1gsAAAAAI5e9fBJjpZH5TzU5SFQHcV-fJta', true // Pass true to allow auto-refresh of tokens
+);
+
 /* Firebase Database Index Configuration:
  * To improve performance, add this to your Firebase Database Rules:
  * {
@@ -652,14 +658,20 @@ function MultiplayerDictionaryGame() {
       return () => gameRef.off();
     }
   }, [gameCode, view]);
-  const getRandomWord = async () => {
+  const getRandomWord = async (retryCount = 0) => {
     setLoadingWord(true);
     try {
       let word = null;
+      const maxRetries = 10;
 
       // console.log('=== RANDOM WORD DEBUG ===');
       // console.log('Difficulty:', difficulty);
 
+      // Helper function to check if word is valid
+      const isWordValid = w => {
+        const wordLower = w.toLowerCase();
+        return !usedWords.includes(wordLower) && !skippedWords.includes(wordLower);
+      };
       if (difficulty === 'kids') {
         const topics = ['animals', 'nature', 'school', 'food', 'sports', 'weather'];
         const topic = topics[Math.floor(Math.random() * topics.length)];
@@ -670,20 +682,25 @@ function MultiplayerDictionaryGame() {
         console.log('API Response length:', data?.length);
         if (data && data.length > 0) {
           // More flexible filtering for kids - 4-10 letters, prioritize common words
-          const filtered = data.filter(w => w.word.length >= 4 && w.word.length <= 10 && /^[a-z]+$/.test(w.word) // Only letters, no hyphens or spaces
-          );
+          let filtered = data.filter(w => w.word.length >= 4 && w.word.length <= 10 && /^[a-z]+$/.test(w.word) &&
+          // Only letters, no hyphens or spaces
+          isWordValid(w.word));
           console.log('Filtered words:', filtered.length);
           if (filtered.length > 0) {
-            // Pick from first 50 results (more common words)
-            const wordIndex = Math.floor(Math.random() * Math.min(50, filtered.length));
+            // Better randomization - use timestamp + random for unique selection
+            const randomSeed = Date.now() + Math.random();
+            const wordIndex = Math.floor(randomSeed % 1 * filtered.length);
             word = filtered[wordIndex]?.word;
           }
         }
 
         // Fallback to simple kid-friendly words
         if (!word) {
-          const fallbackWords = ['canopy', 'whimsy', 'gadget', 'mosaic', 'nimble', 'frolic', 'plume', 'burrow', 'ember', 'marvel', 'riddle', 'puzzle', 'fossil', 'crystal', 'habitat', 'mammal', 'reptile', 'migrate', 'gravity', 'energy'];
-          word = fallbackWords[Math.floor(Math.random() * fallbackWords.length)];
+          let fallbackWords = ['canopy', 'whimsy', 'gadget', 'mosaic', 'nimble', 'frolic', 'plume', 'burrow', 'ember', 'marvel', 'riddle', 'puzzle', 'fossil', 'crystal', 'habitat', 'mammal', 'reptile', 'migrate', 'gravity', 'energy'].filter(isWordValid);
+          if (fallbackWords.length > 0) {
+            const randomSeed = Date.now() + Math.random();
+            word = fallbackWords[Math.floor(randomSeed % 1 * fallbackWords.length)];
+          }
           // console.log('Using fallback kid word');
         }
       } else if (difficulty === 'teen') {
@@ -693,26 +710,33 @@ function MultiplayerDictionaryGame() {
         const data = await response.json();
         console.log('API Response length:', data?.length);
         if (data && data.length > 0) {
-          const filtered = data.filter(w => {
+          let filtered = data.filter(w => {
             const freq = w.tags?.[0]?.replace('f:', '') || '0';
-            return parseFloat(freq) < 20 && /^[a-z]+$/.test(w.word);
+            return parseFloat(freq) < 20 && /^[a-z]+$/.test(w.word) && isWordValid(w.word);
           });
           console.log('Filtered to less common:', filtered.length);
           if (filtered.length > 0) {
-            word = filtered[Math.floor(Math.random() * filtered.length)]?.word;
+            const randomSeed = Date.now() + Math.random();
+            word = filtered[Math.floor(randomSeed % 1 * filtered.length)]?.word;
           }
         }
 
         // Fallback to teen-level words
         if (!word) {
-          const fallbackWords = ['ambiguous', 'benevolent', 'candor', 'diligent', 'ephemeral', 'facetious', 'gregarious', 'haphazard', 'impetuous', 'juxtapose', 'loquacious', 'melancholy'];
-          word = fallbackWords[Math.floor(Math.random() * fallbackWords.length)];
+          let fallbackWords = ['ambiguous', 'benevolent', 'candor', 'diligent', 'ephemeral', 'facetious', 'gregarious', 'haphazard', 'impetuous', 'juxtapose', 'loquacious', 'melancholy'].filter(isWordValid);
+          if (fallbackWords.length > 0) {
+            const randomSeed = Date.now() + Math.random();
+            word = fallbackWords[Math.floor(randomSeed % 1 * fallbackWords.length)];
+          }
           // console.log('Using fallback teen word');
         }
       } else {
         // For adults, use curated obscure words since APIs don't provide truly bizarre words
-        const obscureWords = ['absquatulate', 'bumfuzzle', 'callipygian', 'defenestrate', 'erinaceous', 'floccinaucinihilipilification', 'gobemouche', 'higgler', 'impignorate', 'jentacular', 'kakistocracy', 'lollygag', 'malarkey', 'nudiustertian', 'octothorpe', 'pauciloquent', 'quomodocunquize', 'rhadamanthine', 'smellfungus', 'taradiddle', 'ulotrichous', 'vomitory', 'wabbit', 'xertz', 'yarborough', 'zenzizenzizenzic', 'borborygmus', 'collywobbles', 'donnybrook', 'fartlek', 'gardyloo', 'hobbledehoy', 'kerfuffle'];
-        word = obscureWords[Math.floor(Math.random() * obscureWords.length)];
+        let obscureWords = ['absquatulate', 'bumfuzzle', 'callipygian', 'defenestrate', 'erinaceous', 'floccinaucinihilipilification', 'gobemouche', 'higgler', 'impignorate', 'jentacular', 'kakistocracy', 'lollygag', 'malarkey', 'nudiustertian', 'octothorpe', 'pauciloquent', 'quomodocunquize', 'rhadamanthine', 'smellfungus', 'taradiddle', 'ulotrichous', 'vomitory', 'wabbit', 'xertz', 'yarborough', 'zenzizenzizenzic', 'borborygmus', 'collywobbles', 'donnybrook', 'fartlek', 'gardyloo', 'hobbledehoy', 'kerfuffle', 'snollygoster', 'bumbershoot', 'cattywampus', 'discombobulate', 'flibbertigibbet', 'gobbledygook', 'hullabaloo', 'lackadaisical', 'persnickety', 'shenanigans', 'whippersnapper', 'brouhaha', 'cantankerous', 'curmudgeon', 'dillydally'].filter(isWordValid);
+        if (obscureWords.length > 0) {
+          const randomSeed = Date.now() + Math.random();
+          word = obscureWords[Math.floor(randomSeed % 1 * obscureWords.length)];
+        }
         // console.log('Using curated obscure word for adults');
       }
 
