@@ -16,11 +16,10 @@
         const database = firebase.database();
 
         // Initialize Firebase App Check for DDoS protection
-        // Site key registered at: https://www.google.com/recaptcha/admin
-        // Domain: dictionary.shaolinux.com
+        // reCAPTCHA v3 site key for dictionary.shaolinux.com
         const appCheck = firebase.appCheck();
         appCheck.activate(
-            '6LeITVcsAAAAAMuNPzlkqa2-1yo78z1YSJEnVhRk',
+            '6LedM1gsAAAAAI5e9fBJjpZH5TzU5SFQHcV-fJta',
             true // Pass true to allow auto-refresh of tokens
         );
 
