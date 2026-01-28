@@ -15,14 +15,6 @@
         }
         const database = firebase.database();
 
-        // Initialize Firebase App Check for DDoS protection
-        // reCAPTCHA v3 site key for dictionary.shaolinux.com
-        const appCheck = firebase.appCheck();
-        appCheck.activate(
-            '6LedM1gsAAAAAI5e9fBJjpZH5TzU5SFQHcV-fJta',
-            true // Pass true to allow auto-refresh of tokens
-        );
-
         /* Firebase Database Index Configuration:
          * To improve performance, add this to your Firebase Database Rules:
          * {
@@ -1964,7 +1956,14 @@
                                 <div className="glass-card rounded-2xl shadow-lg p-6 mb-4 fade-in">
                                     <h2 className="text-xl font-semibold mb-2">{isDictionaryHolder ? 'Definitions Coming In' : 'Submit Your Definition'}</h2>
                                     <div className="mb-4">
-                                        <p className="text-gray-600">Word: <span className="font-bold text-lg">{gameData.currentWord}</span></p>
+                                        <div className="flex items-center gap-2">
+                                            <p className="text-gray-600">Word: <span className="font-bold text-lg">{gameData.currentWord}</span></p>
+                                            {gameData.currentWord && (
+                                                <button onClick={speakWord} className="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm" title="Pronounce word">
+                                                    🔊
+                                                </button>
+                                            )}
+                                        </div>
                                         {gameData.pronunciation && (
                                             <p className="text-sm text-purple-600 mt-1">📢 {gameData.pronunciation}</p>
                                         )}
@@ -2013,7 +2012,14 @@
                                 <div className="glass-card rounded-2xl shadow-lg p-6 mb-4 fade-in">
                                     <h2 className="text-xl font-semibold mb-2">Vote for the Real Definition</h2>
                                     <div className="mb-4">
-                                        <p className="text-gray-600">Word: <span className="font-bold text-lg">{gameData.currentWord}</span></p>
+                                        <div className="flex items-center gap-2">
+                                            <p className="text-gray-600">Word: <span className="font-bold text-lg">{gameData.currentWord}</span></p>
+                                            {gameData.currentWord && (
+                                                <button onClick={speakWord} className="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm" title="Pronounce word">
+                                                    🔊
+                                                </button>
+                                            )}
+                                        </div>
                                         {gameData.pronunciation && (
                                             <p className="text-sm text-purple-600 mt-1">📢 {gameData.pronunciation}</p>
                                         )}

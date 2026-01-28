@@ -16,12 +16,6 @@ if (!firebase.apps.length) {
 }
 const database = firebase.database();
 
-// Initialize Firebase App Check for DDoS protection
-// reCAPTCHA v3 site key for dictionary.shaolinux.com
-const appCheck = firebase.appCheck();
-appCheck.activate('6LedM1gsAAAAAI5e9fBJjpZH5TzU5SFQHcV-fJta', true // Pass true to allow auto-refresh of tokens
-);
-
 /* Firebase Database Index Configuration:
  * To improve performance, add this to your Firebase Database Rules:
  * {
@@ -1992,11 +1986,17 @@ function MultiplayerDictionaryGame() {
       className: "text-xl font-semibold mb-2"
     }, isDictionaryHolder ? 'Definitions Coming In' : 'Submit Your Definition'), /*#__PURE__*/React.createElement("div", {
       className: "mb-4"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "flex items-center gap-2"
     }, /*#__PURE__*/React.createElement("p", {
       className: "text-gray-600"
     }, "Word: ", /*#__PURE__*/React.createElement("span", {
       className: "font-bold text-lg"
-    }, gameData.currentWord)), gameData.pronunciation && /*#__PURE__*/React.createElement("p", {
+    }, gameData.currentWord)), gameData.currentWord && /*#__PURE__*/React.createElement("button", {
+      onClick: speakWord,
+      className: "px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm",
+      title: "Pronounce word"
+    }, "\uD83D\uDD0A")), gameData.pronunciation && /*#__PURE__*/React.createElement("p", {
       className: "text-sm text-purple-600 mt-1"
     }, "\uD83D\uDCE2 ", gameData.pronunciation), gameData.wordFact && /*#__PURE__*/React.createElement("p", {
       className: "text-sm text-blue-600 mt-1"
@@ -2034,11 +2034,17 @@ function MultiplayerDictionaryGame() {
       className: "text-xl font-semibold mb-2"
     }, "Vote for the Real Definition"), /*#__PURE__*/React.createElement("div", {
       className: "mb-4"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "flex items-center gap-2"
     }, /*#__PURE__*/React.createElement("p", {
       className: "text-gray-600"
     }, "Word: ", /*#__PURE__*/React.createElement("span", {
       className: "font-bold text-lg"
-    }, gameData.currentWord)), gameData.pronunciation && /*#__PURE__*/React.createElement("p", {
+    }, gameData.currentWord)), gameData.currentWord && /*#__PURE__*/React.createElement("button", {
+      onClick: speakWord,
+      className: "px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm",
+      title: "Pronounce word"
+    }, "\uD83D\uDD0A")), gameData.pronunciation && /*#__PURE__*/React.createElement("p", {
       className: "text-sm text-purple-600 mt-1"
     }, "\uD83D\uDCE2 ", gameData.pronunciation), gameData.wordFact && /*#__PURE__*/React.createElement("p", {
       className: "text-sm text-blue-600 mt-1"
