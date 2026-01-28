@@ -1968,7 +1968,14 @@
                                         <div className="flex items-center gap-2">
                                             <p className="text-gray-600">Word: <span className="font-bold text-lg">{gameData.currentWord}</span></p>
                                             {gameData.currentWord && (
-                                                <button onClick={speakWord} className="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm" title="Pronounce word">
+                                                <button onClick={() => {
+                                                    if ('speechSynthesis' in window) {
+                                                        const utterance = new SpeechSynthesisUtterance(gameData.currentWord);
+                                                        utterance.rate = 0.8;
+                                                        utterance.pitch = 1;
+                                                        window.speechSynthesis.speak(utterance);
+                                                    }
+                                                }} className="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm" title="Pronounce word">
                                                     🔊
                                                 </button>
                                             )}
@@ -2024,7 +2031,14 @@
                                         <div className="flex items-center gap-2">
                                             <p className="text-gray-600">Word: <span className="font-bold text-lg">{gameData.currentWord}</span></p>
                                             {gameData.currentWord && (
-                                                <button onClick={speakWord} className="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm" title="Pronounce word">
+                                                <button onClick={() => {
+                                                    if ('speechSynthesis' in window) {
+                                                        const utterance = new SpeechSynthesisUtterance(gameData.currentWord);
+                                                        utterance.rate = 0.8;
+                                                        utterance.pitch = 1;
+                                                        window.speechSynthesis.speak(utterance);
+                                                    }
+                                                }} className="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm" title="Pronounce word">
                                                     🔊
                                                 </button>
                                             )}

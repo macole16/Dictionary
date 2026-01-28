@@ -2001,7 +2001,14 @@ function MultiplayerDictionaryGame() {
     }, "Word: ", /*#__PURE__*/React.createElement("span", {
       className: "font-bold text-lg"
     }, gameData.currentWord)), gameData.currentWord && /*#__PURE__*/React.createElement("button", {
-      onClick: speakWord,
+      onClick: () => {
+        if ('speechSynthesis' in window) {
+          const utterance = new SpeechSynthesisUtterance(gameData.currentWord);
+          utterance.rate = 0.8;
+          utterance.pitch = 1;
+          window.speechSynthesis.speak(utterance);
+        }
+      },
       className: "px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm",
       title: "Pronounce word"
     }, "\uD83D\uDD0A")), gameData.pronunciation && /*#__PURE__*/React.createElement("p", {
@@ -2049,7 +2056,14 @@ function MultiplayerDictionaryGame() {
     }, "Word: ", /*#__PURE__*/React.createElement("span", {
       className: "font-bold text-lg"
     }, gameData.currentWord)), gameData.currentWord && /*#__PURE__*/React.createElement("button", {
-      onClick: speakWord,
+      onClick: () => {
+        if ('speechSynthesis' in window) {
+          const utterance = new SpeechSynthesisUtterance(gameData.currentWord);
+          utterance.rate = 0.8;
+          utterance.pitch = 1;
+          window.speechSynthesis.speak(utterance);
+        }
+      },
       className: "px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm",
       title: "Pronounce word"
     }, "\uD83D\uDD0A")), gameData.pronunciation && /*#__PURE__*/React.createElement("p", {
