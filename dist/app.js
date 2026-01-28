@@ -425,6 +425,28 @@ function MultiplayerDictionaryGame() {
     message: '',
     type: 'info'
   });
+  const [scoringConfig, setScoringConfig] = useState(null);
+
+  // Load scoring configuration
+  useEffect(() => {
+    fetch('/scoring.json').then(response => response.json()).then(config => setScoringConfig(config)).catch(error => {
+      console.error('Failed to load scoring config:', error);
+      // Default scoring if file cannot be loaded
+      setScoringConfig({
+        rules: {
+          votesForFakeDefinition: {
+            points: 1
+          },
+          votesForRealDefinition: {
+            points: 1
+          },
+          votingForRealDefinition: {
+            points: 1
+          }
+        }
+      });
+    });
+  }, []);
 
   // Toast notification function
   const showToast = (message, type = 'info') => {
@@ -984,25 +1006,38 @@ function MultiplayerDictionaryGame() {
     });
     const updates = {};
 
+    // Get scoring configuration or use defaults
+    const scoring = scoringConfig?.rules || {
+      votesForFakeDefinition: {
+        points: 1
+      },
+      votesForRealDefinition: {
+        points: 1
+      },
+      votingForRealDefinition: {
+        points: 1
+      }
+    };
+
     // Award points to players whose definitions were voted for
     Object.keys(definitions).forEach(defPlayerId => {
       if (voteCounts[defPlayerId]) {
         const currentScore = players[defPlayerId]?.score || 0;
-        updates[`players/${defPlayerId}/score`] = currentScore + voteCounts[defPlayerId];
+        updates[`players/${defPlayerId}/score`] = currentScore + voteCounts[defPlayerId] * scoring.votesForFakeDefinition.points;
       }
     });
 
     // Award points to dictionary holder for each vote on the real definition
     if (voteCounts['real']) {
       const currentScore = players[dictionaryHolderId]?.score || 0;
-      updates[`players/${dictionaryHolderId}/score`] = currentScore + voteCounts['real'];
+      updates[`players/${dictionaryHolderId}/score`] = currentScore + voteCounts['real'] * scoring.votesForRealDefinition.points;
     }
 
-    // Award 1 point to each player who voted for the real definition
+    // Award points to each player who voted for the real definition
     Object.entries(votes).forEach(([voterId, defId]) => {
       if (defId === 'real') {
         const currentScore = players[voterId]?.score || 0;
-        updates[`players/${voterId}/score`] = (updates[`players/${voterId}/score`] || currentScore) + 1;
+        updates[`players/${voterId}/score`] = (updates[`players/${voterId}/score`] || currentScore) + scoring.votingForRealDefinition.points;
       }
     });
     updates.state = 'results';

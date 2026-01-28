@@ -1,0 +1,17 @@
+{
+  "description": "Dictionary Game Scoring Configuration",
+  "rules": {
+    "votesForFakeDefinition": {
+      "description": "Points awarded to a player for each vote their fake definition receives",
+      "points": 1
+    },
+    "votesForRealDefinition": {
+      "description": "Points awarded to the dictionary holder for each vote on the real definition",
+      "points": 1
+    },
+    "votingForRealDefinition": {
+      "description": "Points awarded to a player who correctly votes for the real definition",
+      "points": 1
+    }
+  }
+}
