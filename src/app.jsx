@@ -328,16 +328,23 @@
             // Load available games
             useEffect(() => {
                 if (view === 'join') {
+                    console.log('Loading available games...');
                     const gamesRef = database.ref('games');
 
                     gamesRef.on('value', (snapshot) => {
                         const data = snapshot.val();
+                        console.log('Games data from Firebase:', data);
                         if (data) {
-                            const games = Object.entries(data)
+                            const allGames = Object.entries(data);
+                            console.log('Total games found:', allGames.length);
+
+                            const games = allGames
                                 .filter(([code, game]) => {
                                     // Filter out old games (older than 24 hours)
                                     const age = Date.now() - (game.lastActivity || game.createdAt || 0);
-                                    return age < 24 * 60 * 60 * 1000;
+                                    const isRecent = age < 24 * 60 * 60 * 1000;
+                                    console.log(`Game ${code}: age=${Math.round(age / 1000 / 60)} minutes, isRecent=${isRecent}`);
+                                    return isRecent;
                                 })
                                 .map(([code, game]) => ({
                                     code,
@@ -348,8 +355,10 @@
                                 }))
                                 .sort((a, b) => b.createdAt - a.createdAt);
 
+                            console.log('Filtered available games:', games);
                             setAvailableGames(games);
                         } else {
+                            console.log('No games data in Firebase');
                             setAvailableGames([]);
                         }
                     });
