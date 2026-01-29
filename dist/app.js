@@ -2200,6 +2200,23 @@ function MultiplayerDictionaryGame() {
     }, /*#__PURE__*/React.createElement("p", {
       className: "text-sm text-gray-600"
     }, "Definitions received: ", Object.keys(definitions).length, " / ", Object.keys(players).length - 1), (() => {
+      const pendingPlayers = Object.entries(players).filter(([pId, p]) => pId !== playerId && !definitions[pId]).map(([pId, p]) => p);
+      if (pendingPlayers.length > 0) {
+        return /*#__PURE__*/React.createElement("div", {
+          className: "bg-yellow-50 border border-yellow-200 rounded-lg p-3"
+        }, /*#__PURE__*/React.createElement("p", {
+          className: "text-xs font-semibold text-yellow-800 mb-2"
+        }, "Waiting for:"), /*#__PURE__*/React.createElement("div", {
+          className: "flex flex-wrap gap-2"
+        }, pendingPlayers.map((player, idx) => {
+          const avatar = avatarOptions.find(a => a.id === player.avatar);
+          return /*#__PURE__*/React.createElement("span", {
+            key: idx,
+            className: "text-xs bg-yellow-100 px-2 py-1 rounded-full flex items-center gap-1"
+          }, /*#__PURE__*/React.createElement("span", null, avatar?.emoji || '👤'), /*#__PURE__*/React.createElement("span", null, player.name));
+        })));
+      }
+    })(), (() => {
       // Create array of all definitions including real one
       const allDefs = [{
         id: 'real',
