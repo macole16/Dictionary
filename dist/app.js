@@ -1375,8 +1375,12 @@ function MultiplayerDictionaryGame() {
       onClick: () => setView('instructions'),
       className: "w-full px-6 py-4 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-semibold text-lg btn-3d fade-in-delay-5"
     }, "\uD83D\uDCD6 How to Play")), /*#__PURE__*/React.createElement("div", {
-      className: "mt-8 text-center"
-    }, /*#__PURE__*/React.createElement("button", {
+      className: "mt-8 text-center space-y-2"
+    }, /*#__PURE__*/React.createElement("p", {
+      className: "text-xs text-gray-500"
+    }, "\xA9 2026 Shaolynx, LLC. All rights reserved."), /*#__PURE__*/React.createElement("p", {
+      className: "text-xs text-gray-400"
+    }, "Open source under MIT License"), /*#__PURE__*/React.createElement("button", {
       onClick: e => {
         if (e.shiftKey) {
           const clickCount = parseInt(e.target.dataset.clicks || '0') + 1;
