@@ -1920,6 +1920,7 @@
                                             <li><strong>+1 point per vote</strong> - Players earn 1 point for each vote their fake definition receives</li>
                                             <li><strong>+1 point for guessing correctly</strong> - Players who vote for the real definition earn 1 point</li>
                                             <li><strong>+1 point per correct vote</strong> - The Dictionary Holder earns 1 point for each player who votes for the real definition</li>
+                                            <li><strong>+1 bonus point</strong> - The host can award bonus points to players who provide exceptionally clever or accurate definitions (awarded manually during results)</li>
                                         </ul>
                                     </div>
 
@@ -1930,7 +1931,8 @@
                                             <li>Write convincing fake definitions that sound like dictionary entries</li>
                                             <li>Use proper grammar and formal language to match real definitions</li>
                                             <li>Balance being believable with being creative</li>
-                                            <li>Guess the real definition to earn bonus points</li>
+                                            <li>Get close to the real definition to potentially earn bonus points from the host</li>
+                                            <li>Vote for the real definition to earn points</li>
                                         </ul>
                                     </div>
 
