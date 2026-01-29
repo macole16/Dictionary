@@ -652,7 +652,6 @@
                         // Generate a fun fact if we don't have one from origin
                         if (!wordFact) {
                             const facts = [
-                                `The word "${currentWord}" has ${currentWord.length} letters.`,
                                 `This is a ${difficulty}-level word!`,
                                 `Challenge your friends with this word.`
                             ];
@@ -2208,15 +2207,30 @@
                                             <p className="text-sm text-gray-600">
                                                 Definitions received: {Object.keys(definitions).length} / {Object.keys(players).length - 1}
                                             </p>
+
+                                            {/* Real Definition - Always shown first for dictionary holder */}
+                                            <div className="bg-green-50 p-3 rounded border-2 border-green-300 depth-layer-1">
+                                                <p className="text-sm font-bold text-green-800 flex items-center gap-2">
+                                                    <span>📖</span>
+                                                    Real Definition
+                                                </p>
+                                                <p className="text-gray-800 mt-1">{gameData.realDefinition}</p>
+                                            </div>
+
+                                            {/* Player Definitions */}
                                             {Object.keys(definitions).map((defId, idx) => (
                                                 <div key={defId} className="bg-gray-50 p-3 rounded depth-layer-1">
                                                     <p className="text-sm font-medium text-gray-600">Definition {idx + 1}</p>
                                                     <p className="text-gray-800">{definitions[defId].text}</p>
                                                 </div>
                                             ))}
-                                            {Object.keys(definitions).length > 0 && (
+                                            {Object.keys(definitions).length >= Object.keys(players).length - 1 ? (
                                                 <button onClick={startVoting} className="w-full px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
                                                     Start Voting
+                                                </button>
+                                            ) : (
+                                                <button disabled className="w-full px-4 py-3 bg-gray-400 text-white rounded-lg cursor-not-allowed">
+                                                    Waiting for all definitions...
                                                 </button>
                                             )}
                                         </div>
@@ -2309,6 +2323,7 @@
                                             const totalVotes = Object.values(gameData.voteCounts || {}).reduce((a, b) => a + b, 0) || 1;
                                             const voteCount = gameData.voteCounts?.real || 0;
                                             const percentage = (voteCount / totalVotes * 100).toFixed(0);
+                                            const votersForReal = Object.entries(votes).filter(([voterId, defId]) => defId === 'real').map(([voterId]) => voterId);
                                             return (
                                                 <div className="mt-3">
                                                     <div className="flex justify-between text-sm text-green-700 mb-1">
@@ -2321,6 +2336,21 @@
                                                             style={{width: `${percentage}%`}}
                                                         ></div>
                                                     </div>
+                                                    {votersForReal.length > 0 && (
+                                                        <div className="mt-2 flex flex-wrap gap-2">
+                                                            <span className="text-xs text-green-700 font-semibold">Voted by:</span>
+                                                            {votersForReal.map(voterId => {
+                                                                const voter = players[voterId];
+                                                                const voterAvatar = voter ? avatarOptions.find(a => a.id === voter.avatar) : null;
+                                                                return (
+                                                                    <span key={voterId} className="text-xs bg-green-100 px-2 py-1 rounded-full flex items-center gap-1">
+                                                                        <span>{voterAvatar?.emoji || '👤'}</span>
+                                                                        <span>{voter?.name}</span>
+                                                                    </span>
+                                                                );
+                                                            })}
+                                                        </div>
+                                                    )}
                                                 </div>
                                             );
                                         })()}
@@ -2334,6 +2364,7 @@
                                             const voteCount = gameData.voteCounts?.[defId] || 0;
                                             const totalVotes = Object.values(gameData.voteCounts || {}).reduce((a, b) => a + b, 0) || 1;
                                             const percentage = (voteCount / totalVotes * 100).toFixed(0);
+                                            const votersForDef = Object.entries(votes).filter(([voterId, voteDefId]) => voteDefId === defId).map(([voterId]) => voterId);
                                             return (
                                                 <div key={defId} className="p-4 bg-purple-50 rounded-lg depth-layer-2">
                                                     <div className="flex items-start gap-3 mb-2">
@@ -2354,6 +2385,21 @@
                                                                 style={{width: `${percentage}%`}}
                                                             ></div>
                                                         </div>
+                                                        {votersForDef.length > 0 && (
+                                                            <div className="mt-2 flex flex-wrap gap-2">
+                                                                <span className="text-xs text-purple-700 font-semibold">Voted by:</span>
+                                                                {votersForDef.map(voterId => {
+                                                                    const voter = players[voterId];
+                                                                    const voterAvatar = voter ? avatarOptions.find(a => a.id === voter.avatar) : null;
+                                                                    return (
+                                                                        <span key={voterId} className="text-xs bg-purple-100 px-2 py-1 rounded-full flex items-center gap-1">
+                                                                            <span>{voterAvatar?.emoji || '👤'}</span>
+                                                                            <span>{voter?.name}</span>
+                                                                        </span>
+                                                                    );
+                                                                })}
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 </div>
                                             );
@@ -2367,7 +2413,7 @@
                                     )}
 
                                     {!isHost && (
-                                        <p className="text-center text-gray-600">Waiting for host to start next round...</p>
+                                        <p className="text-center text-gray-600">Waiting for dictionary holder to start next round...</p>
                                     )}
                                 </div>
                             )}

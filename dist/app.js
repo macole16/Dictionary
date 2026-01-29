@@ -873,7 +873,7 @@ function MultiplayerDictionaryGame() {
         }
         // Generate a fun fact if we don't have one from origin
         if (!wordFact) {
-          const facts = [`The word "${currentWord}" has ${currentWord.length} letters.`, `This is a ${difficulty}-level word!`, `Challenge your friends with this word.`];
+          const facts = [`This is a ${difficulty}-level word!`, `Challenge your friends with this word.`];
           setWordFact(facts[Math.floor(Math.random() * facts.length)]);
         }
       } else {
@@ -2178,17 +2178,26 @@ function MultiplayerDictionaryGame() {
       className: "space-y-3"
     }, /*#__PURE__*/React.createElement("p", {
       className: "text-sm text-gray-600"
-    }, "Definitions received: ", Object.keys(definitions).length, " / ", Object.keys(players).length - 1), Object.keys(definitions).map((defId, idx) => /*#__PURE__*/React.createElement("div", {
+    }, "Definitions received: ", Object.keys(definitions).length, " / ", Object.keys(players).length - 1), /*#__PURE__*/React.createElement("div", {
+      className: "bg-green-50 p-3 rounded border-2 border-green-300 depth-layer-1"
+    }, /*#__PURE__*/React.createElement("p", {
+      className: "text-sm font-bold text-green-800 flex items-center gap-2"
+    }, /*#__PURE__*/React.createElement("span", null, "\uD83D\uDCD6"), "Real Definition"), /*#__PURE__*/React.createElement("p", {
+      className: "text-gray-800 mt-1"
+    }, gameData.realDefinition)), Object.keys(definitions).map((defId, idx) => /*#__PURE__*/React.createElement("div", {
       key: defId,
       className: "bg-gray-50 p-3 rounded depth-layer-1"
     }, /*#__PURE__*/React.createElement("p", {
       className: "text-sm font-medium text-gray-600"
     }, "Definition ", idx + 1), /*#__PURE__*/React.createElement("p", {
       className: "text-gray-800"
-    }, definitions[defId].text))), Object.keys(definitions).length > 0 && /*#__PURE__*/React.createElement("button", {
+    }, definitions[defId].text))), Object.keys(definitions).length >= Object.keys(players).length - 1 ? /*#__PURE__*/React.createElement("button", {
       onClick: startVoting,
       className: "w-full px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
-    }, "Start Voting"))), gameData.state === 'voting' && /*#__PURE__*/React.createElement("div", {
+    }, "Start Voting") : /*#__PURE__*/React.createElement("button", {
+      disabled: true,
+      className: "w-full px-4 py-3 bg-gray-400 text-white rounded-lg cursor-not-allowed"
+    }, "Waiting for all definitions..."))), gameData.state === 'voting' && /*#__PURE__*/React.createElement("div", {
       className: "glass-card rounded-2xl shadow-lg p-6 mb-4 fade-in"
     }, /*#__PURE__*/React.createElement("h2", {
       className: "text-xl font-semibold mb-2"
@@ -2267,6 +2276,7 @@ function MultiplayerDictionaryGame() {
       const totalVotes = Object.values(gameData.voteCounts || {}).reduce((a, b) => a + b, 0) || 1;
       const voteCount = gameData.voteCounts?.real || 0;
       const percentage = (voteCount / totalVotes * 100).toFixed(0);
+      const votersForReal = Object.entries(votes).filter(([voterId, defId]) => defId === 'real').map(([voterId]) => voterId);
       return /*#__PURE__*/React.createElement("div", {
         className: "mt-3"
       }, /*#__PURE__*/React.createElement("div", {
@@ -2278,6 +2288,17 @@ function MultiplayerDictionaryGame() {
         style: {
           width: `${percentage}%`
         }
+      })), votersForReal.length > 0 && /*#__PURE__*/React.createElement("div", {
+        className: "mt-2 flex flex-wrap gap-2"
+      }, /*#__PURE__*/React.createElement("span", {
+        className: "text-xs text-green-700 font-semibold"
+      }, "Voted by:"), votersForReal.map(voterId => {
+        const voter = players[voterId];
+        const voterAvatar = voter ? avatarOptions.find(a => a.id === voter.avatar) : null;
+        return /*#__PURE__*/React.createElement("span", {
+          key: voterId,
+          className: "text-xs bg-green-100 px-2 py-1 rounded-full flex items-center gap-1"
+        }, /*#__PURE__*/React.createElement("span", null, voterAvatar?.emoji || '👤'), /*#__PURE__*/React.createElement("span", null, voter?.name));
       })));
     })()), /*#__PURE__*/React.createElement("div", {
       className: "space-y-3 mb-6"
@@ -2289,6 +2310,7 @@ function MultiplayerDictionaryGame() {
       const voteCount = gameData.voteCounts?.[defId] || 0;
       const totalVotes = Object.values(gameData.voteCounts || {}).reduce((a, b) => a + b, 0) || 1;
       const percentage = (voteCount / totalVotes * 100).toFixed(0);
+      const votersForDef = Object.entries(votes).filter(([voterId, voteDefId]) => voteDefId === defId).map(([voterId]) => voterId);
       return /*#__PURE__*/React.createElement("div", {
         key: defId,
         className: "p-4 bg-purple-50 rounded-lg depth-layer-2"
@@ -2313,13 +2335,24 @@ function MultiplayerDictionaryGame() {
         style: {
           width: `${percentage}%`
         }
+      })), votersForDef.length > 0 && /*#__PURE__*/React.createElement("div", {
+        className: "mt-2 flex flex-wrap gap-2"
+      }, /*#__PURE__*/React.createElement("span", {
+        className: "text-xs text-purple-700 font-semibold"
+      }, "Voted by:"), votersForDef.map(voterId => {
+        const voter = players[voterId];
+        const voterAvatar = voter ? avatarOptions.find(a => a.id === voter.avatar) : null;
+        return /*#__PURE__*/React.createElement("span", {
+          key: voterId,
+          className: "text-xs bg-purple-100 px-2 py-1 rounded-full flex items-center gap-1"
+        }, /*#__PURE__*/React.createElement("span", null, voterAvatar?.emoji || '👤'), /*#__PURE__*/React.createElement("span", null, voter?.name));
       }))));
     })), isHost && /*#__PURE__*/React.createElement("button", {
       onClick: newRound,
       className: "w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
     }, "New Round"), !isHost && /*#__PURE__*/React.createElement("p", {
       className: "text-center text-gray-600"
-    }, "Waiting for host to start next round..."))), showPassDictionary && /*#__PURE__*/React.createElement("div", {
+    }, "Waiting for dictionary holder to start next round..."))), showPassDictionary && /*#__PURE__*/React.createElement("div", {
       className: "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
     }, /*#__PURE__*/React.createElement("div", {
       className: "bg-white rounded-lg shadow-xl max-w-md w-full p-6"
