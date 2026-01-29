@@ -1436,9 +1436,24 @@ function MultiplayerDictionaryGame() {
     }
   };
   if (view === 'home') {
+    // Floating words for background animation
+    const floatingWords = ['serendipity', 'ephemeral', 'quintessential', 'ubiquitous', 'mellifluous', 'enigma', 'paradox', 'luminous', 'euphoria', 'nostalgia', 'eloquent', 'whimsical', 'ethereal', 'labyrinth', 'cascade', 'harmony', 'solitude', 'renaissance', 'kaleidoscope', 'magnificent'];
     return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
-      className: "min-h-screen gradient-bg-animated flex items-center justify-center p-4"
-    }, showReconnectModal && activeGames.length > 0 && /*#__PURE__*/React.createElement("div", {
+      className: "min-h-screen gradient-bg-animated flex items-center justify-center p-4 overflow-hidden relative"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "absolute inset-0 overflow-hidden pointer-events-none"
+    }, floatingWords.map((word, index) => /*#__PURE__*/React.createElement("div", {
+      key: index,
+      className: "absolute text-purple-200 font-serif opacity-20 select-none",
+      style: {
+        fontSize: `${Math.random() * 20 + 15}px`,
+        left: `${Math.random() * 100}%`,
+        top: `${Math.random() * 100}%`,
+        animation: `float ${Math.random() * 20 + 15}s infinite ease-in-out`,
+        animationDelay: `${Math.random() * 5}s`,
+        transform: `rotate(${Math.random() * 30 - 15}deg)`
+      }
+    }, word))), showReconnectModal && activeGames.length > 0 && /*#__PURE__*/React.createElement("div", {
       className: "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
     }, /*#__PURE__*/React.createElement("div", {
       className: "bg-white rounded-lg shadow-2xl p-6 max-w-lg w-full card-3d"

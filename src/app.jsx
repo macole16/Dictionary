@@ -1279,9 +1279,37 @@
             };
 
             if (view === 'home') {
+                // Floating words for background animation
+                const floatingWords = [
+                    'serendipity', 'ephemeral', 'quintessential', 'ubiquitous', 'mellifluous',
+                    'enigma', 'paradox', 'luminous', 'euphoria', 'nostalgia',
+                    'eloquent', 'whimsical', 'ethereal', 'labyrinth', 'cascade',
+                    'harmony', 'solitude', 'renaissance', 'kaleidoscope', 'magnificent'
+                ];
+
                 return (
                     <>
-                    <div className="min-h-screen gradient-bg-animated flex items-center justify-center p-4">
+                    <div className="min-h-screen gradient-bg-animated flex items-center justify-center p-4 overflow-hidden relative">
+                        {/* Floating Words Background */}
+                        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                            {floatingWords.map((word, index) => (
+                                <div
+                                    key={index}
+                                    className="absolute text-purple-200 font-serif opacity-20 select-none"
+                                    style={{
+                                        fontSize: `${Math.random() * 20 + 15}px`,
+                                        left: `${Math.random() * 100}%`,
+                                        top: `${Math.random() * 100}%`,
+                                        animation: `float ${Math.random() * 20 + 15}s infinite ease-in-out`,
+                                        animationDelay: `${Math.random() * 5}s`,
+                                        transform: `rotate(${Math.random() * 30 - 15}deg)`
+                                    }}
+                                >
+                                    {word}
+                                </div>
+                            ))}
+                        </div>
+
                         {/* Reconnect Modal */}
                         {showReconnectModal && activeGames.length > 0 && (
                             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
