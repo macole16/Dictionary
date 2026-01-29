@@ -2182,7 +2182,7 @@
 
                             {!isDictionaryHolder && gameData.state === 'setup' && (
                                 <div className="bg-white rounded-lg shadow-lg p-6 mb-4 text-center">
-                                    <p className="text-gray-600">Waiting for host to start the round...</p>
+                                    <p className="text-gray-600">Waiting for dictionary holder to start the round...</p>
                                 </div>
                             )}
 
@@ -2467,7 +2467,7 @@
                                     )}
 
                                     {!isHost && (
-                                        <p className="text-center text-gray-600">Waiting for dictionary holder to start next round...</p>
+                                        <p className="text-center text-gray-600">Waiting for host to start next round...</p>
                                     )}
                                 </div>
                             )}
