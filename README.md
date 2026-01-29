@@ -86,3 +86,9 @@ Add, remove, or modify player avatar options. Each avatar needs:
 ## Technology
 
 Built with React, Firebase Realtime Database, and Tailwind CSS. Uses Babel for JSX compilation.
+
+## License
+
+MIT License - Copyright (c) 2026 Shaolynx, LLC
+
+See [LICENSE](LICENSE) file for details.
