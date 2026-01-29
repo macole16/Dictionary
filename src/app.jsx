@@ -1334,8 +1334,14 @@
                                 </button>
                             </div>
 
-                            {/* Hidden Admin Reset Button - Hold Shift and click the logo 3 times to show */}
-                            <div className="mt-8 text-center">
+                            {/* Copyright and Version */}
+                            <div className="mt-8 text-center space-y-2">
+                                <p className="text-xs text-gray-500">
+                                    © 2026 Shaolynx, LLC. All rights reserved.
+                                </p>
+                                <p className="text-xs text-gray-400">
+                                    Open source under MIT License
+                                </p>
                                 <button
                                     onClick={(e) => {
                                         if (e.shiftKey) {
