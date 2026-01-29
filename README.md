@@ -35,11 +35,13 @@ A multiplayer word bluffing game where players create fake definitions to fool t
 
 ## Scoring
 
-Points are awarded at the end of each round:
+Points are awarded at the end of each round. Scoring rules are customizable via `scoring.json`:
 
 - **+1 point per vote** - Players earn 1 point for each vote their fake definition receives
 - **+1 point for guessing correctly** - Players who vote for the real definition earn 1 point
 - **+1 point per correct vote** - The Dictionary Holder earns 1 point for each player who votes for the real definition
+
+You can customize point values by editing `scoring.json` in the root directory.
 
 ### Strategy Tips
 - Write convincing fake definitions that sound like dictionary entries
@@ -54,10 +56,33 @@ Points are awarded at the end of each round:
 - **Word history tracking** - Prevents duplicate words and tracks skipped words
 - **Multiple difficulty levels** with curated word lists
 - **Auto-definition lookup** from online dictionary APIs
+- **Word pronunciation** - Text-to-speech for hearing word pronunciation
+- **Phonetic spelling** - Shows pronunciation guide when available
 - **Game management** - View and terminate your hosted games
 - **Game history** - See past game results and winners
-- **Avatar selection** - Choose from 9 different player avatars
+- **Active games list** - See and join games in progress
+- **Avatar selection** - Choose from 30+ different player avatars
+- **Customizable scoring** - Edit `scoring.json` to change point values
+- **Customizable avatars** - Edit `avatars.json` to add/remove avatar options
+- **Bot players** - Add AI bots to fill out your game
+- **QR code sharing** - Easily share game codes via QR codes
+- **3D visual effects** - Animated logo and polished UI
+- **Mobile optimized** - Responsive design works on all devices
+
+## Configuration
+
+### Scoring (`scoring.json`)
+Customize point values for different actions:
+- `votesForFakeDefinition`: Points per vote on a fake definition
+- `votesForRealDefinition`: Points to dictionary holder per vote on real definition
+- `votingForRealDefinition`: Points for correctly voting for real definition
+
+### Avatars (`avatars.json`)
+Add, remove, or modify player avatar options. Each avatar needs:
+- `id`: Unique identifier
+- `emoji`: The emoji character to display
+- `label`: Display name for the avatar
 
 ## Technology
 
-Built with React, Firebase Realtime Database, and Tailwind CSS. No build process required - runs directly in the browser.
+Built with React, Firebase Realtime Database, and Tailwind CSS. Uses Babel for JSX compilation.
