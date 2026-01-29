@@ -1928,13 +1928,13 @@ function MultiplayerDictionaryGame() {
       className: "text-gray-700 mb-3"
     }, "Points are awarded at the end of each round:"), /*#__PURE__*/React.createElement("ul", {
       className: "list-disc list-inside space-y-2 text-gray-700 ml-4"
-    }, /*#__PURE__*/React.createElement("li", null, /*#__PURE__*/React.createElement("strong", null, "+1 point per vote"), " - Players earn 1 point for each vote their fake definition receives"), /*#__PURE__*/React.createElement("li", null, /*#__PURE__*/React.createElement("strong", null, "+1 point for guessing correctly"), " - Players who vote for the real definition earn 1 point"), /*#__PURE__*/React.createElement("li", null, /*#__PURE__*/React.createElement("strong", null, "+1 point per correct vote"), " - The Dictionary Holder earns 1 point for each player who votes for the real definition"))), /*#__PURE__*/React.createElement("div", {
+    }, /*#__PURE__*/React.createElement("li", null, /*#__PURE__*/React.createElement("strong", null, "+1 point per vote"), " - Players earn 1 point for each vote their fake definition receives"), /*#__PURE__*/React.createElement("li", null, /*#__PURE__*/React.createElement("strong", null, "+1 point for guessing correctly"), " - Players who vote for the real definition earn 1 point"), /*#__PURE__*/React.createElement("li", null, /*#__PURE__*/React.createElement("strong", null, "+1 point per correct vote"), " - The Dictionary Holder earns 1 point for each player who votes for the real definition"), /*#__PURE__*/React.createElement("li", null, /*#__PURE__*/React.createElement("strong", null, "+1 bonus point"), " - The host can award bonus points to players who provide exceptionally clever or accurate definitions (awarded manually during results)"))), /*#__PURE__*/React.createElement("div", {
       className: "border-l-4 border-orange-500 pl-4"
     }, /*#__PURE__*/React.createElement("h2", {
       className: "text-2xl font-bold text-orange-900 mb-3"
     }, "\uD83D\uDCA1 Strategy Tips"), /*#__PURE__*/React.createElement("ul", {
       className: "list-disc list-inside space-y-2 text-gray-700 ml-4"
-    }, /*#__PURE__*/React.createElement("li", null, "Write convincing fake definitions that sound like dictionary entries"), /*#__PURE__*/React.createElement("li", null, "Use proper grammar and formal language to match real definitions"), /*#__PURE__*/React.createElement("li", null, "Balance being believable with being creative"), /*#__PURE__*/React.createElement("li", null, "Guess the real definition to earn bonus points"))), /*#__PURE__*/React.createElement("div", {
+    }, /*#__PURE__*/React.createElement("li", null, "Write convincing fake definitions that sound like dictionary entries"), /*#__PURE__*/React.createElement("li", null, "Use proper grammar and formal language to match real definitions"), /*#__PURE__*/React.createElement("li", null, "Balance being believable with being creative"), /*#__PURE__*/React.createElement("li", null, "Get close to the real definition to potentially earn bonus points from the host"), /*#__PURE__*/React.createElement("li", null, "Vote for the real definition to earn points"))), /*#__PURE__*/React.createElement("div", {
       className: "border-l-4 border-indigo-500 pl-4"
     }, /*#__PURE__*/React.createElement("h2", {
       className: "text-2xl font-bold text-indigo-900 mb-3"
@@ -2154,7 +2154,7 @@ function MultiplayerDictionaryGame() {
       className: "bg-white rounded-lg shadow-lg p-6 mb-4 text-center"
     }, /*#__PURE__*/React.createElement("p", {
       className: "text-gray-600"
-    }, "Waiting for host to start the round...")), gameData.state === 'collecting' && /*#__PURE__*/React.createElement("div", {
+    }, "Waiting for dictionary holder to start the round...")), gameData.state === 'collecting' && /*#__PURE__*/React.createElement("div", {
       className: "glass-card rounded-2xl shadow-lg p-6 mb-4 fade-in"
     }, /*#__PURE__*/React.createElement("h2", {
       className: "text-xl font-semibold mb-2"
@@ -2394,7 +2394,7 @@ function MultiplayerDictionaryGame() {
       className: "w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
     }, "New Round"), !isHost && /*#__PURE__*/React.createElement("p", {
       className: "text-center text-gray-600"
-    }, "Waiting for dictionary holder to start next round..."))), showPassDictionary && /*#__PURE__*/React.createElement("div", {
+    }, "Waiting for host to start next round..."))), showPassDictionary && /*#__PURE__*/React.createElement("div", {
       className: "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
     }, /*#__PURE__*/React.createElement("div", {
       className: "bg-white rounded-lg shadow-xl max-w-md w-full p-6"
