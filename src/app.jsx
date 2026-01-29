@@ -2260,12 +2260,9 @@
                                                                 {id === 'real' ? (
                                                                     <span className="text-3xl flex-shrink-0">📖</span>
                                                                 ) : (
-                                                                    <span className="text-3xl flex-shrink-0">{avatar?.emoji || '👤'}</span>
+                                                                    <span className="text-3xl flex-shrink-0">📝</span>
                                                                 )}
                                                                 <div className="flex-1">
-                                                                    {id !== 'real' && player && (
-                                                                        <p className="text-xs text-gray-500 mb-1 font-semibold">{player.name}</p>
-                                                                    )}
                                                                     <p className="text-gray-800">{def.text}</p>
                                                                 </div>
                                                                 {voted && <span className="ml-2 text-green-600 font-semibold text-xl flex-shrink-0">✓</span>}
