@@ -99,39 +99,7 @@
             </svg>
         );
 
-        // Avatar options with emojis
-        const avatarOptions = [
-            { id: 'cat', emoji: '🐱', label: 'Cat' },
-            { id: 'dog', emoji: '🐶', label: 'Dog' },
-            { id: 'bird', emoji: '🐦', label: 'Bird' },
-            { id: 'hat', emoji: '🎩', label: 'Hat' },
-            { id: 'car', emoji: '🚗', label: 'Car' },
-            { id: 'bulb', emoji: '💡', label: 'Light Bulb' },
-            { id: 'snake', emoji: '🐍', label: 'Snake' },
-            { id: 'scholar', emoji: '👨‍🎓', label: 'Scholar' },
-            { id: 'school', emoji: '🏫', label: 'School' },
-            { id: 'robot', emoji: '🤖', label: 'Robot' },
-            { id: 'alien', emoji: '👽', label: 'Alien' },
-            { id: 'unicorn', emoji: '🦄', label: 'Unicorn' },
-            { id: 'dragon', emoji: '🐉', label: 'Dragon' },
-            { id: 'wizard', emoji: '🧙', label: 'Wizard' },
-            { id: 'ninja', emoji: '🥷', label: 'Ninja' },
-            { id: 'pirate', emoji: '🏴‍☠️', label: 'Pirate' },
-            { id: 'astronaut', emoji: '👨‍🚀', label: 'Astronaut' },
-            { id: 'detective', emoji: '🕵️', label: 'Detective' },
-            { id: 'artist', emoji: '🎨', label: 'Artist' },
-            { id: 'musician', emoji: '🎸', label: 'Musician' },
-            { id: 'chef', emoji: '👨‍🍳', label: 'Chef' },
-            { id: 'brain', emoji: '🧠', label: 'Brain' },
-            { id: 'book', emoji: '📚', label: 'Book' },
-            { id: 'trophy', emoji: '🏆', label: 'Trophy' },
-            { id: 'star', emoji: '⭐', label: 'Star' },
-            { id: 'fire', emoji: '🔥', label: 'Fire' },
-            { id: 'crown', emoji: '👑', label: 'Crown' },
-            { id: 'rocket', emoji: '🚀', label: 'Rocket' },
-            { id: 'gem', emoji: '💎', label: 'Gem' },
-            { id: 'pizza', emoji: '🍕', label: 'Pizza' }
-        ];
+        // Avatar options - will be loaded from avatars.json
 
         function MultiplayerDictionaryGame() {
             const [view, setView] = useState('home');
@@ -163,6 +131,19 @@
             const [showReconnectModal, setShowReconnectModal] = useState(false);
             const [toast, setToast] = useState({ show: false, message: '', type: 'info' });
             const [scoringConfig, setScoringConfig] = useState(null);
+            const [avatarOptions, setAvatarOptions] = useState([]);
+
+            // Load avatar options
+            useEffect(() => {
+                fetch('/avatars.json')
+                    .then(response => response.json())
+                    .then(config => setAvatarOptions(config.avatars))
+                    .catch(error => {
+                        console.error('Failed to load avatar options:', error);
+                        // Default avatar if file cannot be loaded
+                        setAvatarOptions([{ id: 'cat', emoji: '🐱', label: 'Cat' }]);
+                    });
+            }, []);
 
             // Load scoring configuration
             useEffect(() => {
