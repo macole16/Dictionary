@@ -27,7 +27,7 @@ const database = firebase.database();
  * }
  */
 
-// Logo Component - Open Dictionary Book
+// Logo Component - Classic Dictionary Book (OED/Webster's style)
 const DictionaryLogo = ({
   size = 64
 }) => /*#__PURE__*/React.createElement("svg", {
@@ -45,19 +45,19 @@ const DictionaryLogo = ({
 }, /*#__PURE__*/React.createElement("stop", {
   offset: "0%",
   style: {
-    stopColor: "#7c3aed",
+    stopColor: "#7f1d1d",
     stopOpacity: 1
   }
 }), /*#__PURE__*/React.createElement("stop", {
   offset: "50%",
   style: {
-    stopColor: "#6d28d9",
+    stopColor: "#991b1b",
     stopOpacity: 1
   }
 }), /*#__PURE__*/React.createElement("stop", {
   offset: "100%",
   style: {
-    stopColor: "#5b21b6",
+    stopColor: "#7f1d1d",
     stopOpacity: 1
   }
 })), /*#__PURE__*/React.createElement("linearGradient", {
@@ -69,13 +69,13 @@ const DictionaryLogo = ({
 }, /*#__PURE__*/React.createElement("stop", {
   offset: "0%",
   style: {
-    stopColor: "#fefefe",
+    stopColor: "#fef9e7",
     stopOpacity: 1
   }
 }), /*#__PURE__*/React.createElement("stop", {
   offset: "100%",
   style: {
-    stopColor: "#f5f5f5",
+    stopColor: "#faf5e4",
     stopOpacity: 1
   }
 })), /*#__PURE__*/React.createElement("linearGradient", {
@@ -88,7 +88,7 @@ const DictionaryLogo = ({
   offset: "0%",
   style: {
     stopColor: "#000",
-    stopOpacity: 0.3
+    stopOpacity: 0.4
   }
 }), /*#__PURE__*/React.createElement("stop", {
   offset: "100%",
@@ -96,178 +96,306 @@ const DictionaryLogo = ({
     stopColor: "#000",
     stopOpacity: 0
   }
+})), /*#__PURE__*/React.createElement("linearGradient", {
+  id: "goldFoil",
+  x1: "0%",
+  y1: "0%",
+  x2: "100%",
+  y2: "100%"
+}, /*#__PURE__*/React.createElement("stop", {
+  offset: "0%",
+  style: {
+    stopColor: "#ffd700",
+    stopOpacity: 1
+  }
+}), /*#__PURE__*/React.createElement("stop", {
+  offset: "50%",
+  style: {
+    stopColor: "#ffed4e",
+    stopOpacity: 1
+  }
+}), /*#__PURE__*/React.createElement("stop", {
+  offset: "100%",
+  style: {
+    stopColor: "#ffd700",
+    stopOpacity: 1
+  }
 }))), /*#__PURE__*/React.createElement("ellipse", {
   cx: "100",
-  cy: "165",
-  rx: "70",
-  ry: "8",
+  cy: "168",
+  rx: "75",
+  ry: "10",
   fill: "url(#shadowGrad)",
-  opacity: "0.3"
+  opacity: "0.4"
 }), /*#__PURE__*/React.createElement("path", {
-  d: "M 35 40 L 35 155 Q 35 160 40 160 L 95 160 L 95 40 Z",
+  d: "M 30 35 L 30 158 Q 30 165 37 165 L 95 165 L 95 35 Z",
   fill: "url(#bookCover)",
-  stroke: "#5b21b6",
-  strokeWidth: "1.5"
+  stroke: "#5e1414",
+  strokeWidth: "2"
 }), /*#__PURE__*/React.createElement("path", {
-  d: "M 38 43 L 38 156 L 92 156 L 92 43 Z",
+  d: "M 33 38 L 33 161 L 92 161 L 92 38 Z",
   fill: "url(#pageGradient)"
-}), /*#__PURE__*/React.createElement("path", {
-  d: "M 41 46 L 41 153 L 89 153 L 89 46 Z",
-  fill: "#ffffff"
 }), /*#__PURE__*/React.createElement("line", {
-  x1: "48",
-  y1: "60",
-  x2: "82",
-  y2: "60",
-  stroke: "#9333ea",
-  strokeWidth: "1.5",
-  opacity: "0.7"
+  x1: "35",
+  y1: "38",
+  x2: "35",
+  y2: "161",
+  stroke: "#d4c5a0",
+  strokeWidth: "0.5"
 }), /*#__PURE__*/React.createElement("line", {
-  x1: "48",
-  y1: "70",
-  x2: "80",
-  y2: "70",
-  stroke: "#9333ea",
-  strokeWidth: "1.5",
-  opacity: "0.7"
+  x1: "37",
+  y1: "38",
+  x2: "37",
+  y2: "161",
+  stroke: "#d4c5a0",
+  strokeWidth: "0.5"
 }), /*#__PURE__*/React.createElement("line", {
-  x1: "48",
-  y1: "80",
-  x2: "82",
-  y2: "80",
-  stroke: "#9333ea",
-  strokeWidth: "1.5",
-  opacity: "0.7"
-}), /*#__PURE__*/React.createElement("line", {
-  x1: "48",
-  y1: "90",
-  x2: "75",
-  y2: "90",
-  stroke: "#9333ea",
-  strokeWidth: "1.5",
-  opacity: "0.7"
-}), /*#__PURE__*/React.createElement("line", {
-  x1: "48",
-  y1: "100",
-  x2: "82",
-  y2: "100",
-  stroke: "#9333ea",
-  strokeWidth: "1.5",
-  opacity: "0.5"
-}), /*#__PURE__*/React.createElement("line", {
-  x1: "48",
-  y1: "110",
-  x2: "78",
-  y2: "110",
-  stroke: "#9333ea",
-  strokeWidth: "1.5",
-  opacity: "0.5"
-}), /*#__PURE__*/React.createElement("path", {
-  d: "M 95 40 L 105 40 L 105 160 L 95 160 Z",
-  fill: "#5b21b6"
+  x1: "39",
+  y1: "38",
+  x2: "39",
+  y2: "161",
+  stroke: "#d4c5a0",
+  strokeWidth: "0.5"
 }), /*#__PURE__*/React.createElement("rect", {
-  x: "97",
-  y: "70",
-  width: "6",
-  height: "60",
-  fill: "#7c3aed",
-  opacity: "0.5",
-  rx: "1"
-}), /*#__PURE__*/React.createElement("path", {
-  d: "M 108 43 L 108 156 L 162 156 L 162 43 Z",
-  fill: "url(#pageGradient)"
-}), /*#__PURE__*/React.createElement("path", {
-  d: "M 111 46 L 111 153 L 159 153 L 159 46 Z",
-  fill: "#ffffff"
-}), /*#__PURE__*/React.createElement("line", {
-  x1: "118",
-  y1: "60",
-  x2: "152",
-  y2: "60",
-  stroke: "#9333ea",
-  strokeWidth: "1.5",
-  opacity: "0.7"
-}), /*#__PURE__*/React.createElement("line", {
-  x1: "118",
-  y1: "70",
-  x2: "150",
-  y2: "70",
-  stroke: "#9333ea",
-  strokeWidth: "1.5",
-  opacity: "0.7"
-}), /*#__PURE__*/React.createElement("line", {
-  x1: "118",
-  y1: "80",
-  x2: "152",
-  y2: "80",
-  stroke: "#9333ea",
-  strokeWidth: "1.5",
-  opacity: "0.7"
-}), /*#__PURE__*/React.createElement("line", {
-  x1: "118",
-  y1: "90",
-  x2: "145",
-  y2: "90",
-  stroke: "#9333ea",
-  strokeWidth: "1.5",
-  opacity: "0.7"
-}), /*#__PURE__*/React.createElement("line", {
-  x1: "118",
-  y1: "100",
-  x2: "152",
-  y2: "100",
-  stroke: "#9333ea",
-  strokeWidth: "1.5",
-  opacity: "0.5"
-}), /*#__PURE__*/React.createElement("line", {
-  x1: "118",
-  y1: "110",
-  x2: "148",
-  y2: "110",
-  stroke: "#9333ea",
-  strokeWidth: "1.5",
-  opacity: "0.5"
-}), /*#__PURE__*/React.createElement("path", {
-  d: "M 105 40 L 165 40 Q 170 40 170 45 L 170 155 Q 170 160 165 160 L 105 160 Z",
-  fill: "url(#bookCover)",
-  stroke: "#5b21b6",
-  strokeWidth: "1.5"
-}), /*#__PURE__*/React.createElement("path", {
-  d: "M 120 55 L 155 55 L 155 58 L 120 58 Z",
-  fill: "#fbbf24",
-  opacity: "0.8"
-}), /*#__PURE__*/React.createElement("circle", {
-  cx: "137.5",
-  cy: "100",
-  r: "15",
-  stroke: "#fbbf24",
-  strokeWidth: "2",
-  fill: "none",
-  opacity: "0.6"
-}), /*#__PURE__*/React.createElement("path", {
-  d: "M 137.5 90 L 137.5 110 M 127.5 100 L 147.5 100",
-  stroke: "#fbbf24",
-  strokeWidth: "2",
-  opacity: "0.6"
+  x: "42",
+  y: "45",
+  width: "45",
+  height: "110",
+  fill: "#fffef8"
 }), /*#__PURE__*/React.createElement("text", {
-  x: "137.5",
-  y: "135",
-  fontSize: "10",
+  x: "45",
+  y: "58",
+  fontSize: "7",
   fontWeight: "bold",
-  fill: "#fbbf24",
-  opacity: "0.8",
+  fill: "#2c1810",
+  fontFamily: "serif"
+}, "DICTIONARY"), /*#__PURE__*/React.createElement("line", {
+  x1: "45",
+  y1: "62",
+  x2: "84",
+  y2: "62",
+  stroke: "#2c1810",
+  strokeWidth: "0.3"
+}), /*#__PURE__*/React.createElement("line", {
+  x1: "45",
+  y1: "70",
+  x2: "82",
+  y2: "70",
+  stroke: "#2c1810",
+  strokeWidth: "0.3",
+  opacity: "0.6"
+}), /*#__PURE__*/React.createElement("line", {
+  x1: "45",
+  y1: "75",
+  x2: "80",
+  y2: "75",
+  stroke: "#2c1810",
+  strokeWidth: "0.3",
+  opacity: "0.6"
+}), /*#__PURE__*/React.createElement("line", {
+  x1: "45",
+  y1: "80",
+  x2: "84",
+  y2: "80",
+  stroke: "#2c1810",
+  strokeWidth: "0.3",
+  opacity: "0.6"
+}), /*#__PURE__*/React.createElement("line", {
+  x1: "45",
+  y1: "85",
+  x2: "78",
+  y2: "85",
+  stroke: "#2c1810",
+  strokeWidth: "0.3",
+  opacity: "0.6"
+}), /*#__PURE__*/React.createElement("path", {
+  d: "M 95 35 L 105 35 L 105 165 L 95 165 Z",
+  fill: "#5e1414"
+}), /*#__PURE__*/React.createElement("rect", {
+  x: "96",
+  y: "50",
+  width: "8",
+  height: "100",
+  fill: "#7f1d1d",
+  opacity: "0.7"
+}), /*#__PURE__*/React.createElement("text", {
+  x: "100",
+  y: "95",
+  fontSize: "6",
+  fontWeight: "bold",
+  fill: "url(#goldFoil)",
+  textAnchor: "middle",
+  fontFamily: "serif",
+  writingMode: "tb"
+}, "DICTIONARY"), /*#__PURE__*/React.createElement("path", {
+  d: "M 108 38 L 108 161 L 167 161 L 167 38 Z",
+  fill: "url(#pageGradient)"
+}), /*#__PURE__*/React.createElement("line", {
+  x1: "165",
+  y1: "38",
+  x2: "165",
+  y2: "161",
+  stroke: "#d4c5a0",
+  strokeWidth: "0.5"
+}), /*#__PURE__*/React.createElement("line", {
+  x1: "163",
+  y1: "38",
+  x2: "163",
+  y2: "161",
+  stroke: "#d4c5a0",
+  strokeWidth: "0.5"
+}), /*#__PURE__*/React.createElement("line", {
+  x1: "161",
+  y1: "38",
+  x2: "161",
+  y2: "161",
+  stroke: "#d4c5a0",
+  strokeWidth: "0.5"
+}), /*#__PURE__*/React.createElement("rect", {
+  x: "113",
+  y: "45",
+  width: "45",
+  height: "110",
+  fill: "#fffef8"
+}), /*#__PURE__*/React.createElement("text", {
+  x: "116",
+  y: "58",
+  fontSize: "6",
+  fontWeight: "bold",
+  fill: "#2c1810",
+  fontFamily: "serif"
+}, "def\xB7i\xB7ni\xB7tion"), /*#__PURE__*/React.createElement("text", {
+  x: "116",
+  y: "66",
+  fontSize: "5",
+  fill: "#666",
+  fontFamily: "serif",
+  fontStyle: "italic"
+}, "/\u02CCdef\u0259\u02C8niSH(\u0259)n/"), /*#__PURE__*/React.createElement("line", {
+  x1: "116",
+  y1: "70",
+  x2: "155",
+  y2: "70",
+  stroke: "#2c1810",
+  strokeWidth: "0.3"
+}), /*#__PURE__*/React.createElement("line", {
+  x1: "116",
+  y1: "75",
+  x2: "152",
+  y2: "75",
+  stroke: "#2c1810",
+  strokeWidth: "0.3",
+  opacity: "0.6"
+}), /*#__PURE__*/React.createElement("line", {
+  x1: "116",
+  y1: "80",
+  x2: "154",
+  y2: "80",
+  stroke: "#2c1810",
+  strokeWidth: "0.3",
+  opacity: "0.6"
+}), /*#__PURE__*/React.createElement("line", {
+  x1: "116",
+  y1: "85",
+  x2: "150",
+  y2: "85",
+  stroke: "#2c1810",
+  strokeWidth: "0.3",
+  opacity: "0.6"
+}), /*#__PURE__*/React.createElement("path", {
+  d: "M 105 35 L 170 35 Q 175 35 175 40 L 175 160 Q 175 165 170 165 L 105 165 Z",
+  fill: "url(#bookCover)",
+  stroke: "#5e1414",
+  strokeWidth: "2"
+}), /*#__PURE__*/React.createElement("rect", {
+  x: "108",
+  y: "38",
+  width: "64",
+  height: "3",
+  fill: "#5e1414",
+  opacity: "0.3"
+}), /*#__PURE__*/React.createElement("rect", {
+  x: "108",
+  y: "159",
+  width: "64",
+  height: "3",
+  fill: "#5e1414",
+  opacity: "0.3"
+}), /*#__PURE__*/React.createElement("rect", {
+  x: "115",
+  y: "50",
+  width: "50",
+  height: "75",
+  stroke: "url(#goldFoil)",
+  strokeWidth: "1.5",
+  fill: "none",
+  opacity: "0.9"
+}), /*#__PURE__*/React.createElement("rect", {
+  x: "118",
+  y: "53",
+  width: "44",
+  height: "69",
+  stroke: "url(#goldFoil)",
+  strokeWidth: "0.8",
+  fill: "none",
+  opacity: "0.7"
+}), /*#__PURE__*/React.createElement("text", {
+  x: "140",
+  y: "75",
+  fontSize: "11",
+  fontWeight: "bold",
+  fill: "url(#goldFoil)",
   textAnchor: "middle",
   fontFamily: "serif"
-}, "DICT"), /*#__PURE__*/React.createElement("path", {
-  d: "M 110 50 Q 115 48 120 50",
-  stroke: "#5b21b6",
-  strokeWidth: "0.5",
-  opacity: "0.3"
+}, "THE"), /*#__PURE__*/React.createElement("text", {
+  x: "140",
+  y: "92",
+  fontSize: "14",
+  fontWeight: "bold",
+  fill: "url(#goldFoil)",
+  textAnchor: "middle",
+  fontFamily: "serif"
+}, "DICTIONARY"), /*#__PURE__*/React.createElement("text", {
+  x: "140",
+  y: "107",
+  fontSize: "9",
+  fill: "url(#goldFoil)",
+  textAnchor: "middle",
+  fontFamily: "serif"
+}, "GAME"), /*#__PURE__*/React.createElement("path", {
+  d: "M 125 65 L 155 65",
+  stroke: "url(#goldFoil)",
+  strokeWidth: "0.8",
+  opacity: "0.7"
 }), /*#__PURE__*/React.createElement("path", {
-  d: "M 110 145 Q 115 143 120 145",
-  stroke: "#5b21b6",
-  strokeWidth: "0.5",
-  opacity: "0.3"
+  d: "M 125 112 L 155 112",
+  stroke: "url(#goldFoil)",
+  strokeWidth: "0.8",
+  opacity: "0.7"
+}), /*#__PURE__*/React.createElement("circle", {
+  cx: "122",
+  cy: "58",
+  r: "1.5",
+  fill: "url(#goldFoil)",
+  opacity: "0.8"
+}), /*#__PURE__*/React.createElement("circle", {
+  cx: "158",
+  cy: "58",
+  r: "1.5",
+  fill: "url(#goldFoil)",
+  opacity: "0.8"
+}), /*#__PURE__*/React.createElement("circle", {
+  cx: "122",
+  cy: "117",
+  r: "1.5",
+  fill: "url(#goldFoil)",
+  opacity: "0.8"
+}), /*#__PURE__*/React.createElement("circle", {
+  cx: "158",
+  cy: "117",
+  r: "1.5",
+  fill: "url(#goldFoil)",
+  opacity: "0.8"
 }));
 
 // Avatar options - will be loaded from avatars.json
@@ -1378,9 +1506,9 @@ function MultiplayerDictionaryGame() {
       className: "mt-8 text-center space-y-2"
     }, /*#__PURE__*/React.createElement("p", {
       className: "text-xs text-gray-500"
-    }, "\xA9 2026 Shaolynx, LLC. All rights reserved."), /*#__PURE__*/React.createElement("p", {
+    }, "\xA9 2026 Shaolynx, LLC"), /*#__PURE__*/React.createElement("p", {
       className: "text-xs text-gray-400"
-    }, "Open source under MIT License"), /*#__PURE__*/React.createElement("button", {
+    }, "Licensed under MIT License"), /*#__PURE__*/React.createElement("button", {
       onClick: e => {
         if (e.shiftKey) {
           const clickCount = parseInt(e.target.dataset.clicks || '0') + 1;

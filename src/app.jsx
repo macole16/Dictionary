@@ -26,76 +26,102 @@
          * }
          */
 
-        // Logo Component - Open Dictionary Book
+        // Logo Component - Classic Dictionary Book (OED/Webster's style)
         const DictionaryLogo = ({ size = 64 }) => (
             <svg width={size} height={size} viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <defs>
-                    {/* Gradient for leather book cover */}
+                    {/* Deep burgundy/maroon leather gradient like classic dictionaries */}
                     <linearGradient id="bookCover" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" style={{stopColor: "#7c3aed", stopOpacity: 1}} />
-                        <stop offset="50%" style={{stopColor: "#6d28d9", stopOpacity: 1}} />
-                        <stop offset="100%" style={{stopColor: "#5b21b6", stopOpacity: 1}} />
+                        <stop offset="0%" style={{stopColor: "#7f1d1d", stopOpacity: 1}} />
+                        <stop offset="50%" style={{stopColor: "#991b1b", stopOpacity: 1}} />
+                        <stop offset="100%" style={{stopColor: "#7f1d1d", stopOpacity: 1}} />
                     </linearGradient>
-                    {/* Gradient for pages */}
+                    {/* Aged paper gradient */}
                     <linearGradient id="pageGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                        <stop offset="0%" style={{stopColor: "#fefefe", stopOpacity: 1}} />
-                        <stop offset="100%" style={{stopColor: "#f5f5f5", stopOpacity: 1}} />
+                        <stop offset="0%" style={{stopColor: "#fef9e7", stopOpacity: 1}} />
+                        <stop offset="100%" style={{stopColor: "#faf5e4", stopOpacity: 1}} />
                     </linearGradient>
                     {/* Shadow gradient */}
                     <linearGradient id="shadowGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                        <stop offset="0%" style={{stopColor: "#000", stopOpacity: 0.3}} />
+                        <stop offset="0%" style={{stopColor: "#000", stopOpacity: 0.4}} />
                         <stop offset="100%" style={{stopColor: "#000", stopOpacity: 0}} />
+                    </linearGradient>
+                    {/* Gold foil gradient */}
+                    <linearGradient id="goldFoil" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style={{stopColor: "#ffd700", stopOpacity: 1}} />
+                        <stop offset="50%" style={{stopColor: "#ffed4e", stopOpacity: 1}} />
+                        <stop offset="100%" style={{stopColor: "#ffd700", stopOpacity: 1}} />
                     </linearGradient>
                 </defs>
 
                 {/* Shadow beneath book */}
-                <ellipse cx="100" cy="165" rx="70" ry="8" fill="url(#shadowGrad)" opacity="0.3"/>
+                <ellipse cx="100" cy="168" rx="75" ry="10" fill="url(#shadowGrad)" opacity="0.4"/>
 
                 {/* Book cover - back */}
-                <path d="M 35 40 L 35 155 Q 35 160 40 160 L 95 160 L 95 40 Z" fill="url(#bookCover)" stroke="#5b21b6" strokeWidth="1.5"/>
+                <path d="M 30 35 L 30 158 Q 30 165 37 165 L 95 165 L 95 35 Z" fill="url(#bookCover)" stroke="#5e1414" strokeWidth="2"/>
 
-                {/* Book pages on left side */}
-                <path d="M 38 43 L 38 156 L 92 156 L 92 43 Z" fill="url(#pageGradient)"/>
-                <path d="M 41 46 L 41 153 L 89 153 L 89 46 Z" fill="#ffffff"/>
+                {/* Book pages on left side - showing multiple page edges */}
+                <path d="M 33 38 L 33 161 L 92 161 L 92 38 Z" fill="url(#pageGradient)"/>
+                <line x1="35" y1="38" x2="35" y2="161" stroke="#d4c5a0" strokeWidth="0.5"/>
+                <line x1="37" y1="38" x2="37" y2="161" stroke="#d4c5a0" strokeWidth="0.5"/>
+                <line x1="39" y1="38" x2="39" y2="161" stroke="#d4c5a0" strokeWidth="0.5"/>
 
-                {/* Text on left page */}
-                <line x1="48" y1="60" x2="82" y2="60" stroke="#9333ea" strokeWidth="1.5" opacity="0.7"/>
-                <line x1="48" y1="70" x2="80" y2="70" stroke="#9333ea" strokeWidth="1.5" opacity="0.7"/>
-                <line x1="48" y1="80" x2="82" y2="80" stroke="#9333ea" strokeWidth="1.5" opacity="0.7"/>
-                <line x1="48" y1="90" x2="75" y2="90" stroke="#9333ea" strokeWidth="1.5" opacity="0.7"/>
-                <line x1="48" y1="100" x2="82" y2="100" stroke="#9333ea" strokeWidth="1.5" opacity="0.5"/>
-                <line x1="48" y1="110" x2="78" y2="110" stroke="#9333ea" strokeWidth="1.5" opacity="0.5"/>
+                {/* Left page content - dictionary entry style */}
+                <rect x="42" y="45" width="45" height="110" fill="#fffef8"/>
+                <text x="45" y="58" fontSize="7" fontWeight="bold" fill="#2c1810" fontFamily="serif">DICTIONARY</text>
+                <line x1="45" y1="62" x2="84" y2="62" stroke="#2c1810" strokeWidth="0.3"/>
+                <line x1="45" y1="70" x2="82" y2="70" stroke="#2c1810" strokeWidth="0.3" opacity="0.6"/>
+                <line x1="45" y1="75" x2="80" y2="75" stroke="#2c1810" strokeWidth="0.3" opacity="0.6"/>
+                <line x1="45" y1="80" x2="84" y2="80" stroke="#2c1810" strokeWidth="0.3" opacity="0.6"/>
+                <line x1="45" y1="85" x2="78" y2="85" stroke="#2c1810" strokeWidth="0.3" opacity="0.6"/>
 
-                {/* Book spine */}
-                <path d="M 95 40 L 105 40 L 105 160 L 95 160 Z" fill="#5b21b6"/>
-                <rect x="97" y="70" width="6" height="60" fill="#7c3aed" opacity="0.5" rx="1"/>
+                {/* Book spine - thicker for classic dictionary */}
+                <path d="M 95 35 L 105 35 L 105 165 L 95 165 Z" fill="#5e1414"/>
+                <rect x="96" y="50" width="8" height="100" fill="#7f1d1d" opacity="0.7"/>
+
+                {/* Gold spine lettering */}
+                <text x="100" y="95" fontSize="6" fontWeight="bold" fill="url(#goldFoil)" textAnchor="middle" fontFamily="serif" writingMode="tb">DICTIONARY</text>
 
                 {/* Book pages on right side */}
-                <path d="M 108 43 L 108 156 L 162 156 L 162 43 Z" fill="url(#pageGradient)"/>
-                <path d="M 111 46 L 111 153 L 159 153 L 159 46 Z" fill="#ffffff"/>
+                <path d="M 108 38 L 108 161 L 167 161 L 167 38 Z" fill="url(#pageGradient)"/>
+                <line x1="165" y1="38" x2="165" y2="161" stroke="#d4c5a0" strokeWidth="0.5"/>
+                <line x1="163" y1="38" x2="163" y2="161" stroke="#d4c5a0" strokeWidth="0.5"/>
+                <line x1="161" y1="38" x2="161" y2="161" stroke="#d4c5a0" strokeWidth="0.5"/>
 
-                {/* Text on right page */}
-                <line x1="118" y1="60" x2="152" y2="60" stroke="#9333ea" strokeWidth="1.5" opacity="0.7"/>
-                <line x1="118" y1="70" x2="150" y2="70" stroke="#9333ea" strokeWidth="1.5" opacity="0.7"/>
-                <line x1="118" y1="80" x2="152" y2="80" stroke="#9333ea" strokeWidth="1.5" opacity="0.7"/>
-                <line x1="118" y1="90" x2="145" y2="90" stroke="#9333ea" strokeWidth="1.5" opacity="0.7"/>
-                <line x1="118" y1="100" x2="152" y2="100" stroke="#9333ea" strokeWidth="1.5" opacity="0.5"/>
-                <line x1="118" y1="110" x2="148" y2="110" stroke="#9333ea" strokeWidth="1.5" opacity="0.5"/>
+                {/* Right page content */}
+                <rect x="113" y="45" width="45" height="110" fill="#fffef8"/>
+                <text x="116" y="58" fontSize="6" fontWeight="bold" fill="#2c1810" fontFamily="serif">def·i·ni·tion</text>
+                <text x="116" y="66" fontSize="5" fill="#666" fontFamily="serif" fontStyle="italic">/ˌdefəˈniSH(ə)n/</text>
+                <line x1="116" y1="70" x2="155" y2="70" stroke="#2c1810" strokeWidth="0.3"/>
+                <line x1="116" y1="75" x2="152" y2="75" stroke="#2c1810" strokeWidth="0.3" opacity="0.6"/>
+                <line x1="116" y1="80" x2="154" y2="80" stroke="#2c1810" strokeWidth="0.3" opacity="0.6"/>
+                <line x1="116" y1="85" x2="150" y2="85" stroke="#2c1810" strokeWidth="0.3" opacity="0.6"/>
 
                 {/* Book cover - front */}
-                <path d="M 105 40 L 165 40 Q 170 40 170 45 L 170 155 Q 170 160 165 160 L 105 160 Z" fill="url(#bookCover)" stroke="#5b21b6" strokeWidth="1.5"/>
+                <path d="M 105 35 L 170 35 Q 175 35 175 40 L 175 160 Q 175 165 170 165 L 105 165 Z" fill="url(#bookCover)" stroke="#5e1414" strokeWidth="2"/>
 
-                {/* Decorative gold embossing on cover */}
-                <path d="M 120 55 L 155 55 L 155 58 L 120 58 Z" fill="#fbbf24" opacity="0.8"/>
-                <circle cx="137.5" cy="100" r="15" stroke="#fbbf24" strokeWidth="2" fill="none" opacity="0.6"/>
-                <path d="M 137.5 90 L 137.5 110 M 127.5 100 L 147.5 100" stroke="#fbbf24" strokeWidth="2" opacity="0.6"/>
+                {/* Leather texture embossing */}
+                <rect x="108" y="38" width="64" height="3" fill="#5e1414" opacity="0.3"/>
+                <rect x="108" y="159" width="64" height="3" fill="#5e1414" opacity="0.3"/>
 
-                {/* Book title embossing */}
-                <text x="137.5" y="135" fontSize="10" fontWeight="bold" fill="#fbbf24" opacity="0.8" textAnchor="middle" fontFamily="serif">DICT</text>
+                {/* Gold foil title and decorative border - classic dictionary style */}
+                <rect x="115" y="50" width="50" height="75" stroke="url(#goldFoil)" strokeWidth="1.5" fill="none" opacity="0.9"/>
+                <rect x="118" y="53" width="44" height="69" stroke="url(#goldFoil)" strokeWidth="0.8" fill="none" opacity="0.7"/>
 
-                {/* Leather texture details */}
-                <path d="M 110 50 Q 115 48 120 50" stroke="#5b21b6" strokeWidth="0.5" opacity="0.3"/>
-                <path d="M 110 145 Q 115 143 120 145" stroke="#5b21b6" strokeWidth="0.5" opacity="0.3"/>
+                {/* Title text */}
+                <text x="140" y="75" fontSize="11" fontWeight="bold" fill="url(#goldFoil)" textAnchor="middle" fontFamily="serif">THE</text>
+                <text x="140" y="92" fontSize="14" fontWeight="bold" fill="url(#goldFoil)" textAnchor="middle" fontFamily="serif">DICTIONARY</text>
+                <text x="140" y="107" fontSize="9" fill="url(#goldFoil)" textAnchor="middle" fontFamily="serif">GAME</text>
+
+                {/* Decorative elements */}
+                <path d="M 125 65 L 155 65" stroke="url(#goldFoil)" strokeWidth="0.8" opacity="0.7"/>
+                <path d="M 125 112 L 155 112" stroke="url(#goldFoil)" strokeWidth="0.8" opacity="0.7"/>
+
+                {/* Corner ornaments */}
+                <circle cx="122" cy="58" r="1.5" fill="url(#goldFoil)" opacity="0.8"/>
+                <circle cx="158" cy="58" r="1.5" fill="url(#goldFoil)" opacity="0.8"/>
+                <circle cx="122" cy="117" r="1.5" fill="url(#goldFoil)" opacity="0.8"/>
+                <circle cx="158" cy="117" r="1.5" fill="url(#goldFoil)" opacity="0.8"/>
             </svg>
         );
 
