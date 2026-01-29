@@ -1309,7 +1309,7 @@
                                     <DictionaryLogo size={80} />
                                 </div>
                                 <h1 className="text-3xl font-bold text-purple-900 mb-2 gradient-text">Dictionary Game</h1>
-                                <p className="text-gray-600">Multiplayer word bluffing game</p>
+                                <p className="text-gray-600">Multiplayer Word Bluffing Game</p>
                             </div>
 
                             <div className="space-y-4">
