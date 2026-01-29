@@ -1337,10 +1337,10 @@
                             {/* Copyright and Version */}
                             <div className="mt-8 text-center space-y-2">
                                 <p className="text-xs text-gray-500">
-                                    © 2026 Shaolynx, LLC. All rights reserved.
+                                    © 2026 Shaolynx, LLC
                                 </p>
                                 <p className="text-xs text-gray-400">
-                                    Open source under MIT License
+                                    Licensed under MIT License
                                 </p>
                                 <button
                                     onClick={(e) => {
