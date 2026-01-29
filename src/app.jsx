@@ -694,10 +694,13 @@
                     await database.ref(`games/${gameCode}/usedWords`).set(updatedUsedWords);
                 }
 
+                // Remove trailing punctuation from real definition for consistency
+                const cleanedRealDefinition = realDefinition.trim().replace(/[.!?;,]+$/, '');
+
                 await database.ref(`games/${gameCode}`).update({
                     state: 'collecting',
                     currentWord: currentWord,
-                    realDefinition: realDefinition,
+                    realDefinition: cleanedRealDefinition,
                     difficulty: difficulty,
                     pronunciation: pronunciation || '',
                     wordFact: wordFact || '',
@@ -793,8 +796,11 @@
                     return;
                 }
 
+                // Remove trailing punctuation for consistency
+                const cleanedDefinition = myDefinition.trim().replace(/[.!?;,]+$/, '');
+
                 await database.ref(`games/${gameCode}/definitions/${playerId}`).set({
-                    text: myDefinition.trim()
+                    text: cleanedDefinition
                 });
 
                 setMyDefinition('');
@@ -857,6 +863,14 @@
                 updates.voteCounts = voteCounts;
 
                 await database.ref(`games/${gameCode}`).update(updates);
+            };
+
+            const awardBonusPoint = async (playerId) => {
+                if (!isHost) return;
+
+                const currentScore = gameData.players[playerId]?.score || 0;
+                await database.ref(`games/${gameCode}/players/${playerId}/score`).set(currentScore + 1);
+                showToast(`Awarded bonus point to ${gameData.players[playerId]?.name}`, 'success');
             };
 
             const newRound = async () => {
@@ -963,40 +977,52 @@
                                 const existingDefs = currentDefs.val() || {};
                                 const existingTexts = Object.values(existingDefs).map(d => d.text);
 
-                                // Smarter definition templates based on word structure
-                                const definitionTemplates = [
+                                // Helper to pick random from array
+                                const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+
+                                // Generate unique definition templates (generates fresh each time)
+                                const generateDefinitionTemplates = () => [
                                     // Noun templates
-                                    `A ${['small', 'large', 'rare', 'common', 'unusual'][Math.floor(Math.random() * 5)]} object or substance used in ${['ancient', 'medieval', 'traditional', 'modern'][Math.floor(Math.random() * 4)]} ${['ceremonies', 'practices', 'crafts', 'medicine'][Math.floor(Math.random() * 4)]}`,
-                                    `The ${['process', 'art', 'practice', 'technique'][Math.floor(Math.random() * 4)]} of ${['creating', 'producing', 'forming', 'shaping'][Math.floor(Math.random() * 4)]} something through ${['careful', 'precise', 'deliberate', 'systematic'][Math.floor(Math.random() * 4)]} means`,
-                                    `A ${['medical', 'botanical', 'geological', 'astronomical'][Math.floor(Math.random() * 4)]} term for a ${['condition', 'phenomenon', 'formation', 'pattern'][Math.floor(Math.random() * 4)]} ${['characterized by', 'resulting from', 'associated with', 'marked by'][Math.floor(Math.random() * 4)]} ${['unusual', 'specific', 'distinct', 'particular'][Math.floor(Math.random() * 4)]} properties`,
+                                    `A ${pick(['small', 'large', 'rare', 'common', 'unusual', 'peculiar', 'distinctive'])} object or substance used in ${pick(['ancient', 'medieval', 'traditional', 'modern', 'contemporary'])} ${pick(['ceremonies', 'practices', 'crafts', 'medicine', 'rituals', 'trades'])}`,
+                                    `The ${pick(['process', 'art', 'practice', 'technique', 'method', 'procedure'])} of ${pick(['creating', 'producing', 'forming', 'shaping', 'fashioning', 'crafting'])} something through ${pick(['careful', 'precise', 'deliberate', 'systematic', 'meticulous', 'rigorous'])} means`,
+                                    `A ${pick(['medical', 'botanical', 'geological', 'astronomical', 'nautical', 'architectural'])} term for a ${pick(['condition', 'phenomenon', 'formation', 'pattern', 'structure', 'occurrence'])} ${pick(['characterized by', 'resulting from', 'associated with', 'marked by', 'distinguished by', 'defined by'])} ${pick(['unusual', 'specific', 'distinct', 'particular', 'unique', 'notable'])} properties`,
 
                                     // Verb templates
-                                    `To ${['carefully', 'deliberately', 'systematically', 'thoroughly'][Math.floor(Math.random() * 4)]} ${['arrange', 'organize', 'prepare', 'modify'][Math.floor(Math.random() * 4)]} something in a ${['specific', 'particular', 'prescribed', 'traditional'][Math.floor(Math.random() * 4)]} manner`,
-                                    `The act of ${['moving', 'transferring', 'converting', 'transforming'][Math.floor(Math.random() * 4)]} something from one ${['state', 'form', 'position', 'condition'][Math.floor(Math.random() * 4)]} to another`,
+                                    `To ${pick(['carefully', 'deliberately', 'systematically', 'thoroughly', 'methodically', 'precisely'])} ${pick(['arrange', 'organize', 'prepare', 'modify', 'adjust', 'configure'])} something in a ${pick(['specific', 'particular', 'prescribed', 'traditional', 'customary', 'established'])} manner`,
+                                    `The act of ${pick(['moving', 'transferring', 'converting', 'transforming', 'shifting', 'transitioning'])} something from one ${pick(['state', 'form', 'position', 'condition', 'phase', 'stage'])} to another`,
 
                                     // Adjective templates
-                                    `Having the ${['quality', 'characteristic', 'property', 'nature'][Math.floor(Math.random() * 4)]} of being ${['exceptionally', 'particularly', 'remarkably', 'notably'][Math.floor(Math.random() * 4)]} ${['complex', 'simple', 'delicate', 'robust'][Math.floor(Math.random() * 4)]}`,
-                                    `${['Relating to', 'Pertaining to', 'Associated with', 'Connected with'][Math.floor(Math.random() * 4)]} ${['ancient', 'historical', 'traditional', 'cultural'][Math.floor(Math.random() * 4)]} ${['beliefs', 'practices', 'customs', 'traditions'][Math.floor(Math.random() * 4)]}`,
+                                    `Having the ${pick(['quality', 'characteristic', 'property', 'nature', 'attribute', 'trait'])} of being ${pick(['exceptionally', 'particularly', 'remarkably', 'notably', 'distinctly', 'uncommonly'])} ${pick(['complex', 'simple', 'delicate', 'robust', 'intricate', 'elaborate'])}`,
+                                    `${pick(['Relating to', 'Pertaining to', 'Associated with', 'Connected with', 'Concerning', 'Regarding'])} ${pick(['ancient', 'historical', 'traditional', 'cultural', 'ancestral', 'bygone'])} ${pick(['beliefs', 'practices', 'customs', 'traditions', 'conventions', 'ceremonies'])}`,
 
                                     // Professional/occupation templates
-                                    `A person who ${['specializes in', 'practices', 'studies', 'engages in'][Math.floor(Math.random() * 4)]} the ${['art', 'science', 'craft', 'skill'][Math.floor(Math.random() * 4)]} of ${['creating', 'maintaining', 'analyzing', 'interpreting'][Math.floor(Math.random() * 4)]} ${['complex', 'intricate', 'detailed', 'specialized'][Math.floor(Math.random() * 4)]} ${['works', 'systems', 'structures', 'patterns'][Math.floor(Math.random() * 4)]}`,
+                                    `A person who ${pick(['specializes in', 'practices', 'studies', 'engages in', 'devotes themselves to', 'focuses on'])} the ${pick(['art', 'science', 'craft', 'skill', 'discipline', 'profession'])} of ${pick(['creating', 'maintaining', 'analyzing', 'interpreting', 'designing', 'constructing'])} ${pick(['complex', 'intricate', 'detailed', 'specialized', 'sophisticated', 'elaborate'])} ${pick(['works', 'systems', 'structures', 'patterns', 'compositions', 'arrangements'])}`,
 
                                     // Archaic/historical templates
-                                    `An ${['archaic', 'obsolete', 'antiquated', 'historical'][Math.floor(Math.random() * 4)]} term ${['formerly', 'originally', 'traditionally', 'historically'][Math.floor(Math.random() * 4)]} used to ${['describe', 'denote', 'refer to', 'indicate'][Math.floor(Math.random() * 4)]} ${['persons', 'objects', 'practices', 'conditions'][Math.floor(Math.random() * 4)]} of ${['particular', 'special', 'significant', 'notable'][Math.floor(Math.random() * 4)]} importance`
+                                    `An ${pick(['archaic', 'obsolete', 'antiquated', 'historical', 'outdated', 'bygone'])} term ${pick(['formerly', 'originally', 'traditionally', 'historically', 'previously', 'once'])} used to ${pick(['describe', 'denote', 'refer to', 'indicate', 'designate', 'signify'])} ${pick(['persons', 'objects', 'practices', 'conditions', 'situations', 'phenomena'])} of ${pick(['particular', 'special', 'significant', 'notable', 'considerable', 'exceptional'])} importance`,
+
+                                    // Additional variety templates
+                                    `A ${pick(['decorative', 'functional', 'ceremonial', 'symbolic', 'ornamental'])} ${pick(['implement', 'device', 'tool', 'instrument', 'apparatus'])} used primarily in ${pick(['rural', 'urban', 'coastal', 'mountain', 'desert'])} regions`,
+                                    `The ${pick(['traditional', 'customary', 'habitual', 'routine', 'conventional'])} practice of ${pick(['celebrating', 'commemorating', 'observing', 'honoring', 'marking'])} ${pick(['seasonal', 'agricultural', 'religious', 'civic', 'social'])} events`,
+                                    `A ${pick(['temporary', 'permanent', 'seasonal', 'periodic', 'intermittent'])} ${pick(['state', 'phase', 'condition', 'period', 'stage'])} of ${pick(['growth', 'decline', 'transition', 'development', 'maturation'])} in ${pick(['flora', 'fauna', 'geology', 'climate', 'society'])}`
                                 ];
 
-                                // Try to find a unique definition (max 10 attempts)
+                                // Try to find a unique definition (max 20 attempts with fresh templates each time)
                                 let randomDef;
                                 let attempts = 0;
                                 do {
-                                    randomDef = definitionTemplates[Math.floor(Math.random() * definitionTemplates.length)];
+                                    const templates = generateDefinitionTemplates();
+                                    randomDef = pick(templates);
                                     attempts++;
-                                } while (existingTexts.includes(randomDef) && attempts < 10);
+                                } while (existingTexts.includes(randomDef) && attempts < 20);
 
-                                // If still duplicate after 10 tries, add bot name to make it unique
+                                // If still duplicate after 20 tries, add variation
                                 if (existingTexts.includes(randomDef)) {
-                                    randomDef = `${randomDef} (variant interpretation)`;
+                                    randomDef = `${randomDef.slice(0, -1)}, ${pick(['especially', 'particularly', 'notably'])} in ${pick(['various', 'certain', 'specific', 'numerous'])} contexts`;
                                 }
+
+                                // Remove trailing punctuation for consistency
+                                randomDef = randomDef.replace(/[.!?;,]+$/, '');
 
                                 await database.ref(`games/${gameCode}/definitions/${botId}`).set({
                                     text: randomDef
@@ -2208,22 +2234,35 @@
                                                 Definitions received: {Object.keys(definitions).length} / {Object.keys(players).length - 1}
                                             </p>
 
-                                            {/* Real Definition - Always shown first for dictionary holder */}
-                                            <div className="bg-green-50 p-3 rounded border-2 border-green-300 depth-layer-1">
-                                                <p className="text-sm font-bold text-green-800 flex items-center gap-2">
-                                                    <span>📖</span>
-                                                    Real Definition
-                                                </p>
-                                                <p className="text-gray-800 mt-1">{gameData.realDefinition}</p>
-                                            </div>
+                                            {/* All Definitions - Randomized order for reading aloud */}
+                                            {(() => {
+                                                // Create array of all definitions including real one
+                                                const allDefs = [
+                                                    { id: 'real', text: gameData.realDefinition, isReal: true },
+                                                    ...Object.entries(definitions).map(([defId, def]) => ({
+                                                        id: defId,
+                                                        text: def.text,
+                                                        isReal: false
+                                                    }))
+                                                ];
 
-                                            {/* Player Definitions */}
-                                            {Object.keys(definitions).map((defId, idx) => (
-                                                <div key={defId} className="bg-gray-50 p-3 rounded depth-layer-1">
-                                                    <p className="text-sm font-medium text-gray-600">Definition {idx + 1}</p>
-                                                    <p className="text-gray-800">{definitions[defId].text}</p>
-                                                </div>
-                                            ))}
+                                                // Shuffle the array (using sort with random comparison)
+                                                const shuffled = allDefs.sort(() => Math.random() - 0.5);
+
+                                                return shuffled.map((def, idx) => (
+                                                    <div
+                                                        key={def.id}
+                                                        className={def.isReal ? "bg-green-50 p-3 rounded border-2 border-green-300 depth-layer-1" : "bg-gray-50 p-3 rounded depth-layer-1"}
+                                                    >
+                                                        <p className="text-sm font-medium text-gray-600 flex items-center gap-2">
+                                                            {def.isReal && <span>📖</span>}
+                                                            Definition {idx + 1}
+                                                            {def.isReal && <span className="text-green-700 font-bold">(Real)</span>}
+                                                        </p>
+                                                        <p className="text-gray-800 mt-1">{def.text}</p>
+                                                    </div>
+                                                ));
+                                            })()}
                                             {Object.keys(definitions).length >= Object.keys(players).length - 1 ? (
                                                 <button onClick={startVoting} className="w-full px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
                                                     Start Voting
@@ -2276,11 +2315,7 @@
                                                     return (
                                                         <button key={id} onClick={() => castVote(id)} className={`w-full text-left p-4 rounded-lg border-2 transition-all ${voted ? 'border-green-500 bg-green-50' : 'border-gray-200 hover:border-purple-300 hover:shadow-md'} btn-3d`}>
                                                             <div className="flex items-start gap-3">
-                                                                {id === 'real' ? (
-                                                                    <span className="text-3xl flex-shrink-0">📖</span>
-                                                                ) : (
-                                                                    <span className="text-3xl flex-shrink-0">📝</span>
-                                                                )}
+                                                                <span className="text-3xl flex-shrink-0">📝</span>
                                                                 <div className="flex-1">
                                                                     <p className="text-gray-800">{def.text}</p>
                                                                 </div>
@@ -2310,6 +2345,14 @@
                             {gameData.state === 'results' && (
                                 <div className="glass-card rounded-2xl shadow-lg p-6 mb-4 fade-in">
                                     <h2 className="text-xl font-semibold mb-4">Round Results</h2>
+
+                                    {/* Word Display */}
+                                    <div className="mb-4 text-center">
+                                        <p className="text-2xl font-bold text-purple-900">{gameData.currentWord}</p>
+                                        {gameData.pronunciation && (
+                                            <p className="text-sm text-purple-600 mt-1">📢 {gameData.pronunciation}</p>
+                                        )}
+                                    </div>
 
                                     <div className="mb-6 p-4 bg-green-50 rounded-lg depth-layer-2">
                                         <div className="flex items-start gap-3 mb-3">
@@ -2370,7 +2413,18 @@
                                                     <div className="flex items-start gap-3 mb-2">
                                                         <span className="text-3xl">{avatar?.emoji || '👤'}</span>
                                                         <div className="flex-1">
-                                                            <p className="font-semibold text-purple-900">{playerInfo?.name}:</p>
+                                                            <div className="flex items-center justify-between mb-1">
+                                                                <p className="font-semibold text-purple-900">{playerInfo?.name}:</p>
+                                                                {isHost && !playerInfo?.isBot && (
+                                                                    <button
+                                                                        onClick={() => awardBonusPoint(defId)}
+                                                                        className="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 text-xs font-semibold btn-3d"
+                                                                        title="Award bonus point for excellent definition"
+                                                                    >
+                                                                        +1 Bonus
+                                                                    </button>
+                                                                )}
+                                                            </div>
                                                             <p className="text-gray-800 mt-1">{def.text}</p>
                                                         </div>
                                                     </div>
