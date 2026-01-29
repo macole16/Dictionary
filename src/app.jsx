@@ -1328,6 +1328,10 @@
                                 <button onClick={() => setView('stats')} className="w-full px-6 py-4 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold text-lg btn-3d fade-in-delay-4">
                                     📊 Game Stats
                                 </button>
+
+                                <button onClick={() => setView('instructions')} className="w-full px-6 py-4 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-semibold text-lg btn-3d fade-in-delay-5">
+                                    📖 How to Play
+                                </button>
                             </div>
 
                             {/* Hidden Admin Reset Button - Hold Shift and click the logo 3 times to show */}
@@ -1738,6 +1742,130 @@
                                             ))}
                                         </div>
                                     )}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+
+            if (view === 'instructions') {
+                return (
+                    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 p-4">
+                        <div className="max-w-4xl mx-auto">
+                            <div className="bg-white rounded-lg shadow-xl p-8 mb-6">
+                                <button
+                                    onClick={() => setView('home')}
+                                    className="mb-6 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 btn-3d"
+                                >
+                                    ← Back to Menu
+                                </button>
+
+                                <div className="text-center mb-8">
+                                    <h1 className="text-4xl font-bold text-purple-900 mb-2">How to Play</h1>
+                                    <p className="text-gray-600">A multiplayer word bluffing game</p>
+                                </div>
+
+                                <div className="space-y-6">
+                                    {/* Setup Section */}
+                                    <div className="border-l-4 border-purple-500 pl-4">
+                                        <h2 className="text-2xl font-bold text-purple-900 mb-3">🎮 Setup</h2>
+                                        <ol className="list-decimal list-inside space-y-2 text-gray-700">
+                                            <li><strong>Host a Game:</strong> One player creates a new game and receives a 6-digit game code</li>
+                                            <li><strong>Join:</strong> Other players join using the game code</li>
+                                            <li><strong>Dictionary Holder:</strong> The host assigns a "Dictionary Holder" who manages each round (can be any player)</li>
+                                        </ol>
+                                    </div>
+
+                                    {/* Round Flow Section */}
+                                    <div className="border-l-4 border-blue-500 pl-4">
+                                        <h2 className="text-2xl font-bold text-blue-900 mb-3">🔄 Round Flow</h2>
+
+                                        <div className="space-y-4">
+                                            <div>
+                                                <h3 className="text-lg font-semibold text-gray-800 mb-2">1. Setup Phase (Dictionary Holder)</h3>
+                                                <ul className="list-disc list-inside space-y-1 text-gray-700 ml-4">
+                                                    <li>Select a difficulty level: Kids (8-12), Teens, or Adults</li>
+                                                    <li>Choose an obscure word (use "Random" button or enter manually)</li>
+                                                    <li>Enter or fetch the real definition from online dictionaries</li>
+                                                    <li>Start the round to begin collecting definitions</li>
+                                                </ul>
+                                            </div>
+
+                                            <div>
+                                                <h3 className="text-lg font-semibold text-gray-800 mb-2">2. Definition Phase (All Other Players)</h3>
+                                                <ul className="list-disc list-inside space-y-1 text-gray-700 ml-4">
+                                                    <li>See the word</li>
+                                                    <li>Submit a fake definition that sounds plausible</li>
+                                                    <li>Try to fool other players into thinking your definition is real</li>
+                                                </ul>
+                                            </div>
+
+                                            <div>
+                                                <h3 className="text-lg font-semibold text-gray-800 mb-2">3. Voting Phase (All Players except Dictionary Holder)</h3>
+                                                <ul className="list-disc list-inside space-y-1 text-gray-700 ml-4">
+                                                    <li>See all fake definitions plus the real definition (shuffled randomly)</li>
+                                                    <li>Vote for the definition you think is real</li>
+                                                    <li>Cannot vote for your own definition</li>
+                                                </ul>
+                                            </div>
+
+                                            <div>
+                                                <h3 className="text-lg font-semibold text-gray-800 mb-2">4. Results Phase</h3>
+                                                <ul className="list-disc list-inside space-y-1 text-gray-700 ml-4">
+                                                    <li>Reveals which definition was real</li>
+                                                    <li>Shows who wrote each fake definition</li>
+                                                    <li>Displays vote counts and points earned</li>
+                                                    <li>Host starts the next round</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Scoring Section */}
+                                    <div className="border-l-4 border-green-500 pl-4">
+                                        <h2 className="text-2xl font-bold text-green-900 mb-3">🏆 Scoring</h2>
+                                        <p className="text-gray-700 mb-3">Points are awarded at the end of each round:</p>
+                                        <ul className="list-disc list-inside space-y-2 text-gray-700 ml-4">
+                                            <li><strong>+1 point per vote</strong> - Players earn 1 point for each vote their fake definition receives</li>
+                                            <li><strong>+1 point for guessing correctly</strong> - Players who vote for the real definition earn 1 point</li>
+                                            <li><strong>+1 point per correct vote</strong> - The Dictionary Holder earns 1 point for each player who votes for the real definition</li>
+                                        </ul>
+                                    </div>
+
+                                    {/* Strategy Section */}
+                                    <div className="border-l-4 border-orange-500 pl-4">
+                                        <h2 className="text-2xl font-bold text-orange-900 mb-3">💡 Strategy Tips</h2>
+                                        <ul className="list-disc list-inside space-y-2 text-gray-700 ml-4">
+                                            <li>Write convincing fake definitions that sound like dictionary entries</li>
+                                            <li>Use proper grammar and formal language to match real definitions</li>
+                                            <li>Balance being believable with being creative</li>
+                                            <li>Guess the real definition to earn bonus points</li>
+                                        </ul>
+                                    </div>
+
+                                    {/* Features Section */}
+                                    <div className="border-l-4 border-indigo-500 pl-4">
+                                        <h2 className="text-2xl font-bold text-indigo-900 mb-3">✨ Features</h2>
+                                        <ul className="list-disc list-inside space-y-1 text-gray-700 ml-4">
+                                            <li>Real-time multiplayer with Firebase</li>
+                                            <li>Word pronunciation with text-to-speech (click the 🔊 icon)</li>
+                                            <li>Phonetic spelling guides when available</li>
+                                            <li>Bot players to fill out your game</li>
+                                            <li>QR code sharing for easy joining</li>
+                                            <li>Session persistence - reconnects if you refresh</li>
+                                            <li>Game history tracking</li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <div className="mt-8 text-center">
+                                    <button
+                                        onClick={() => setView('home')}
+                                        className="px-8 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-semibold text-lg btn-3d"
+                                    >
+                                        Ready to Play!
+                                    </button>
                                 </div>
                             </div>
                         </div>

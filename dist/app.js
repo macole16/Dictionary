@@ -1357,7 +1357,7 @@ function MultiplayerDictionaryGame() {
       className: "text-3xl font-bold text-purple-900 mb-2 gradient-text"
     }, "Dictionary Game"), /*#__PURE__*/React.createElement("p", {
       className: "text-gray-600"
-    }, "Multiplayer word bluffing game")), /*#__PURE__*/React.createElement("div", {
+    }, "Multiplayer Word Bluffing Game")), /*#__PURE__*/React.createElement("div", {
       className: "space-y-4"
     }, /*#__PURE__*/React.createElement("button", {
       onClick: () => setView('host'),
@@ -1371,7 +1371,10 @@ function MultiplayerDictionaryGame() {
     }, "Manage My Games"), /*#__PURE__*/React.createElement("button", {
       onClick: () => setView('stats'),
       className: "w-full px-6 py-4 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold text-lg btn-3d fade-in-delay-4"
-    }, "\uD83D\uDCCA Game Stats")), /*#__PURE__*/React.createElement("div", {
+    }, "\uD83D\uDCCA Game Stats"), /*#__PURE__*/React.createElement("button", {
+      onClick: () => setView('instructions'),
+      className: "w-full px-6 py-4 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-semibold text-lg btn-3d fade-in-delay-5"
+    }, "\uD83D\uDCD6 How to Play")), /*#__PURE__*/React.createElement("div", {
       className: "mt-8 text-center"
     }, /*#__PURE__*/React.createElement("button", {
       onClick: e => {
@@ -1709,6 +1712,79 @@ function MultiplayerDictionaryGame() {
     }, "+", game.players.length - 6, " more")), /*#__PURE__*/React.createElement("div", {
       className: "mt-2 text-xs text-gray-500"
     }, "Rounds played: ", game.roundsPlayed || 0))))))));
+  }
+  if (view === 'instructions') {
+    return /*#__PURE__*/React.createElement("div", {
+      className: "min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 p-4"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "max-w-4xl mx-auto"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "bg-white rounded-lg shadow-xl p-8 mb-6"
+    }, /*#__PURE__*/React.createElement("button", {
+      onClick: () => setView('home'),
+      className: "mb-6 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 btn-3d"
+    }, "\u2190 Back to Menu"), /*#__PURE__*/React.createElement("div", {
+      className: "text-center mb-8"
+    }, /*#__PURE__*/React.createElement("h1", {
+      className: "text-4xl font-bold text-purple-900 mb-2"
+    }, "How to Play"), /*#__PURE__*/React.createElement("p", {
+      className: "text-gray-600"
+    }, "A multiplayer word bluffing game")), /*#__PURE__*/React.createElement("div", {
+      className: "space-y-6"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "border-l-4 border-purple-500 pl-4"
+    }, /*#__PURE__*/React.createElement("h2", {
+      className: "text-2xl font-bold text-purple-900 mb-3"
+    }, "\uD83C\uDFAE Setup"), /*#__PURE__*/React.createElement("ol", {
+      className: "list-decimal list-inside space-y-2 text-gray-700"
+    }, /*#__PURE__*/React.createElement("li", null, /*#__PURE__*/React.createElement("strong", null, "Host a Game:"), " One player creates a new game and receives a 6-digit game code"), /*#__PURE__*/React.createElement("li", null, /*#__PURE__*/React.createElement("strong", null, "Join:"), " Other players join using the game code"), /*#__PURE__*/React.createElement("li", null, /*#__PURE__*/React.createElement("strong", null, "Dictionary Holder:"), " The host assigns a \"Dictionary Holder\" who manages each round (can be any player)"))), /*#__PURE__*/React.createElement("div", {
+      className: "border-l-4 border-blue-500 pl-4"
+    }, /*#__PURE__*/React.createElement("h2", {
+      className: "text-2xl font-bold text-blue-900 mb-3"
+    }, "\uD83D\uDD04 Round Flow"), /*#__PURE__*/React.createElement("div", {
+      className: "space-y-4"
+    }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h3", {
+      className: "text-lg font-semibold text-gray-800 mb-2"
+    }, "1. Setup Phase (Dictionary Holder)"), /*#__PURE__*/React.createElement("ul", {
+      className: "list-disc list-inside space-y-1 text-gray-700 ml-4"
+    }, /*#__PURE__*/React.createElement("li", null, "Select a difficulty level: Kids (8-12), Teens, or Adults"), /*#__PURE__*/React.createElement("li", null, "Choose an obscure word (use \"Random\" button or enter manually)"), /*#__PURE__*/React.createElement("li", null, "Enter or fetch the real definition from online dictionaries"), /*#__PURE__*/React.createElement("li", null, "Start the round to begin collecting definitions"))), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h3", {
+      className: "text-lg font-semibold text-gray-800 mb-2"
+    }, "2. Definition Phase (All Other Players)"), /*#__PURE__*/React.createElement("ul", {
+      className: "list-disc list-inside space-y-1 text-gray-700 ml-4"
+    }, /*#__PURE__*/React.createElement("li", null, "See the word"), /*#__PURE__*/React.createElement("li", null, "Submit a fake definition that sounds plausible"), /*#__PURE__*/React.createElement("li", null, "Try to fool other players into thinking your definition is real"))), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h3", {
+      className: "text-lg font-semibold text-gray-800 mb-2"
+    }, "3. Voting Phase (All Players except Dictionary Holder)"), /*#__PURE__*/React.createElement("ul", {
+      className: "list-disc list-inside space-y-1 text-gray-700 ml-4"
+    }, /*#__PURE__*/React.createElement("li", null, "See all fake definitions plus the real definition (shuffled randomly)"), /*#__PURE__*/React.createElement("li", null, "Vote for the definition you think is real"), /*#__PURE__*/React.createElement("li", null, "Cannot vote for your own definition"))), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h3", {
+      className: "text-lg font-semibold text-gray-800 mb-2"
+    }, "4. Results Phase"), /*#__PURE__*/React.createElement("ul", {
+      className: "list-disc list-inside space-y-1 text-gray-700 ml-4"
+    }, /*#__PURE__*/React.createElement("li", null, "Reveals which definition was real"), /*#__PURE__*/React.createElement("li", null, "Shows who wrote each fake definition"), /*#__PURE__*/React.createElement("li", null, "Displays vote counts and points earned"), /*#__PURE__*/React.createElement("li", null, "Host starts the next round"))))), /*#__PURE__*/React.createElement("div", {
+      className: "border-l-4 border-green-500 pl-4"
+    }, /*#__PURE__*/React.createElement("h2", {
+      className: "text-2xl font-bold text-green-900 mb-3"
+    }, "\uD83C\uDFC6 Scoring"), /*#__PURE__*/React.createElement("p", {
+      className: "text-gray-700 mb-3"
+    }, "Points are awarded at the end of each round:"), /*#__PURE__*/React.createElement("ul", {
+      className: "list-disc list-inside space-y-2 text-gray-700 ml-4"
+    }, /*#__PURE__*/React.createElement("li", null, /*#__PURE__*/React.createElement("strong", null, "+1 point per vote"), " - Players earn 1 point for each vote their fake definition receives"), /*#__PURE__*/React.createElement("li", null, /*#__PURE__*/React.createElement("strong", null, "+1 point for guessing correctly"), " - Players who vote for the real definition earn 1 point"), /*#__PURE__*/React.createElement("li", null, /*#__PURE__*/React.createElement("strong", null, "+1 point per correct vote"), " - The Dictionary Holder earns 1 point for each player who votes for the real definition"))), /*#__PURE__*/React.createElement("div", {
+      className: "border-l-4 border-orange-500 pl-4"
+    }, /*#__PURE__*/React.createElement("h2", {
+      className: "text-2xl font-bold text-orange-900 mb-3"
+    }, "\uD83D\uDCA1 Strategy Tips"), /*#__PURE__*/React.createElement("ul", {
+      className: "list-disc list-inside space-y-2 text-gray-700 ml-4"
+    }, /*#__PURE__*/React.createElement("li", null, "Write convincing fake definitions that sound like dictionary entries"), /*#__PURE__*/React.createElement("li", null, "Use proper grammar and formal language to match real definitions"), /*#__PURE__*/React.createElement("li", null, "Balance being believable with being creative"), /*#__PURE__*/React.createElement("li", null, "Guess the real definition to earn bonus points"))), /*#__PURE__*/React.createElement("div", {
+      className: "border-l-4 border-indigo-500 pl-4"
+    }, /*#__PURE__*/React.createElement("h2", {
+      className: "text-2xl font-bold text-indigo-900 mb-3"
+    }, "\u2728 Features"), /*#__PURE__*/React.createElement("ul", {
+      className: "list-disc list-inside space-y-1 text-gray-700 ml-4"
+    }, /*#__PURE__*/React.createElement("li", null, "Real-time multiplayer with Firebase"), /*#__PURE__*/React.createElement("li", null, "Word pronunciation with text-to-speech (click the \uD83D\uDD0A icon)"), /*#__PURE__*/React.createElement("li", null, "Phonetic spelling guides when available"), /*#__PURE__*/React.createElement("li", null, "Bot players to fill out your game"), /*#__PURE__*/React.createElement("li", null, "QR code sharing for easy joining"), /*#__PURE__*/React.createElement("li", null, "Session persistence - reconnects if you refresh"), /*#__PURE__*/React.createElement("li", null, "Game history tracking")))), /*#__PURE__*/React.createElement("div", {
+      className: "mt-8 text-center"
+    }, /*#__PURE__*/React.createElement("button", {
+      onClick: () => setView('home'),
+      className: "px-8 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-semibold text-lg btn-3d"
+    }, "Ready to Play!")))));
   }
   if (view === 'game' && gameData) {
     const isHost = gameData.host === playerId;
