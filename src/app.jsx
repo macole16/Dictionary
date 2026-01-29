@@ -1176,9 +1176,9 @@
                 }
 
                 try {
-                    // Clear all Firebase data
-                    await database.ref('games').remove();
-                    await database.ref('gameHistory').remove();
+                    // Note: Due to Firebase security rules, this function can only clear localStorage
+                    // To delete all Firebase data, you need to do it from the Firebase Console
+                    // or update your security rules to allow deletion of the root paths
 
                     // Clear all localStorage
                     localStorage.clear();
@@ -1193,7 +1193,7 @@
                     setMyCreatedGames([]);
                     setView('home');
 
-                    alert('✅ All data has been reset successfully!');
+                    alert('✅ Local data has been cleared!\n\nNote: Firebase games data remains for security. To delete all games, use Firebase Console or the "Manage My Games" feature to terminate individual games.');
                 } catch (error) {
                     console.error('Error resetting data:', error);
                     alert('❌ Error resetting data. Check console for details.');
