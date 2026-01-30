@@ -5,6 +5,64 @@ All notable changes to the Dictionary Game will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.3] - 2026-01-30
+
+### Changed
+- **Game Timestamp Display**: "Manage My Games" now shows full date and time
+  - Changed from `toLocaleDateString()` to `toLocaleString()`
+  - Displays both date and time when game was created
+  - Helps hosts track when games were started
+
+## [1.2.2] - 2026-01-30
+
+### Added
+- **What's New Page**: New "✨ What's New" button on home screen
+  - Displays recent version updates from CHANGELOG.md
+  - Dynamically loads and parses changelog content
+  - Beautiful color-coded sections (Added=green, Changed=blue, Fixed=orange, Removed=red)
+  - Shows version headers with dates
+  - Easy way for players to see latest features and improvements
+
+### Changed
+- **Enhanced Markdown Parser**: Improved to handle changelog format
+  - Recognizes version headers (e.g., `## [1.2.2] - 2026-01-30`)
+  - Color-codes section headers (Added, Changed, Fixed, Removed)
+  - Better formatting for changelogs and documentation
+
+## [1.2.1] - 2026-01-30
+
+### Changed
+- **Instructions Externalized**: Moved "How to Play" content to separate `instructions.md` file
+  - Easier to update and maintain instructions without editing code
+  - Custom markdown parser for rendering instructions
+  - Dynamically loaded at runtime
+  - Updated instructions to include direct link sharing feature
+
+### Added
+- **Markdown Parser**: Simple markdown-to-React parser for instructions
+  - Supports headers (H1, H2, H3)
+  - Supports ordered and unordered lists
+  - Supports bold text with `**text**` syntax
+  - Color-coded sections by emoji (🎮=purple, 🔄=blue, 🏆=green, 💡=orange, ✨=indigo)
+
+## [1.2.0] - 2026-01-30
+
+### Added
+- **Direct Link Sharing**: One-click join functionality for remote players
+  - New "🔗 Link" button copies shareable URL with game code
+  - URL format: `https://yourdomain.com/?game=ABC123`
+  - Automatic join screen population when opening link
+  - Players no longer need to manually type game codes
+  - Perfect for texting, messaging, or emailing invites
+- **URL Parameter Auto-Join**: Automatic game code detection from URL
+  - Detects `?game=` parameter on page load
+  - Pre-fills join screen with game code
+  - Cleans up URL after detection to prevent confusion
+
+### Changed
+- **QR Code Updated**: QR codes now generate links with `?game=` parameter for consistency
+- **Button Layout**: Added dedicated "🔗 Link" button alongside existing "📋 Copy" and "📱 QR" buttons
+
 ## [1.1.1] - 2026-01-30
 
 ### Changed
@@ -109,6 +167,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Version History
 
+- **1.2.3** (2026-01-30) - Game Timestamp Display with Date and Time
+- **1.2.2** (2026-01-30) - What's New Page with Changelog Display
+- **1.2.1** (2026-01-30) - Instructions Externalized to Markdown File
+- **1.2.0** (2026-01-30) - Direct Link Sharing & URL Auto-Join
 - **1.1.1** (2026-01-30) - Expanded Background Words
 - **1.1.0** (2026-01-29) - Word History Management, Bonus Points, Voter Info
 - **1.0.0** (2026-01-25) - Initial Release

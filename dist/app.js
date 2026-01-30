@@ -437,6 +437,8 @@ function MultiplayerDictionaryGame() {
   const [avatarOptions, setAvatarOptions] = useState([]);
   const [wordBuffer, setWordBuffer] = useState([]);
   const [showWordHistory, setShowWordHistory] = useState(false);
+  const [instructions, setInstructions] = useState('');
+  const [changelog, setChangelog] = useState('');
 
   // Load avatar options
   useEffect(() => {
@@ -472,6 +474,160 @@ function MultiplayerDictionaryGame() {
     });
   }, []);
 
+  // Load instructions
+  useEffect(() => {
+    fetch('/instructions.md').then(response => response.text()).then(text => setInstructions(text)).catch(error => {
+      console.error('Failed to load instructions:', error);
+      setInstructions('# How to Play\n\nInstructions could not be loaded.');
+    });
+  }, []);
+
+  // Load changelog
+  useEffect(() => {
+    fetch('/CHANGELOG.md').then(response => response.text()).then(text => {
+      // Extract only recent versions (up to 1.0.0)
+      const lines = text.split('\n');
+      const startIdx = lines.findIndex(line => line.startsWith('## [1.'));
+      const endIdx = lines.findIndex(line => line.startsWith('## Version History'));
+      if (startIdx !== -1 && endIdx !== -1) {
+        setChangelog(lines.slice(startIdx, endIdx).join('\n'));
+      } else {
+        setChangelog(text);
+      }
+    }).catch(error => {
+      console.error('Failed to load changelog:', error);
+      setChangelog('# What\'s New\n\nChangelog could not be loaded.');
+    });
+  }, []);
+
+  // Simple markdown parser for instructions
+  const parseMarkdown = markdown => {
+    if (!markdown) return null;
+    const lines = markdown.split('\n');
+    const elements = [];
+    let currentList = null;
+    let currentListType = null;
+    lines.forEach((line, index) => {
+      // Headers
+      if (line.startsWith('# ')) {
+        elements.push(/*#__PURE__*/React.createElement("h1", {
+          key: index,
+          className: "text-4xl font-bold text-purple-900 mb-2"
+        }, line.substring(2)));
+      } else if (line.startsWith('## ')) {
+        if (currentList) {
+          elements.push(currentList);
+          currentList = null;
+        }
+        // Check if it's a version header like "## [1.2.0] - 2026-01-30"
+        const versionMatch = line.match(/^##\s+\[(\d+\.\d+\.\d+)\]\s+-\s+(.+)$/);
+        if (versionMatch) {
+          elements.push(/*#__PURE__*/React.createElement("div", {
+            key: index,
+            className: "border-l-4 border-purple-500 pl-4 mb-6 mt-6"
+          }, /*#__PURE__*/React.createElement("h2", {
+            className: "text-2xl font-bold text-purple-900 mb-1"
+          }, "Version ", versionMatch[1]), /*#__PURE__*/React.createElement("p", {
+            className: "text-sm text-gray-500 mb-3"
+          }, versionMatch[2])));
+        } else {
+          const icon = line.substring(3, 5);
+          const text = line.substring(5).trim();
+          const colors = {
+            '🎮': 'purple',
+            '🔄': 'blue',
+            '🏆': 'green',
+            '💡': 'orange',
+            '✨': 'indigo'
+          };
+          const color = colors[icon] || 'purple';
+          elements.push(/*#__PURE__*/React.createElement("div", {
+            key: index,
+            className: `border-l-4 border-${color}-500 pl-4 mb-6`
+          }, /*#__PURE__*/React.createElement("h2", {
+            className: `text-2xl font-bold text-${color}-900 mb-3`
+          }, icon, " ", text)));
+        }
+      } else if (line.startsWith('### ')) {
+        if (currentList) {
+          elements.push(currentList);
+          currentList = null;
+        }
+        const sectionColors = {
+          'Added': 'text-green-800 bg-green-50 border-green-200',
+          'Changed': 'text-blue-800 bg-blue-50 border-blue-200',
+          'Fixed': 'text-orange-800 bg-orange-50 border-orange-200',
+          'Removed': 'text-red-800 bg-red-50 border-red-200'
+        };
+        const sectionName = line.substring(4).trim();
+        const colorClass = sectionColors[sectionName] || 'text-gray-800';
+        elements.push(/*#__PURE__*/React.createElement("h3", {
+          key: index,
+          className: `text-lg font-semibold mb-2 mt-4 px-3 py-1 rounded border ${colorClass}`
+        }, sectionName));
+      }
+      // Lists
+      else if (line.match(/^\d+\.\s/)) {
+        const content = line.replace(/^\d+\.\s/, '');
+        const boldMatch = content.match(/\*\*(.*?)\*\*/);
+        if (!currentList || currentListType !== 'ol') {
+          if (currentList) elements.push(currentList);
+          currentList = /*#__PURE__*/React.createElement("ol", {
+            key: `list-${index}`,
+            className: "list-decimal list-inside space-y-2 text-gray-700 mb-4"
+          });
+          currentListType = 'ol';
+        }
+        currentList = React.cloneElement(currentList, {
+          children: [...(currentList.props.children || []), /*#__PURE__*/React.createElement("li", {
+            key: index
+          }, boldMatch ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("strong", null, boldMatch[1]), content.replace(/\*\*(.*?)\*\*/, '').substring(boldMatch[1].length)) : content)]
+        });
+      } else if (line.match(/^-\s/)) {
+        const content = line.substring(2);
+        const boldMatch = content.match(/\*\*(.*?)\*\*/g);
+        if (!currentList || currentListType !== 'ul') {
+          if (currentList) elements.push(currentList);
+          currentList = /*#__PURE__*/React.createElement("ul", {
+            key: `list-${index}`,
+            className: "list-disc list-inside space-y-2 text-gray-700 ml-4 mb-4"
+          });
+          currentListType = 'ul';
+        }
+        let parsedContent = content;
+        if (boldMatch) {
+          parsedContent = content.split(/(\*\*.*?\*\*)/).map((part, i) => part.startsWith('**') && part.endsWith('**') ? /*#__PURE__*/React.createElement("strong", {
+            key: i
+          }, part.slice(2, -2)) : part);
+        }
+        currentList = React.cloneElement(currentList, {
+          children: [...(currentList.props.children || []), /*#__PURE__*/React.createElement("li", {
+            key: index
+          }, parsedContent)]
+        });
+      }
+      // Paragraphs
+      else if (line.trim() && !line.startsWith('#')) {
+        if (currentList) {
+          elements.push(currentList);
+          currentList = null;
+        }
+        elements.push(/*#__PURE__*/React.createElement("p", {
+          key: index,
+          className: "text-gray-600 mb-3"
+        }, line));
+      }
+      // Empty lines
+      else if (!line.trim() && currentList) {
+        elements.push(currentList);
+        currentList = null;
+        currentListType = null;
+      }
+    });
+    if (currentList) elements.push(currentList);
+    return elements;
+  };
+
   // Toast notification function
   const showToast = (message, type = 'info') => {
     setToast({
@@ -487,6 +643,19 @@ function MultiplayerDictionaryGame() {
       });
     }, 3000);
   };
+
+  // Check for game code in URL parameters
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const codeFromUrl = urlParams.get('game');
+    if (codeFromUrl) {
+      // Store the code and set view to join
+      setInputGameCode(codeFromUrl.toUpperCase());
+      setView('join');
+      // Clean up URL without reload
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+  }, []);
 
   // Try to restore session - check for multiple active games
   useEffect(() => {
@@ -1130,6 +1299,11 @@ function MultiplayerDictionaryGame() {
   const shareGameCode = () => {
     setShowQRCode(!showQRCode);
   };
+  const copyShareLink = () => {
+    const shareUrl = `${window.location.origin}${window.location.pathname}?game=${gameCode}`;
+    navigator.clipboard.writeText(shareUrl);
+    showToast('Share link copied!', 'success');
+  };
   const addBotPlayers = async () => {
     const numBots = prompt('How many bots would you like to add? (1-8)', '4');
     if (!numBots) return;
@@ -1464,7 +1638,7 @@ function MultiplayerDictionaryGame() {
   };
   if (view === 'home') {
     // Floating words for background animation
-    const floatingWords = ['serendipity', 'ephemeral', 'quintessential', 'ubiquitous', 'mellifluous', 'enigma', 'paradox', 'luminous', 'euphoria', 'nostalgia', 'eloquent', 'whimsical', 'ethereal', 'labyrinth', 'cascade', 'harmony', 'solitude', 'renaissance', 'kaleidoscope', 'magnificent'];
+    const floatingWords = ['serendipity', 'ephemeral', 'quintessential', 'ubiquitous', 'mellifluous', 'enigma', 'paradox', 'luminous', 'euphoria', 'nostalgia', 'eloquent', 'whimsical', 'ethereal', 'labyrinth', 'cascade', 'harmony', 'solitude', 'renaissance', 'kaleidoscope', 'magnificent', 'ebullient', 'ineffable', 'petrichor', 'susurrus', 'phosphenes', 'vellichor', 'defenestration', 'apricity', 'hiraeth', 'eigengrau', 'sonder', 'onism', 'chrysalism', 'kenopsia', 'monachopsis', 'lachesism', 'exulansis', 'nodus tollens', 'anecdoche', 'ellipsism', 'jouska', 'liberosis', 'mauerbauertraurigkeit', 'occhiolism', 'opia'];
     return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
       className: "min-h-screen gradient-bg-animated flex items-center justify-center p-4 overflow-hidden relative"
     }, /*#__PURE__*/React.createElement("div", {
@@ -1544,7 +1718,10 @@ function MultiplayerDictionaryGame() {
     }, "\uD83D\uDCCA Game Stats"), /*#__PURE__*/React.createElement("button", {
       onClick: () => setView('instructions'),
       className: "w-full px-6 py-4 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-semibold text-lg btn-3d fade-in-delay-5"
-    }, "\uD83D\uDCD6 How to Play")), /*#__PURE__*/React.createElement("div", {
+    }, "\uD83D\uDCD6 How to Play"), /*#__PURE__*/React.createElement("button", {
+      onClick: () => setView('changelog'),
+      className: "w-full px-6 py-4 bg-pink-600 text-white rounded-lg hover:bg-pink-700 font-semibold text-lg btn-3d fade-in-delay-6"
+    }, "\u2728 What's New")), /*#__PURE__*/React.createElement("div", {
       className: "mt-8 text-center space-y-2"
     }, /*#__PURE__*/React.createElement("p", {
       className: "text-xs text-gray-500"
@@ -1568,7 +1745,7 @@ function MultiplayerDictionaryGame() {
         }
       },
       className: "text-xs text-gray-400 hover:text-gray-600"
-    }, "v1.1.0")), gameHistory.length > 0 && /*#__PURE__*/React.createElement("div", {
+    }, "v1.2.2")), gameHistory.length > 0 && /*#__PURE__*/React.createElement("div", {
       className: "mt-8"
     }, /*#__PURE__*/React.createElement("h2", {
       className: "text-lg font-semibold text-gray-700 mb-3"
@@ -1671,7 +1848,7 @@ function MultiplayerDictionaryGame() {
       className: "font-medium"
     }, "Host:"), " ", game.hostName), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("span", {
       className: "font-medium"
-    }, "Created:"), " ", new Date(game.createdAt).toLocaleDateString()), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("span", {
+    }, "Created:"), " ", new Date(game.createdAt).toLocaleString()), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("span", {
       className: "font-medium"
     }, "Rounds:"), " ", game.roundsPlayed || 0)), game.currentWord && /*#__PURE__*/React.createElement("div", {
       className: "mt-2 text-sm"
@@ -1899,66 +2076,37 @@ function MultiplayerDictionaryGame() {
       className: "mb-6 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 btn-3d"
     }, "\u2190 Back to Menu"), /*#__PURE__*/React.createElement("div", {
       className: "text-center mb-8"
-    }, /*#__PURE__*/React.createElement("h1", {
-      className: "text-4xl font-bold text-purple-900 mb-2"
-    }, "How to Play"), /*#__PURE__*/React.createElement("p", {
-      className: "text-gray-600"
-    }, "A multiplayer word bluffing game")), /*#__PURE__*/React.createElement("div", {
-      className: "space-y-6"
-    }, /*#__PURE__*/React.createElement("div", {
-      className: "border-l-4 border-purple-500 pl-4"
-    }, /*#__PURE__*/React.createElement("h2", {
-      className: "text-2xl font-bold text-purple-900 mb-3"
-    }, "\uD83C\uDFAE Setup"), /*#__PURE__*/React.createElement("ol", {
-      className: "list-decimal list-inside space-y-2 text-gray-700"
-    }, /*#__PURE__*/React.createElement("li", null, /*#__PURE__*/React.createElement("strong", null, "Host a Game:"), " One player creates a new game and receives a 6-digit game code"), /*#__PURE__*/React.createElement("li", null, /*#__PURE__*/React.createElement("strong", null, "Join:"), " Other players join using the game code"), /*#__PURE__*/React.createElement("li", null, /*#__PURE__*/React.createElement("strong", null, "Dictionary Holder:"), " The host assigns a \"Dictionary Holder\" who manages each round (can be any player)"))), /*#__PURE__*/React.createElement("div", {
-      className: "border-l-4 border-blue-500 pl-4"
-    }, /*#__PURE__*/React.createElement("h2", {
-      className: "text-2xl font-bold text-blue-900 mb-3"
-    }, "\uD83D\uDD04 Round Flow"), /*#__PURE__*/React.createElement("div", {
-      className: "space-y-4"
-    }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h3", {
-      className: "text-lg font-semibold text-gray-800 mb-2"
-    }, "1. Setup Phase (Dictionary Holder)"), /*#__PURE__*/React.createElement("ul", {
-      className: "list-disc list-inside space-y-1 text-gray-700 ml-4"
-    }, /*#__PURE__*/React.createElement("li", null, "Select a difficulty level: Kids (8-12), Teens, or Adults"), /*#__PURE__*/React.createElement("li", null, "Choose an obscure word (use \"Random\" button or enter manually)"), /*#__PURE__*/React.createElement("li", null, "Enter or fetch the real definition from online dictionaries"), /*#__PURE__*/React.createElement("li", null, "Start the round to begin collecting definitions"))), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h3", {
-      className: "text-lg font-semibold text-gray-800 mb-2"
-    }, "2. Definition Phase (All Other Players)"), /*#__PURE__*/React.createElement("ul", {
-      className: "list-disc list-inside space-y-1 text-gray-700 ml-4"
-    }, /*#__PURE__*/React.createElement("li", null, "See the word"), /*#__PURE__*/React.createElement("li", null, "Submit a fake definition that sounds plausible"), /*#__PURE__*/React.createElement("li", null, "Try to fool other players into thinking your definition is real"))), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h3", {
-      className: "text-lg font-semibold text-gray-800 mb-2"
-    }, "3. Voting Phase (All Players except Dictionary Holder)"), /*#__PURE__*/React.createElement("ul", {
-      className: "list-disc list-inside space-y-1 text-gray-700 ml-4"
-    }, /*#__PURE__*/React.createElement("li", null, "See all fake definitions plus the real definition (shuffled randomly)"), /*#__PURE__*/React.createElement("li", null, "Vote for the definition you think is real"), /*#__PURE__*/React.createElement("li", null, "Cannot vote for your own definition"))), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h3", {
-      className: "text-lg font-semibold text-gray-800 mb-2"
-    }, "4. Results Phase"), /*#__PURE__*/React.createElement("ul", {
-      className: "list-disc list-inside space-y-1 text-gray-700 ml-4"
-    }, /*#__PURE__*/React.createElement("li", null, "Reveals which definition was real"), /*#__PURE__*/React.createElement("li", null, "Shows who wrote each fake definition"), /*#__PURE__*/React.createElement("li", null, "Displays vote counts and points earned"), /*#__PURE__*/React.createElement("li", null, "Host starts the next round"))))), /*#__PURE__*/React.createElement("div", {
-      className: "border-l-4 border-green-500 pl-4"
-    }, /*#__PURE__*/React.createElement("h2", {
-      className: "text-2xl font-bold text-green-900 mb-3"
-    }, "\uD83C\uDFC6 Scoring"), /*#__PURE__*/React.createElement("p", {
-      className: "text-gray-700 mb-3"
-    }, "Points are awarded at the end of each round:"), /*#__PURE__*/React.createElement("ul", {
-      className: "list-disc list-inside space-y-2 text-gray-700 ml-4"
-    }, /*#__PURE__*/React.createElement("li", null, /*#__PURE__*/React.createElement("strong", null, "+1 point per vote"), " - Players earn 1 point for each vote their fake definition receives"), /*#__PURE__*/React.createElement("li", null, /*#__PURE__*/React.createElement("strong", null, "+1 point for guessing correctly"), " - Players who vote for the real definition earn 1 point"), /*#__PURE__*/React.createElement("li", null, /*#__PURE__*/React.createElement("strong", null, "+1 point per correct vote"), " - The Dictionary Holder earns 1 point for each player who votes for the real definition"), /*#__PURE__*/React.createElement("li", null, /*#__PURE__*/React.createElement("strong", null, "+1 bonus point"), " - The host can award bonus points to players who provide exceptionally clever or accurate definitions (awarded manually during results)"))), /*#__PURE__*/React.createElement("div", {
-      className: "border-l-4 border-orange-500 pl-4"
-    }, /*#__PURE__*/React.createElement("h2", {
-      className: "text-2xl font-bold text-orange-900 mb-3"
-    }, "\uD83D\uDCA1 Strategy Tips"), /*#__PURE__*/React.createElement("ul", {
-      className: "list-disc list-inside space-y-2 text-gray-700 ml-4"
-    }, /*#__PURE__*/React.createElement("li", null, "Write convincing fake definitions that sound like dictionary entries"), /*#__PURE__*/React.createElement("li", null, "Use proper grammar and formal language to match real definitions"), /*#__PURE__*/React.createElement("li", null, "Balance being believable with being creative"), /*#__PURE__*/React.createElement("li", null, "Get close to the real definition to potentially earn bonus points from the host"), /*#__PURE__*/React.createElement("li", null, "Vote for the real definition to earn points"))), /*#__PURE__*/React.createElement("div", {
-      className: "border-l-4 border-indigo-500 pl-4"
-    }, /*#__PURE__*/React.createElement("h2", {
-      className: "text-2xl font-bold text-indigo-900 mb-3"
-    }, "\u2728 Features"), /*#__PURE__*/React.createElement("ul", {
-      className: "list-disc list-inside space-y-1 text-gray-700 ml-4"
-    }, /*#__PURE__*/React.createElement("li", null, "Real-time multiplayer with Firebase"), /*#__PURE__*/React.createElement("li", null, "Word pronunciation with text-to-speech (click the \uD83D\uDD0A icon)"), /*#__PURE__*/React.createElement("li", null, "Phonetic spelling guides when available"), /*#__PURE__*/React.createElement("li", null, "Bot players to fill out your game"), /*#__PURE__*/React.createElement("li", null, "QR code sharing for easy joining"), /*#__PURE__*/React.createElement("li", null, "Session persistence - reconnects if you refresh"), /*#__PURE__*/React.createElement("li", null, "Game history tracking")))), /*#__PURE__*/React.createElement("div", {
+    }, parseMarkdown(instructions)), /*#__PURE__*/React.createElement("div", {
       className: "mt-8 text-center"
     }, /*#__PURE__*/React.createElement("button", {
       onClick: () => setView('home'),
       className: "px-8 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-semibold text-lg btn-3d"
     }, "Ready to Play!")))));
+  }
+  if (view === 'changelog') {
+    return /*#__PURE__*/React.createElement("div", {
+      className: "min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 p-4"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "max-w-4xl mx-auto"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "bg-white rounded-lg shadow-xl p-8 mb-6"
+    }, /*#__PURE__*/React.createElement("button", {
+      onClick: () => setView('home'),
+      className: "mb-6 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 btn-3d"
+    }, "\u2190 Back to Menu"), /*#__PURE__*/React.createElement("div", {
+      className: "text-center mb-8"
+    }, /*#__PURE__*/React.createElement("h1", {
+      className: "text-4xl font-bold text-purple-900 mb-2"
+    }, "\u2728 What's New"), /*#__PURE__*/React.createElement("p", {
+      className: "text-gray-600"
+    }, "Recent updates and changes")), /*#__PURE__*/React.createElement("div", {
+      className: "space-y-4"
+    }, parseMarkdown(changelog)), /*#__PURE__*/React.createElement("div", {
+      className: "mt-8 text-center"
+    }, /*#__PURE__*/React.createElement("button", {
+      onClick: () => setView('home'),
+      className: "px-8 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-semibold text-lg btn-3d"
+    }, "Back to Menu")))));
   }
   if (view === 'game' && gameData) {
     const isHost = gameData.host === playerId;
@@ -2012,12 +2160,15 @@ function MultiplayerDictionaryGame() {
       onClick: copyGameCode,
       className: "text-purple-600 hover:text-purple-800 text-sm font-semibold btn-3d px-2 py-1"
     }, "\uD83D\uDCCB Copy"), /*#__PURE__*/React.createElement("button", {
+      onClick: copyShareLink,
+      className: "text-purple-600 hover:text-purple-800 text-sm font-semibold btn-3d px-2 py-1"
+    }, "\uD83D\uDD17 Link"), /*#__PURE__*/React.createElement("button", {
       onClick: shareGameCode,
       className: "text-purple-600 hover:text-purple-800 text-sm font-semibold btn-3d px-2 py-1"
-    }, "\uD83D\uDD17 QR")), showQRCode && /*#__PURE__*/React.createElement("div", {
+    }, "\uD83D\uDCF1 QR")), showQRCode && /*#__PURE__*/React.createElement("div", {
       className: "mb-2 p-3 bg-white rounded-lg shadow-lg depth-layer-3"
     }, /*#__PURE__*/React.createElement("img", {
-      src: `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(window.location.origin + '?join=' + gameCode)}`,
+      src: `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(window.location.origin + window.location.pathname + '?game=' + gameCode)}`,
       alt: "QR Code",
       className: "mx-auto"
     }), /*#__PURE__*/React.createElement("p", {
