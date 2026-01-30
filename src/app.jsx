@@ -1459,7 +1459,7 @@
                                     }}
                                     className="text-xs text-gray-400 hover:text-gray-600"
                                 >
-                                    v1.0
+                                    v1.1.0
                                 </button>
                             </div>
 

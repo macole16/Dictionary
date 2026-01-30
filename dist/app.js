@@ -1568,7 +1568,7 @@ function MultiplayerDictionaryGame() {
         }
       },
       className: "text-xs text-gray-400 hover:text-gray-600"
-    }, "v1.0")), gameHistory.length > 0 && /*#__PURE__*/React.createElement("div", {
+    }, "v1.1.0")), gameHistory.length > 0 && /*#__PURE__*/React.createElement("div", {
       className: "mt-8"
     }, /*#__PURE__*/React.createElement("h2", {
       className: "text-lg font-semibold text-gray-700 mb-3"
