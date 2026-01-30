@@ -2,6 +2,8 @@
 
 A multiplayer word bluffing game where players create fake definitions to fool their friends!
 
+**Current Version:** 1.1.0 | [Changelog](CHANGELOG.md)
+
 ## How to Play
 
 ### Setup
@@ -40,6 +42,7 @@ Points are awarded at the end of each round. Scoring rules are customizable via 
 - **+1 point per vote** - Players earn 1 point for each vote their fake definition receives
 - **+1 point for guessing correctly** - Players who vote for the real definition earn 1 point
 - **+1 point per correct vote** - The Dictionary Holder earns 1 point for each player who votes for the real definition
+- **+1 bonus point** - Host can award bonus points to players with exceptionally clever or accurate definitions (awarded manually during results)
 
 You can customize point values by editing `scoring.json` in the root directory.
 
@@ -47,27 +50,43 @@ You can customize point values by editing `scoring.json` in the root directory.
 - Write convincing fake definitions that sound like dictionary entries
 - Use proper grammar and formal language to match real definitions
 - Balance being believable with being creative
-- Guess the real definition to earn bonus points
+- Get close to the real definition to potentially earn bonus points from the host
+- Vote for the real definition to earn points
 
 ## Features
 
+### Core Gameplay
 - **Real-time multiplayer** using Firebase
 - **Session persistence** - Reconnects players if they refresh
+- **Multiple difficulty levels** with curated word lists (Kids, Teens, Adults)
+- **Bot players** - Add AI bots with realistic fake definitions to fill out your game
+- **Mobile optimized** - Responsive design works on all devices
+
+### Word Management
 - **Word history tracking** - Prevents duplicate words and tracks skipped words
-- **Multiple difficulty levels** with curated word lists
+- **Word history management** - View, review, and clear used/skipped words per game
 - **Auto-definition lookup** from online dictionary APIs
-- **Word pronunciation** - Text-to-speech for hearing word pronunciation
+- **Word pronunciation** - Text-to-speech for hearing word pronunciation (🔊 button)
 - **Phonetic spelling** - Shows pronunciation guide when available
-- **Game management** - View and terminate your hosted games
+- **Smart word buffering** - Fetches 20-30 words at once to reduce duplicates
+
+### Game Management
+- **Game management dashboard** - View and terminate your hosted games
 - **Game history** - See past game results and winners
 - **Active games list** - See and join games in progress
-- **Avatar selection** - Choose from 30+ different player avatars
-- **Customizable scoring** - Edit `scoring.json` to change point values
-- **Customizable avatars** - Edit `avatars.json` to add/remove avatar options
-- **Bot players** - Add AI bots to fill out your game
 - **QR code sharing** - Easily share game codes via QR codes
-- **3D visual effects** - Animated logo and polished UI
-- **Mobile optimized** - Responsive design works on all devices
+
+### Customization
+- **Customizable scoring** - Edit `scoring.json` to change point values
+- **Customizable avatars** - Edit `avatars.json` to add/remove avatar options (30+ included)
+- **Bonus point awards** - Host can manually award bonus points for excellent definitions
+
+### Visual & UX
+- **Classic dictionary logo** - OED/Webster's inspired design
+- **3D visual effects** - Animated elements and polished UI
+- **Floating background words** - Aesthetic word animations on home screen
+- **Voter transparency** - See who voted for each definition in results
+- **Pending players display** - Dictionary holder can see who hasn't submitted yet
 
 ## Configuration
 
@@ -83,12 +102,57 @@ Add, remove, or modify player avatar options. Each avatar needs:
 - `emoji`: The emoji character to display
 - `label`: Display name for the avatar
 
-## Technology
+## Installation & Setup
 
-Built with React, Firebase Realtime Database, and Tailwind CSS. Uses Babel for JSX compilation.
+```bash
+# Install dependencies
+npm install
+
+# Build the project
+npm run build
+
+# Start the development server
+npm run dev
+```
+
+The game will open in your browser at `http://localhost:8080`.
+
+## Technology Stack
+
+- **Frontend**: React 18
+- **Database**: Firebase Realtime Database
+- **Styling**: Tailwind CSS (CDN)
+- **Build Tool**: Babel
+- **Server**: http-server
+
+## Project Structure
+
+```
+Dictionary/
+├── src/
+│   └── app.jsx           # Main React application
+├── dist/
+│   └── app.js            # Compiled JavaScript
+├── index.html            # Entry point
+├── scoring.json          # Scoring configuration
+├── avatars.json          # Avatar options
+├── package.json          # Dependencies and scripts
+├── LICENSE               # MIT License
+├── CHANGELOG.md          # Version history
+└── README.md             # This file
+```
+
+## Contributing
+
+This is an open-source project under the MIT License. Contributions are welcome!
 
 ## License
 
 MIT License - Copyright (c) 2026 Shaolynx, LLC
 
 See [LICENSE](LICENSE) file for details.
+
+## Credits
+
+Developed by Shaolynx, LLC
+Game inspired by classic word bluffing games
