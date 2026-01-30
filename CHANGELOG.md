@@ -5,6 +5,14 @@ All notable changes to the Dictionary Game will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.1] - 2026-01-30
+
+### Changed
+- **Expanded Background Words**: Added 25 more obscure and poetic words to floating background
+  - Includes rare terms like "petrichor", "defenestration", "hiraeth", "eigengrau"
+  - Increased total from 20 to 45 floating words
+  - Enhanced visual atmosphere on home screen
+
 ## [1.1.0] - 2026-01-29
 
 ### Added
@@ -101,5 +109,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Version History
 
+- **1.1.1** (2026-01-30) - Expanded Background Words
 - **1.1.0** (2026-01-29) - Word History Management, Bonus Points, Voter Info
 - **1.0.0** (2026-01-25) - Initial Release
