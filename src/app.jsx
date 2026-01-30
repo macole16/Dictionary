@@ -159,6 +159,7 @@
             const [scoringConfig, setScoringConfig] = useState(null);
             const [avatarOptions, setAvatarOptions] = useState([]);
             const [wordBuffer, setWordBuffer] = useState([]);
+            const [showWordHistory, setShowWordHistory] = useState(false);
 
             // Load avatar options
             useEffect(() => {
@@ -732,8 +733,21 @@
                     });
                     setUsedWords([]);
                     setSkippedWords([]);
-                    alert('Word history cleared!');
+                    showToast('Word history cleared!', 'success');
                 }
+            };
+
+            const removeWordFromHistory = async (word, type) => {
+                if (type === 'used') {
+                    const updated = usedWords.filter(w => w !== word);
+                    await database.ref(`games/${gameCode}/usedWords`).set(updated);
+                    setUsedWords(updated);
+                } else {
+                    const updated = skippedWords.filter(w => w !== word);
+                    await database.ref(`games/${gameCode}/skippedWords`).set(updated);
+                    setSkippedWords(updated);
+                }
+                showToast(`"${word}" removed from ${type} words`, 'success');
             };
 
             const endGame = async () => {
@@ -2096,7 +2110,15 @@
 
                             {isDictionaryHolder && gameData.state === 'setup' && (
                                 <div className="glass-card rounded-2xl shadow-lg p-6 mb-4 fade-in">
-                                    <h2 className="text-xl font-semibold mb-4">Setup Round</h2>
+                                    <div className="flex items-center justify-between mb-4">
+                                        <h2 className="text-xl font-semibold">Setup Round</h2>
+                                        <button
+                                            onClick={() => setShowWordHistory(true)}
+                                            className="px-3 py-1 bg-indigo-500 text-white rounded text-sm hover:bg-indigo-600 btn-3d"
+                                        >
+                                            📚 Word History ({usedWords.length + skippedWords.length})
+                                        </button>
+                                    </div>
 
                                     <div className="space-y-4">
                                         <div>
@@ -2500,6 +2522,84 @@
                                 </div>
                             )}
                         </div>
+
+                        {/* Word History Modal */}
+                        {showWordHistory && (
+                            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+                                <div className="bg-white rounded-lg shadow-2xl p-6 max-w-3xl w-full max-h-[80vh] overflow-y-auto">
+                                    <h3 className="text-xl font-bold text-gray-900 mb-4">📚 Word History</h3>
+
+                                    {usedWords.length === 0 && skippedWords.length === 0 ? (
+                                        <p className="text-gray-600 text-center py-8">No words in history yet</p>
+                                    ) : (
+                                        <div className="space-y-6">
+                                            {/* Used Words */}
+                                            {usedWords.length > 0 && (
+                                                <div>
+                                                    <div className="flex items-center justify-between mb-3">
+                                                        <h4 className="font-semibold text-green-900">✓ Used Words ({usedWords.length})</h4>
+                                                    </div>
+                                                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2 max-h-48 overflow-y-auto">
+                                                        {usedWords.map((word, idx) => (
+                                                            <div key={idx} className="bg-green-50 border border-green-200 rounded p-2 flex items-center justify-between">
+                                                                <span className="text-sm truncate">{word}</span>
+                                                                <button
+                                                                    onClick={() => removeWordFromHistory(word, 'used')}
+                                                                    className="ml-2 text-red-500 hover:text-red-700 text-xs"
+                                                                    title="Remove from history"
+                                                                >
+                                                                    ✕
+                                                                </button>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {/* Skipped Words */}
+                                            {skippedWords.length > 0 && (
+                                                <div>
+                                                    <div className="flex items-center justify-between mb-3">
+                                                        <h4 className="font-semibold text-orange-900">⏭️ Skipped Words ({skippedWords.length})</h4>
+                                                    </div>
+                                                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2 max-h-48 overflow-y-auto">
+                                                        {skippedWords.map((word, idx) => (
+                                                            <div key={idx} className="bg-orange-50 border border-orange-200 rounded p-2 flex items-center justify-between">
+                                                                <span className="text-sm truncate">{word}</span>
+                                                                <button
+                                                                    onClick={() => removeWordFromHistory(word, 'skipped')}
+                                                                    className="ml-2 text-red-500 hover:text-red-700 text-xs"
+                                                                    title="Remove from history"
+                                                                >
+                                                                    ✕
+                                                                </button>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+
+                                    <div className="mt-6 flex gap-3">
+                                        {(usedWords.length > 0 || skippedWords.length > 0) && (
+                                            <button
+                                                onClick={clearWordHistory}
+                                                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                                            >
+                                                Clear All History
+                                            </button>
+                                        )}
+                                        <button
+                                            onClick={() => setShowWordHistory(false)}
+                                            className="flex-1 px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
+                                        >
+                                            Close
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
 
                         {/* Pass Dictionary Modal */}
                         {showPassDictionary && (
