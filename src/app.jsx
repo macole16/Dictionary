@@ -1328,7 +1328,12 @@
                     'serendipity', 'ephemeral', 'quintessential', 'ubiquitous', 'mellifluous',
                     'enigma', 'paradox', 'luminous', 'euphoria', 'nostalgia',
                     'eloquent', 'whimsical', 'ethereal', 'labyrinth', 'cascade',
-                    'harmony', 'solitude', 'renaissance', 'kaleidoscope', 'magnificent'
+                    'harmony', 'solitude', 'renaissance', 'kaleidoscope', 'magnificent',
+                    'ebullient', 'ineffable', 'petrichor', 'susurrus', 'phosphenes',
+                    'vellichor', 'defenestration', 'apricity', 'hiraeth', 'eigengrau',
+                    'sonder', 'onism', 'chrysalism', 'kenopsia', 'monachopsis',
+                    'lachesism', 'exulansis', 'nodus tollens', 'anecdoche', 'ellipsism',
+                    'jouska', 'liberosis', 'mauerbauertraurigkeit', 'occhiolism', 'opia'
                 ];
 
                 return (
@@ -1459,7 +1464,7 @@
                                     }}
                                     className="text-xs text-gray-400 hover:text-gray-600"
                                 >
-                                    v1.1.0
+                                    v1.1.1
                                 </button>
                             </div>
 
