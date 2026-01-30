@@ -2,7 +2,7 @@
 
 A multiplayer word bluffing game where players create fake definitions to fool their friends!
 
-**Current Version:** 1.1.0 | [Changelog](CHANGELOG.md)
+**Current Version:** 1.1.1 | [Changelog](CHANGELOG.md)
 
 ## How to Play
 
