@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - **Configuration Page**: New centralized configuration view for game hosts
-  - Access via "⚙️ Configuration" button in setup screen (host only)
+  - Access via "⚙️ Config" button in game controls (host only)
   - Dedicated page for all game customization options
   - Shows current game code and host-only access control
   - Clean, organized layout for current and future settings
@@ -21,9 +21,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - **Scoring Button Relocated**: Moved from inline button to dedicated config page
-  - Replaced "⚙️ Scoring" with "⚙️ Configuration" button
+  - Added "⚙️ Config" button to main game controls (always visible to host)
+  - Scoring modal now properly renders within config view
   - Better organization for multiple configuration options
   - Prepares for future expandability
+
+### Fixed
+- **Scoring Modal Display**: Fixed modal not appearing on Configuration page
+  - Modal now positioned at top level using React Fragment
+  - Removed `customScoring` requirement from modal condition
+  - Added `setTimeout` to ensure proper state synchronization
+  - Modal appears immediately when clicking "Edit Scoring Rules"
 
 ## [1.3.0] - 2026-01-30
 

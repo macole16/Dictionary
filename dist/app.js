@@ -1747,7 +1747,7 @@ function MultiplayerDictionaryGame() {
         }
       },
       className: "text-xs text-gray-400 hover:text-gray-600"
-    }, "v1.3.0")), gameHistory.length > 0 && /*#__PURE__*/React.createElement("div", {
+    }, "v1.3.1")), gameHistory.length > 0 && /*#__PURE__*/React.createElement("div", {
       className: "mt-8"
     }, /*#__PURE__*/React.createElement("h2", {
       className: "text-lg font-semibold text-gray-700 mb-3"
@@ -2126,7 +2126,7 @@ function MultiplayerDictionaryGame() {
         className: "px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 btn-3d"
       }, "Back to Game")));
     }
-    return /*#__PURE__*/React.createElement("div", {
+    return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
       className: "min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 p-4"
     }, /*#__PURE__*/React.createElement("div", {
       className: "max-w-4xl mx-auto"
@@ -2155,7 +2155,7 @@ function MultiplayerDictionaryGame() {
       className: "text-gray-600 mb-4"
     }, "Customize point values for different actions. Changes apply to this game only."), /*#__PURE__*/React.createElement("button", {
       onClick: () => {
-        setCustomScoring(gameData.customScoring || scoringConfig?.rules || {
+        const defaultScoring = {
           votesForFakeDefinition: {
             points: 1,
             description: 'Points per vote on fake definition'
@@ -2168,8 +2168,9 @@ function MultiplayerDictionaryGame() {
             points: 1,
             description: 'Points for voting for real definition'
           }
-        });
-        setShowScoringModal(true);
+        };
+        setCustomScoring(gameData.customScoring || scoringConfig?.rules || defaultScoring);
+        setTimeout(() => setShowScoringModal(true), 0);
       },
       className: "px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold btn-3d"
     }, "Edit Scoring Rules"), /*#__PURE__*/React.createElement("div", {
@@ -2201,7 +2202,102 @@ function MultiplayerDictionaryGame() {
     }, /*#__PURE__*/React.createElement("button", {
       onClick: () => setView('game'),
       className: "px-8 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-semibold text-lg btn-3d"
-    }, "Back to Game")))));
+    }, "Back to Game"))))), showScoringModal && /*#__PURE__*/React.createElement("div", {
+      className: "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "bg-white rounded-lg shadow-2xl p-6 max-w-2xl w-full"
+    }, /*#__PURE__*/React.createElement("h3", {
+      className: "text-xl font-bold text-gray-900 mb-4"
+    }, "\u2699\uFE0F Customize Scoring"), /*#__PURE__*/React.createElement("p", {
+      className: "text-sm text-gray-600 mb-4"
+    }, "Adjust point values for different actions. Changes apply to this game only."), /*#__PURE__*/React.createElement("div", {
+      className: "space-y-4 mb-6"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "bg-purple-50 p-4 rounded-lg"
+    }, /*#__PURE__*/React.createElement("label", {
+      className: "block text-sm font-semibold text-purple-900 mb-2"
+    }, "Points per vote on fake definition"), /*#__PURE__*/React.createElement("p", {
+      className: "text-xs text-gray-600 mb-2"
+    }, "Players earn this many points for each vote their fake definition receives"), /*#__PURE__*/React.createElement("input", {
+      type: "number",
+      min: "0",
+      max: "10",
+      value: customScoring.votesForFakeDefinition?.points || 0,
+      onChange: e => setCustomScoring({
+        ...customScoring,
+        votesForFakeDefinition: {
+          ...customScoring.votesForFakeDefinition,
+          points: parseInt(e.target.value) || 0
+        }
+      }),
+      className: "w-full px-4 py-2 border rounded-lg text-center text-lg font-bold"
+    })), /*#__PURE__*/React.createElement("div", {
+      className: "bg-green-50 p-4 rounded-lg"
+    }, /*#__PURE__*/React.createElement("label", {
+      className: "block text-sm font-semibold text-green-900 mb-2"
+    }, "Points to dictionary holder per vote on real definition"), /*#__PURE__*/React.createElement("p", {
+      className: "text-xs text-gray-600 mb-2"
+    }, "Dictionary holder earns this many points for each vote on the real definition"), /*#__PURE__*/React.createElement("input", {
+      type: "number",
+      min: "0",
+      max: "10",
+      value: customScoring.votesForRealDefinition?.points || 0,
+      onChange: e => setCustomScoring({
+        ...customScoring,
+        votesForRealDefinition: {
+          ...customScoring.votesForRealDefinition,
+          points: parseInt(e.target.value) || 0
+        }
+      }),
+      className: "w-full px-4 py-2 border rounded-lg text-center text-lg font-bold"
+    })), /*#__PURE__*/React.createElement("div", {
+      className: "bg-blue-50 p-4 rounded-lg"
+    }, /*#__PURE__*/React.createElement("label", {
+      className: "block text-sm font-semibold text-blue-900 mb-2"
+    }, "Points for voting for real definition"), /*#__PURE__*/React.createElement("p", {
+      className: "text-xs text-gray-600 mb-2"
+    }, "Players earn this many points when they correctly vote for the real definition"), /*#__PURE__*/React.createElement("input", {
+      type: "number",
+      min: "0",
+      max: "10",
+      value: customScoring.votingForRealDefinition?.points || 0,
+      onChange: e => setCustomScoring({
+        ...customScoring,
+        votingForRealDefinition: {
+          ...customScoring.votingForRealDefinition,
+          points: parseInt(e.target.value) || 0
+        }
+      }),
+      className: "w-full px-4 py-2 border rounded-lg text-center text-lg font-bold"
+    }))), /*#__PURE__*/React.createElement("div", {
+      className: "flex gap-3"
+    }, /*#__PURE__*/React.createElement("button", {
+      onClick: () => {
+        // Reset to defaults
+        setCustomScoring(scoringConfig?.rules || {
+          votesForFakeDefinition: {
+            points: 1
+          },
+          votesForRealDefinition: {
+            points: 1
+          },
+          votingForRealDefinition: {
+            points: 1
+          }
+        });
+      },
+      className: "flex-1 px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+    }, "Reset to Defaults"), /*#__PURE__*/React.createElement("button", {
+      onClick: () => setShowScoringModal(false),
+      className: "flex-1 px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
+    }, "Cancel"), /*#__PURE__*/React.createElement("button", {
+      onClick: async () => {
+        await database.ref(`games/${gameCode}/customScoring`).set(customScoring);
+        showToast('Scoring rules updated!', 'success');
+        setShowScoringModal(false);
+      },
+      className: "flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold"
+    }, "Save Changes")))));
   }
   if (view === 'game' && gameData) {
     const isHost = gameData.host === playerId;
@@ -2280,6 +2376,9 @@ function MultiplayerDictionaryGame() {
       onClick: () => setShowPassDictionary(true),
       className: "px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600"
     }, "\uD83D\uDCD6 Pass Dictionary"), isHost && /*#__PURE__*/React.createElement("button", {
+      onClick: () => setView('config'),
+      className: "px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700"
+    }, "\u2699\uFE0F Config"), isHost && /*#__PURE__*/React.createElement("button", {
       onClick: endGame,
       className: "px-3 py-1 bg-purple-600 text-white rounded text-sm hover:bg-purple-700"
     }, "End Game"), /*#__PURE__*/React.createElement("button", {
