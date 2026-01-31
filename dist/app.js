@@ -1735,7 +1735,7 @@ function MultiplayerDictionaryGame() {
     }, /*#__PURE__*/React.createElement("p", {
       className: "text-xs text-gray-500"
     }, "\xA9 2026 Shaolynx, LLC"), /*#__PURE__*/React.createElement("p", {
-      className: "text-xs text-gray-400"
+      className: "text-xs text-gray-500"
     }, "Licensed under MIT License"), /*#__PURE__*/React.createElement("button", {
       onClick: e => {
         if (e.shiftKey) {
@@ -1753,8 +1753,8 @@ function MultiplayerDictionaryGame() {
           }
         }
       },
-      className: "text-xs text-gray-400 hover:text-gray-600"
-    }, "v1.3.1")), gameHistory.length > 0 && /*#__PURE__*/React.createElement("div", {
+      className: "text-xs text-gray-500 hover:text-gray-700"
+    }, "v1.3.2")), gameHistory.length > 0 && /*#__PURE__*/React.createElement("div", {
       className: "mt-8"
     }, /*#__PURE__*/React.createElement("h2", {
       className: "text-lg font-semibold text-gray-700 mb-3"
@@ -2191,7 +2191,7 @@ function MultiplayerDictionaryGame() {
     }, /*#__PURE__*/React.createElement("h2", {
       className: "text-2xl font-bold text-gray-500 mb-3"
     }, "\uD83C\uDFA8 Avatar Management"), /*#__PURE__*/React.createElement("p", {
-      className: "text-gray-400 mb-4"
+      className: "text-gray-500 mb-4"
     }, "Coming soon: Customize available avatars for players"), /*#__PURE__*/React.createElement("button", {
       disabled: true,
       className: "px-6 py-3 bg-gray-300 text-gray-500 rounded-lg cursor-not-allowed"
@@ -2200,7 +2200,7 @@ function MultiplayerDictionaryGame() {
     }, /*#__PURE__*/React.createElement("h2", {
       className: "text-2xl font-bold text-gray-500 mb-3"
     }, "\uD83D\uDCDD Instructions"), /*#__PURE__*/React.createElement("p", {
-      className: "text-gray-400 mb-4"
+      className: "text-gray-500 mb-4"
     }, "Coming soon: Customize game instructions and rules"), /*#__PURE__*/React.createElement("button", {
       disabled: true,
       className: "px-6 py-3 bg-gray-300 text-gray-500 rounded-lg cursor-not-allowed"

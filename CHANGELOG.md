@@ -5,6 +5,23 @@ All notable changes to the Dictionary Game will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.3] - 2026-01-31
+
+### Fixed
+- **WCAG 2 AA Contrast Compliance**: Improved text contrast for accessibility
+  - Changed footer copyright text from `text-gray-400` to `text-gray-500` (4.61:1 contrast ratio)
+  - Changed version number from `text-gray-400` to `text-gray-500` with hover state `text-gray-700`
+  - Changed "Coming soon" placeholder text from `text-gray-400` to `text-gray-500`
+  - All text now meets WCAG 2 AA minimum contrast ratio of 4.5:1 for normal text
+  - Improved readability for users with low vision or color blindness
+  - 4 instances updated across the application
+
+### Added
+- **WCAG Contrast Analysis Document**: Created comprehensive accessibility audit
+  - Documented all color combinations and contrast ratios
+  - Provided recommendations for maintaining compliance
+  - Reference guide for future development
+
 ## [1.3.2] - 2026-01-31
 
 ### Changed
@@ -226,6 +243,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Version History
 
+- **1.3.3** (2026-01-31) - WCAG 2 AA Accessibility Compliance
 - **1.3.2** (2026-01-31) - Game History Filter (Skip Games with 0 Rounds)
 - **1.3.1** (2026-01-30) - Configuration Page with Centralized Settings
 - **1.3.0** (2026-01-30) - Custom Scoring Per Game

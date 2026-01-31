@@ -1629,7 +1629,7 @@
                                 <p className="text-xs text-gray-500">
                                     © 2026 Shaolynx, LLC
                                 </p>
-                                <p className="text-xs text-gray-400">
+                                <p className="text-xs text-gray-500">
                                     Licensed under MIT License
                                 </p>
                                 <button
@@ -1649,9 +1649,9 @@
                                             }
                                         }
                                     }}
-                                    className="text-xs text-gray-400 hover:text-gray-600"
+                                    className="text-xs text-gray-500 hover:text-gray-700"
                                 >
-                                    v1.3.2
+                                    v1.3.3
                                 </button>
                             </div>
 
@@ -2182,7 +2182,7 @@
                                     {/* Future Configuration Options */}
                                     <div className="border-l-4 border-gray-400 pl-4">
                                         <h2 className="text-2xl font-bold text-gray-500 mb-3">🎨 Avatar Management</h2>
-                                        <p className="text-gray-400 mb-4">Coming soon: Customize available avatars for players</p>
+                                        <p className="text-gray-500 mb-4">Coming soon: Customize available avatars for players</p>
                                         <button
                                             disabled
                                             className="px-6 py-3 bg-gray-300 text-gray-500 rounded-lg cursor-not-allowed"
@@ -2193,7 +2193,7 @@
 
                                     <div className="border-l-4 border-gray-400 pl-4">
                                         <h2 className="text-2xl font-bold text-gray-500 mb-3">📝 Instructions</h2>
-                                        <p className="text-gray-400 mb-4">Coming soon: Customize game instructions and rules</p>
+                                        <p className="text-gray-500 mb-4">Coming soon: Customize game instructions and rules</p>
                                         <button
                                             disabled
                                             className="px-6 py-3 bg-gray-300 text-gray-500 rounded-lg cursor-not-allowed"
