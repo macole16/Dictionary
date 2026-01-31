@@ -927,6 +927,7 @@
 
                 const players = gameData.players || {};
                 const leftPlayers = gameData.leftPlayers || {};
+                const roundsPlayed = gameData.roundsPlayed || 0;
 
                 // Combine active and left players
                 const allPlayers = [
@@ -942,16 +943,18 @@
                     }))
                 ].sort((a, b) => b.score - a.score);
 
-                // Save to history
-                const historyId = `${gameCode}_${Date.now()}`;
-                await database.ref(`gameHistory/${historyId}`).set({
-                    gameCode,
-                    players: allPlayers,
-                    winner: allPlayers[0],
-                    endedAt: Date.now(),
-                    hostName: gameData.hostName,
-                    roundsPlayed: gameData.roundsPlayed || 0
-                });
+                // Save to history only if at least one round was played
+                if (roundsPlayed > 0) {
+                    const historyId = `${gameCode}_${Date.now()}`;
+                    await database.ref(`gameHistory/${historyId}`).set({
+                        gameCode,
+                        players: allPlayers,
+                        winner: allPlayers[0],
+                        endedAt: Date.now(),
+                        hostName: gameData.hostName,
+                        roundsPlayed
+                    });
+                }
 
                 // Delete active game
                 await database.ref(`games/${gameCode}`).remove();
@@ -966,7 +969,11 @@
                 localStorage.removeItem('dictionaryGame_playerId');
                 localStorage.removeItem('dictionaryGame_playerName');
 
-                alert('Game ended and saved to history!');
+                if (roundsPlayed > 0) {
+                    alert('Game ended and saved to history!');
+                } else {
+                    alert('Game ended (not saved to history - no rounds played).');
+                }
                 setView('home');
             };
 
@@ -1644,7 +1651,7 @@
                                     }}
                                     className="text-xs text-gray-400 hover:text-gray-600"
                                 >
-                                    v1.3.1
+                                    v1.3.2
                                 </button>
                             </div>
 

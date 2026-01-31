@@ -5,6 +5,16 @@ All notable changes to the Dictionary Game will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.2] - 2026-01-31
+
+### Changed
+- **Game History Filter**: Games with no rounds played are no longer saved to history
+  - Only games with `roundsPlayed > 0` are saved to game history
+  - Prevents cluttering history with abandoned/test games
+  - User receives different message based on whether game was saved
+    - "Game ended and saved to history!" (if rounds played)
+    - "Game ended (not saved to history - no rounds played)." (if no rounds)
+
 ## [1.3.1] - 2026-01-30
 
 ### Added
@@ -216,6 +226,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Version History
 
+- **1.3.2** (2026-01-31) - Game History Filter (Skip Games with 0 Rounds)
 - **1.3.1** (2026-01-30) - Configuration Page with Centralized Settings
 - **1.3.0** (2026-01-30) - Custom Scoring Per Game
 - **1.2.3** (2026-01-30) - Game Timestamp Display with Date and Time
