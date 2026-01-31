@@ -308,14 +308,21 @@
                                 </li>
                             ]
                         });
-                    } else if (line.match(/^-\s/)) {
-                        const content = line.substring(2);
+                    } else if (line.match(/^(\s*)-\s/)) {
+                        const indentMatch = line.match(/^(\s*)-\s/);
+                        const indentLevel = indentMatch[1].length;
+                        const content = line.substring(indentMatch[0].length);
                         const boldMatch = content.match(/\*\*(.*?)\*\*/g);
+
+                        // Determine if this is a nested item (indented with spaces)
+                        const isNested = indentLevel >= 2;
+
                         if (!currentList || currentListType !== 'ul') {
                             if (currentList) elements.push(currentList);
                             currentList = <ul key={`list-${index}`} className="list-disc list-inside space-y-2 text-gray-700 ml-4 mb-4"></ul>;
                             currentListType = 'ul';
                         }
+
                         let parsedContent = content;
                         if (boldMatch) {
                             parsedContent = content.split(/(\*\*.*?\*\*)/).map((part, i) =>
@@ -323,8 +330,14 @@
                                     <strong key={i}>{part.slice(2, -2)}</strong> : part
                             );
                         }
+
+                        // Apply margin for nested items
+                        const itemClass = isNested ? "ml-4" : "";
+
                         currentList = React.cloneElement(currentList, {
-                            children: [...(currentList.props.children || []), <li key={index}>{parsedContent}</li>]
+                            children: [...(currentList.props.children || []),
+                                <li key={index} className={itemClass}>{parsedContent}</li>
+                            ]
                         });
                     }
                     // Paragraphs
@@ -1651,7 +1664,7 @@
                                     }}
                                     className="text-xs text-gray-500 hover:text-gray-700"
                                 >
-                                    v1.3.3
+                                    v1.3.4
                                 </button>
                             </div>
 

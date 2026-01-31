@@ -585,9 +585,14 @@ function MultiplayerDictionaryGame() {
             key: index
           }, boldMatch ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("strong", null, boldMatch[1]), content.replace(/\*\*(.*?)\*\*/, '').substring(boldMatch[1].length)) : content)]
         });
-      } else if (line.match(/^-\s/)) {
-        const content = line.substring(2);
+      } else if (line.match(/^(\s*)-\s/)) {
+        const indentMatch = line.match(/^(\s*)-\s/);
+        const indentLevel = indentMatch[1].length;
+        const content = line.substring(indentMatch[0].length);
         const boldMatch = content.match(/\*\*(.*?)\*\*/g);
+
+        // Determine if this is a nested item (indented with spaces)
+        const isNested = indentLevel >= 2;
         if (!currentList || currentListType !== 'ul') {
           if (currentList) elements.push(currentList);
           currentList = /*#__PURE__*/React.createElement("ul", {
@@ -602,9 +607,13 @@ function MultiplayerDictionaryGame() {
             key: i
           }, part.slice(2, -2)) : part);
         }
+
+        // Apply margin for nested items
+        const itemClass = isNested ? "ml-4" : "";
         currentList = React.cloneElement(currentList, {
           children: [...(currentList.props.children || []), /*#__PURE__*/React.createElement("li", {
-            key: index
+            key: index,
+            className: itemClass
           }, parsedContent)]
         });
       }
@@ -1754,7 +1763,7 @@ function MultiplayerDictionaryGame() {
         }
       },
       className: "text-xs text-gray-500 hover:text-gray-700"
-    }, "v1.3.2")), gameHistory.length > 0 && /*#__PURE__*/React.createElement("div", {
+    }, "v1.3.3")), gameHistory.length > 0 && /*#__PURE__*/React.createElement("div", {
       className: "mt-8"
     }, /*#__PURE__*/React.createElement("h2", {
       className: "text-lg font-semibold text-gray-700 mb-3"
