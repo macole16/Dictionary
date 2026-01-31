@@ -162,6 +162,8 @@
             const [showWordHistory, setShowWordHistory] = useState(false);
             const [instructions, setInstructions] = useState('');
             const [changelog, setChangelog] = useState('');
+            const [showScoringModal, setShowScoringModal] = useState(false);
+            const [customScoring, setCustomScoring] = useState(null);
 
             // Load avatar options
             useEffect(() => {
@@ -1012,8 +1014,8 @@
 
                 const updates = {};
 
-                // Get scoring configuration or use defaults
-                const scoring = scoringConfig?.rules || {
+                // Get scoring configuration (game custom > default config > hardcoded defaults)
+                const scoring = gameData.customScoring || scoringConfig?.rules || {
                     votesForFakeDefinition: { points: 1 },
                     votesForRealDefinition: { points: 1 },
                     votingForRealDefinition: { points: 1 }
@@ -1642,7 +1644,7 @@
                                     }}
                                     className="text-xs text-gray-400 hover:text-gray-600"
                                 >
-                                    v1.2.3
+                                    v1.3.1
                                 </button>
                             </div>
 
@@ -2101,6 +2103,111 @@
                 );
             }
 
+            if (view === 'config' && gameData) {
+                const isHost = gameData.host === playerId;
+
+                if (!isHost) {
+                    return (
+                        <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 flex items-center justify-center p-4">
+                            <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full text-center">
+                                <h2 className="text-2xl font-bold text-red-600 mb-4">Access Denied</h2>
+                                <p className="text-gray-600 mb-4">Only the game host can access configuration.</p>
+                                <button
+                                    onClick={() => setView('game')}
+                                    className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 btn-3d"
+                                >
+                                    Back to Game
+                                </button>
+                            </div>
+                        </div>
+                    );
+                }
+
+                return (
+                    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 p-4">
+                        <div className="max-w-4xl mx-auto">
+                            <div className="bg-white rounded-lg shadow-xl p-8 mb-6">
+                                <button
+                                    onClick={() => setView('game')}
+                                    className="mb-6 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 btn-3d"
+                                >
+                                    ← Back to Game
+                                </button>
+
+                                <div className="text-center mb-8">
+                                    <h1 className="text-4xl font-bold text-purple-900 mb-2">⚙️ Game Configuration</h1>
+                                    <p className="text-gray-600">Customize game settings (Host only)</p>
+                                    <p className="text-sm text-gray-500 mt-2">Game Code: <span className="font-mono font-bold">{gameCode}</span></p>
+                                </div>
+
+                                <div className="space-y-6">
+                                    {/* Scoring Configuration */}
+                                    <div className="border-l-4 border-green-500 pl-4">
+                                        <h2 className="text-2xl font-bold text-green-900 mb-3">🎯 Scoring Rules</h2>
+                                        <p className="text-gray-600 mb-4">Customize point values for different actions. Changes apply to this game only.</p>
+                                        <button
+                                            onClick={() => {
+                                                setCustomScoring(gameData.customScoring || scoringConfig?.rules || {
+                                                    votesForFakeDefinition: { points: 1, description: 'Points per vote on fake definition' },
+                                                    votesForRealDefinition: { points: 1, description: 'Points to dictionary holder per vote on real definition' },
+                                                    votingForRealDefinition: { points: 1, description: 'Points for voting for real definition' }
+                                                });
+                                                setShowScoringModal(true);
+                                            }}
+                                            className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold btn-3d"
+                                        >
+                                            Edit Scoring Rules
+                                        </button>
+
+                                        {/* Display current scoring */}
+                                        <div className="mt-4 bg-green-50 p-4 rounded-lg">
+                                            <h3 className="font-semibold text-green-900 mb-2">Current Rules:</h3>
+                                            <ul className="text-sm text-gray-700 space-y-1">
+                                                <li>• Votes on fake definition: <strong>{(gameData.customScoring?.votesForFakeDefinition?.points || scoringConfig?.rules?.votesForFakeDefinition?.points || 1)} points</strong></li>
+                                                <li>• Votes on real definition (to holder): <strong>{(gameData.customScoring?.votesForRealDefinition?.points || scoringConfig?.rules?.votesForRealDefinition?.points || 1)} points</strong></li>
+                                                <li>• Voting for real definition: <strong>{(gameData.customScoring?.votingForRealDefinition?.points || scoringConfig?.rules?.votingForRealDefinition?.points || 1)} points</strong></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+
+                                    {/* Future Configuration Options */}
+                                    <div className="border-l-4 border-gray-400 pl-4">
+                                        <h2 className="text-2xl font-bold text-gray-500 mb-3">🎨 Avatar Management</h2>
+                                        <p className="text-gray-400 mb-4">Coming soon: Customize available avatars for players</p>
+                                        <button
+                                            disabled
+                                            className="px-6 py-3 bg-gray-300 text-gray-500 rounded-lg cursor-not-allowed"
+                                        >
+                                            Manage Avatars (Coming Soon)
+                                        </button>
+                                    </div>
+
+                                    <div className="border-l-4 border-gray-400 pl-4">
+                                        <h2 className="text-2xl font-bold text-gray-500 mb-3">📝 Instructions</h2>
+                                        <p className="text-gray-400 mb-4">Coming soon: Customize game instructions and rules</p>
+                                        <button
+                                            disabled
+                                            className="px-6 py-3 bg-gray-300 text-gray-500 rounded-lg cursor-not-allowed"
+                                        >
+                                            Edit Instructions (Coming Soon)
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div className="mt-8 text-center">
+                                    <button
+                                        onClick={() => setView('game')}
+                                        className="px-8 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-semibold text-lg btn-3d"
+                                    >
+                                        Back to Game
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+
             if (view === 'game' && gameData) {
                 const isHost = gameData.host === playerId;
                 const isDictionaryHolder = (gameData.dictionaryHolder || gameData.host) === playerId;
@@ -2235,12 +2342,22 @@
                                 <div className="glass-card rounded-2xl shadow-lg p-6 mb-4 fade-in">
                                     <div className="flex items-center justify-between mb-4">
                                         <h2 className="text-xl font-semibold">Setup Round</h2>
-                                        <button
-                                            onClick={() => setShowWordHistory(true)}
-                                            className="px-3 py-1 bg-indigo-500 text-white rounded text-sm hover:bg-indigo-600 btn-3d"
-                                        >
-                                            📚 Word History ({usedWords.length + skippedWords.length})
-                                        </button>
+                                        <div className="flex gap-2">
+                                            {isHost && (
+                                                <button
+                                                    onClick={() => setView('config')}
+                                                    className="px-3 py-1 bg-green-500 text-white rounded text-sm hover:bg-green-600 btn-3d"
+                                                >
+                                                    ⚙️ Configuration
+                                                </button>
+                                            )}
+                                            <button
+                                                onClick={() => setShowWordHistory(true)}
+                                                className="px-3 py-1 bg-indigo-500 text-white rounded text-sm hover:bg-indigo-600 btn-3d"
+                                            >
+                                                📚 Word History ({usedWords.length + skippedWords.length})
+                                            </button>
+                                        </div>
                                     </div>
 
                                     <div className="space-y-4">
@@ -2645,6 +2762,116 @@
                                 </div>
                             )}
                         </div>
+
+                        {/* Scoring Configuration Modal */}
+                        {showScoringModal && customScoring && (
+                            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+                                <div className="bg-white rounded-lg shadow-2xl p-6 max-w-2xl w-full">
+                                    <h3 className="text-xl font-bold text-gray-900 mb-4">⚙️ Customize Scoring</h3>
+                                    <p className="text-sm text-gray-600 mb-4">Adjust point values for different actions. Changes apply to this game only.</p>
+
+                                    <div className="space-y-4 mb-6">
+                                        {/* Votes for Fake Definition */}
+                                        <div className="bg-purple-50 p-4 rounded-lg">
+                                            <label className="block text-sm font-semibold text-purple-900 mb-2">
+                                                Points per vote on fake definition
+                                            </label>
+                                            <p className="text-xs text-gray-600 mb-2">Players earn this many points for each vote their fake definition receives</p>
+                                            <input
+                                                type="number"
+                                                min="0"
+                                                max="10"
+                                                value={customScoring.votesForFakeDefinition?.points || 0}
+                                                onChange={(e) => setCustomScoring({
+                                                    ...customScoring,
+                                                    votesForFakeDefinition: {
+                                                        ...customScoring.votesForFakeDefinition,
+                                                        points: parseInt(e.target.value) || 0
+                                                    }
+                                                })}
+                                                className="w-full px-4 py-2 border rounded-lg text-center text-lg font-bold"
+                                            />
+                                        </div>
+
+                                        {/* Votes for Real Definition */}
+                                        <div className="bg-green-50 p-4 rounded-lg">
+                                            <label className="block text-sm font-semibold text-green-900 mb-2">
+                                                Points to dictionary holder per vote on real definition
+                                            </label>
+                                            <p className="text-xs text-gray-600 mb-2">Dictionary holder earns this many points for each vote on the real definition</p>
+                                            <input
+                                                type="number"
+                                                min="0"
+                                                max="10"
+                                                value={customScoring.votesForRealDefinition?.points || 0}
+                                                onChange={(e) => setCustomScoring({
+                                                    ...customScoring,
+                                                    votesForRealDefinition: {
+                                                        ...customScoring.votesForRealDefinition,
+                                                        points: parseInt(e.target.value) || 0
+                                                    }
+                                                })}
+                                                className="w-full px-4 py-2 border rounded-lg text-center text-lg font-bold"
+                                            />
+                                        </div>
+
+                                        {/* Voting for Real Definition */}
+                                        <div className="bg-blue-50 p-4 rounded-lg">
+                                            <label className="block text-sm font-semibold text-blue-900 mb-2">
+                                                Points for voting for real definition
+                                            </label>
+                                            <p className="text-xs text-gray-600 mb-2">Players earn this many points when they correctly vote for the real definition</p>
+                                            <input
+                                                type="number"
+                                                min="0"
+                                                max="10"
+                                                value={customScoring.votingForRealDefinition?.points || 0}
+                                                onChange={(e) => setCustomScoring({
+                                                    ...customScoring,
+                                                    votingForRealDefinition: {
+                                                        ...customScoring.votingForRealDefinition,
+                                                        points: parseInt(e.target.value) || 0
+                                                    }
+                                                })}
+                                                className="w-full px-4 py-2 border rounded-lg text-center text-lg font-bold"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="flex gap-3">
+                                        <button
+                                            onClick={() => {
+                                                // Reset to defaults
+                                                setCustomScoring(scoringConfig?.rules || {
+                                                    votesForFakeDefinition: { points: 1 },
+                                                    votesForRealDefinition: { points: 1 },
+                                                    votingForRealDefinition: { points: 1 }
+                                                });
+                                            }}
+                                            className="flex-1 px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+                                        >
+                                            Reset to Defaults
+                                        </button>
+                                        <button
+                                            onClick={() => setShowScoringModal(false)}
+                                            className="flex-1 px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button
+                                            onClick={async () => {
+                                                await database.ref(`games/${gameCode}/customScoring`).set(customScoring);
+                                                showToast('Scoring rules updated!', 'success');
+                                                setShowScoringModal(false);
+                                            }}
+                                            className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold"
+                                        >
+                                            Save Changes
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
 
                         {/* Word History Modal */}
                         {showWordHistory && (

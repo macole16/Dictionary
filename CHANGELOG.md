@@ -5,6 +5,47 @@ All notable changes to the Dictionary Game will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.1] - 2026-01-30
+
+### Added
+- **Configuration Page**: New centralized configuration view for game hosts
+  - Access via "⚙️ Configuration" button in setup screen (host only)
+  - Dedicated page for all game customization options
+  - Shows current game code and host-only access control
+  - Clean, organized layout for current and future settings
+  - Includes "🎯 Scoring Rules" section with edit button
+  - Displays current scoring values for easy reference
+  - Placeholder sections for future features:
+    - 🎨 Avatar Management (coming soon)
+    - 📝 Instructions Customization (coming soon)
+
+### Changed
+- **Scoring Button Relocated**: Moved from inline button to dedicated config page
+  - Replaced "⚙️ Scoring" with "⚙️ Configuration" button
+  - Better organization for multiple configuration options
+  - Prepares for future expandability
+
+## [1.3.0] - 2026-01-30
+
+### Added
+- **Custom Scoring Per Game**: Hosts can now customize point values for each game
+  - New "⚙️ Scoring" button in setup screen (host only)
+  - Interactive modal to adjust three scoring rules:
+    - Points per vote on fake definition (default: 1)
+    - Points to dictionary holder per vote on real definition (default: 1)
+    - Points for voting for real definition (default: 1)
+  - Adjust values from 0 to 10 for each rule
+  - "Reset to Defaults" button to restore original values
+  - Custom scoring saved per-game in Firebase
+  - Scoring calculations use game-specific rules
+  - Allows different play styles (competitive, casual, educational)
+
+### Changed
+- **Scoring System**: Now supports per-game custom scoring rules
+  - Scoring calculations check for `gameData.customScoring` first
+  - Falls back to `scoring.json` config, then hardcoded defaults
+  - Maintains backward compatibility with existing games
+
 ## [1.2.3] - 2026-01-30
 
 ### Changed
@@ -167,6 +208,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Version History
 
+- **1.3.1** (2026-01-30) - Configuration Page with Centralized Settings
+- **1.3.0** (2026-01-30) - Custom Scoring Per Game
 - **1.2.3** (2026-01-30) - Game Timestamp Display with Date and Time
 - **1.2.2** (2026-01-30) - What's New Page with Changelog Display
 - **1.2.1** (2026-01-30) - Instructions Externalized to Markdown File
