@@ -167,6 +167,7 @@
             const [showScoringModal, setShowScoringModal] = useState(false);
             const [customScoring, setCustomScoring] = useState(null);
             const [authUser, setAuthUser] = useState(null);
+            const [showEndGameConfirm, setShowEndGameConfirm] = useState(false);
             const [authLoading, setAuthLoading] = useState(true);
 
             // Initialize Firebase Authentication
@@ -972,9 +973,12 @@
             };
 
             const endGame = async () => {
-                if (!confirm('End this game and save to history? This will close the game for all players.')) {
-                    return;
-                }
+                // Non-blocking: Just show confirmation modal (no UI blocking)
+                setShowEndGameConfirm(true);
+            };
+
+            const confirmEndGame = async () => {
+                setShowEndGameConfirm(false);
 
                 // Immediate feedback (0ms blocking)
                 showToast('Ending game...', 'info');
@@ -1607,6 +1611,31 @@
                         </div>
 
                         {/* Reconnect Modal */}
+                        {showEndGameConfirm && (
+                            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+                                <div className="bg-white rounded-lg shadow-2xl p-6 max-w-md w-full card-3d">
+                                    <h2 className="text-2xl font-bold text-red-600 mb-4">⚠️ End Game?</h2>
+                                    <p className="text-gray-700 mb-6">
+                                        Are you sure you want to end this game? This will close the game for all players and save it to history.
+                                    </p>
+                                    <div className="flex gap-3">
+                                        <button
+                                            onClick={() => setShowEndGameConfirm(false)}
+                                            className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 btn-3d"
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button
+                                            onClick={confirmEndGame}
+                                            className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 btn-3d"
+                                        >
+                                            End Game
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
                         {showReconnectModal && activeGames.length > 0 && (
                             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
                                 <div className="bg-white rounded-lg shadow-2xl p-6 max-w-lg w-full card-3d">
