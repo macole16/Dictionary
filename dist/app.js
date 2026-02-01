@@ -1813,7 +1813,7 @@ function MultiplayerDictionaryGame() {
         }
       },
       className: "text-xs text-gray-500 hover:text-gray-700"
-    }, "v1.4.2")), gameHistory.length > 0 && /*#__PURE__*/React.createElement("div", {
+    }, "v1.4.4")), gameHistory.length > 0 && /*#__PURE__*/React.createElement("div", {
       className: "mt-8"
     }, /*#__PURE__*/React.createElement("h2", {
       className: "text-lg font-semibold text-gray-700 mb-3"

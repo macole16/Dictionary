@@ -6,10 +6,25 @@
     <title>Dictionary Game - Multiplayer</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>📚</text></svg>">
 
-    <!-- Preconnect to external domains for faster loading -->
+    <!-- DNS Prefetch for external APIs (early DNS resolution) -->
+    <link rel="dns-prefetch" href="https://api.dictionaryapi.dev">
+    <link rel="dns-prefetch" href="https://api.datamuse.com">
+    <link rel="dns-prefetch" href="https://api.qrserver.com">
+
+    <!-- Preconnect to critical external domains (DNS + TCP + TLS) -->
     <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://unpkg.com" crossorigin>
-    <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+
+    <!-- Preload critical resources for faster loading -->
+    <link rel="preload" href="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js" as="script" crossorigin>
+    <link rel="preload" href="https://unpkg.com/react@18/umd/react.production.min.js" as="script" crossorigin>
+    <link rel="preload" href="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" as="script" crossorigin>
+    <link rel="preload" href="dist/output.css?v=1.4.3" as="style">
+    <link rel="preload" href="dist/app.js?v=1.4.3" as="script">
+
+    <!-- Tailwind CSS - Compiled (includes all custom styles) -->
+    <link rel="stylesheet" href="dist/output.css?v=1.4.3">
 
     <!-- Firebase - defer to avoid blocking render -->
     <script defer src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -19,12 +34,15 @@
     <!-- React - defer to avoid blocking render -->
     <script defer crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script defer crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-
-    <!-- Tailwind CSS - Compiled (includes all custom styles) -->
-    <link rel="stylesheet" href="dist/output.css?v=1.4.2">
 </head>
 <body>
-    <div id="root"></div>
+    <main id="root"></main>
+
+    <!-- Vercel Speed Insights -->
+    <script type="module">
+        import { injectSpeedInsights } from 'https://cdn.jsdelivr.net/npm/@vercel/speed-insights@1/dist/index.mjs';
+        injectSpeedInsights();
+    </script>
 
     <script defer src="dist/app.js?v=1.4.2"></script>
 </body>
