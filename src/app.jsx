@@ -1602,7 +1602,9 @@
                                         top: `${Math.random() * 100}%`,
                                         animation: `float ${Math.random() * 20 + 15}s infinite ease-in-out`,
                                         animationDelay: `${Math.random() * 5}s`,
-                                        transform: `rotate(${Math.random() * 30 - 15}deg)`
+                                        transform: `rotate(${Math.random() * 30 - 15}deg)`,
+                                        willChange: 'transform',
+                                        contain: 'layout style paint'
                                     }}
                                 >
                                     {word}
