@@ -70,11 +70,12 @@
     "autoprefixer": "^10.4.24",
     "http-server": "^14.1.1",
     "postcss": "^8.5.6",
-    "tailwindcss": "^3.4.17"
+    "tailwindcss": "^3.4.17",
+    "terser": "^5.46.0"
   },
   "scripts": {
     "build:css": "npx tailwindcss -i ./src/input.css -o ./dist/output.css --minify",
-    "build:js": "babel src --out-dir dist",
+    "build:js": "babel src --out-dir dist && terser dist/app.js -o dist/app.js -c -m",
     "build": "npm run build:css && npm run build:js",
     "watch:css": "npx tailwindcss -i ./src/input.css -o ./dist/output.css --watch",
     "watch:js": "babel src --out-dir dist --watch",
