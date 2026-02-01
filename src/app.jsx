@@ -1,19 +1,21 @@
         const { useState, useEffect } = React;
 
+        // Firebase configuration - loads from window.ENV (set in index.html)
         const firebaseConfig = {
-            apiKey: "AIzaSyDFlzHW747uu1p1TdqWbdFM_omkjORRht4",
-            authDomain: "dictionary-5fae9.firebaseapp.com",
-            databaseURL: "https://dictionary-5fae9-default-rtdb.firebaseio.com",
-            projectId: "dictionary-5fae9",
-            storageBucket: "dictionary-5fae9.firebasestorage.app",
-            messagingSenderId: "615496664058",
-            appId: "1:615496664058:web:0ea7b1bd792d230cbf1a43"
+            apiKey: window.ENV?.VITE_FIREBASE_API_KEY || "AIzaSyDFlzHW747uu1p1TdqWbdFM_omkjORRht4",
+            authDomain: window.ENV?.VITE_FIREBASE_AUTH_DOMAIN || "dictionary-5fae9.firebaseapp.com",
+            databaseURL: window.ENV?.VITE_FIREBASE_DATABASE_URL || "https://dictionary-5fae9-default-rtdb.firebaseio.com",
+            projectId: window.ENV?.VITE_FIREBASE_PROJECT_ID || "dictionary-5fae9",
+            storageBucket: window.ENV?.VITE_FIREBASE_STORAGE_BUCKET || "dictionary-5fae9.firebasestorage.app",
+            messagingSenderId: window.ENV?.VITE_FIREBASE_MESSAGING_SENDER_ID || "615496664058",
+            appId: window.ENV?.VITE_FIREBASE_APP_ID || "1:615496664058:web:0ea7b1bd792d230cbf1a43"
         };
 
         if (!firebase.apps.length) {
             firebase.initializeApp(firebaseConfig);
         }
         const database = firebase.database();
+        const auth = firebase.auth();
 
         /* Firebase Database Index Configuration:
          * To improve performance, add this to your Firebase Database Rules:
@@ -164,6 +166,32 @@
             const [changelog, setChangelog] = useState('');
             const [showScoringModal, setShowScoringModal] = useState(false);
             const [customScoring, setCustomScoring] = useState(null);
+            const [authUser, setAuthUser] = useState(null);
+            const [authLoading, setAuthLoading] = useState(true);
+
+            // Initialize Firebase Authentication
+            useEffect(() => {
+                const unsubscribe = auth.onAuthStateChanged(async (user) => {
+                    if (user) {
+                        // User is signed in
+                        setAuthUser(user);
+                        setPlayerId(user.uid);
+                    } else {
+                        // No user signed in, sign in anonymously
+                        try {
+                            const result = await auth.signInAnonymously();
+                            setAuthUser(result.user);
+                            setPlayerId(result.user.uid);
+                        } catch (error) {
+                            console.error('Error signing in anonymously:', error);
+                            showToast('Authentication error. Please refresh the page.', 'error');
+                        }
+                    }
+                    setAuthLoading(false);
+                });
+
+                return () => unsubscribe();
+            }, []);
 
             // Load avatar options
             useEffect(() => {
@@ -441,8 +469,13 @@
             };
 
             const createGame = async () => {
+                if (!authUser) {
+                    showToast('Please wait for authentication...', 'error');
+                    return;
+                }
+
                 const code = generateGameCode();
-                const newPlayerId = Date.now().toString();
+                const newPlayerId = authUser.uid;
 
                 await database.ref(`games/${code}`).set({
                     host: newPlayerId,
@@ -482,6 +515,11 @@
             };
 
             const joinGame = async () => {
+                if (!authUser) {
+                    showToast('Please wait for authentication...', 'error');
+                    return;
+                }
+
                 if (!inputGameCode || !inputPlayerName) {
                     showToast('Please enter both game code and your name', 'error');
                     return;
@@ -508,7 +546,7 @@
                     return;
                 }
 
-                const newPlayerId = Date.now().toString();
+                const newPlayerId = authUser.uid;
 
                 await database.ref(`games/${code}/players/${newPlayerId}`).set({
                     name: inputPlayerName,
@@ -1664,7 +1702,7 @@
                                     }}
                                     className="text-xs text-gray-500 hover:text-gray-700"
                                 >
-                                    v1.3.4
+                                    v1.4.0
                                 </button>
                             </div>
 

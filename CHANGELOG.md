@@ -5,6 +5,45 @@ All notable changes to the Dictionary Game will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2026-02-01
+
+### Added
+- **Firebase Anonymous Authentication**: Users now automatically sign in anonymously
+  - Player IDs now use Firebase Auth UIDs instead of timestamps
+  - Persistent sessions across page reloads
+  - Better security and identity validation
+  - Automatic authentication on app load
+- **Security Documentation**: Comprehensive security guides and best practices
+  - `SECURITY.md` - Firebase security rules and configuration guide
+  - `FIREBASE_AUTH_SETUP.md` - Step-by-step authentication setup instructions
+  - `firebase-rules-with-auth.json` - Enhanced security rules for authenticated users
+- **Environment Variable Support**: Firebase credentials now use environment variables
+  - Created `.env` file for local development (git-ignored)
+  - Created `.env.example` template for easy setup
+  - Supports Vercel environment variables for production
+
+### Changed
+- **Firebase Configuration**: Moved from hardcoded values to environment variables
+  - Uses `window.ENV` with fallback values for backward compatibility
+  - Credentials no longer exposed in source code repository
+  - `.env` file properly excluded from version control
+- **Player ID Generation**: Changed from timestamp-based to Firebase Auth UID
+  - Old: `Date.now().toString()` (e.g., "1738436789123")
+  - New: `authUser.uid` (e.g., "xY3kL9mP2qR5sT8w")
+  - Non-guessable, cryptographically secure identifiers
+
+### Security
+- **Enhanced Firebase Security Rules**: Created auth-based security rules
+  - Players can only modify their own data (`$playerId === auth.uid`)
+  - Scores can only increase (prevents cheating)
+  - Host field must match creator's auth UID
+  - State-specific write permissions (definitions in 'collecting', votes in 'voting')
+  - Player names limited to 50 characters
+- **Credential Protection**: Firebase API keys moved out of source code
+  - API keys in `.env` file (local development)
+  - Environment variables in Vercel (production)
+  - `.gitignore` properly configured to exclude sensitive files
+
 ## [1.3.4] - 2026-01-31
 
 ### Fixed

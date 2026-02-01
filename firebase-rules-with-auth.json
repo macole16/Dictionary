@@ -1,0 +1,101 @@
+{
+  "rules": {
+    "games": {
+      ".read": true,
+      ".write": false,
+      "$gameCode": {
+        ".read": true,
+        ".write": "data.exists()",
+        ".validate": "newData.exists()",
+        ".indexOn": ["createdAt", "lastActivity"],
+        "players": {
+          "$playerId": {
+            ".write": "($playerId === auth.uid && !data.exists()) || ($playerId === auth.uid && data.exists())",
+            ".validate": "newData.hasChildren(['name', 'avatar'])",
+            "score": {
+              ".write": "newData.val() >= data.val()"
+            },
+            "name": {
+              ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 50"
+            },
+            "avatar": {
+              ".validate": "newData.isString()"
+            }
+          },
+          ".indexOn": ["joinedAt"]
+        },
+        "host": {
+          ".write": "!data.exists() && newData.val() === auth.uid",
+          ".validate": "newData.val() === auth.uid"
+        },
+        "hostName": {
+          ".write": "!data.exists() || data.parent().child('host').val() === auth.uid"
+        },
+        "state": {
+          ".write": "data.parent().child('host').val() === auth.uid || data.parent().child('dictionaryHolder').val() === auth.uid"
+        },
+        "currentWord": {
+          ".write": "data.parent().child('dictionaryHolder').val() === auth.uid || data.parent().child('host').val() === auth.uid"
+        },
+        "realDefinition": {
+          ".write": "data.parent().child('dictionaryHolder').val() === auth.uid || data.parent().child('host').val() === auth.uid"
+        },
+        "difficulty": {
+          ".write": "data.parent().child('dictionaryHolder').val() === auth.uid || data.parent().child('host').val() === auth.uid"
+        },
+        "pronunciation": {
+          ".write": "data.parent().child('dictionaryHolder').val() === auth.uid || data.parent().child('host').val() === auth.uid"
+        },
+        "wordFact": {
+          ".write": "data.parent().child('dictionaryHolder').val() === auth.uid || data.parent().child('host').val() === auth.uid"
+        },
+        "definitions": {
+          "$playerId": {
+            ".write": "$playerId === auth.uid && data.parent().parent().child('state').val() === 'collecting'"
+          }
+        },
+        "votes": {
+          "$playerId": {
+            ".write": "$playerId === auth.uid && data.parent().parent().child('state').val() === 'voting'"
+          }
+        },
+        "voteCounts": {
+          ".write": "data.parent().child('host').val() === auth.uid"
+        },
+        "customScoring": {
+          ".write": "data.parent().child('host').val() === auth.uid"
+        },
+        "usedWords": {
+          ".write": "data.parent().child('dictionaryHolder').val() === auth.uid || data.parent().child('host').val() === auth.uid"
+        },
+        "skippedWords": {
+          ".write": "data.parent().child('dictionaryHolder').val() === auth.uid || data.parent().child('host').val() === auth.uid"
+        },
+        "dictionaryHolder": {
+          ".write": "data.parent().child('host').val() === auth.uid"
+        },
+        "dictionaryHolderName": {
+          ".write": "data.parent().child('host').val() === auth.uid"
+        },
+        "roundsPlayed": {
+          ".write": "data.parent().child('host').val() === auth.uid"
+        },
+        "leftPlayers": {
+          ".write": "auth != null"
+        },
+        "createdAt": {
+          ".write": "!data.exists()",
+          ".validate": "newData.val() === now"
+        },
+        "lastActivity": {
+          ".write": "auth != null"
+        }
+      }
+    },
+    "gameHistory": {
+      ".read": true,
+      ".write": "auth != null",
+      ".indexOn": ["endedAt", "createdAt"]
+    }
+  }
+}
