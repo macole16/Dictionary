@@ -44,6 +44,34 @@
         injectSpeedInsights();
     </script>
 
-    <script defer src="dist/app.js?v=1.4.2"></script>
+    <!-- Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then((registration) => {
+                        console.log('[App] Service Worker registered:', registration.scope);
+
+                        // Check for updates periodically
+                        registration.addEventListener('updatefound', () => {
+                            const newWorker = registration.installing;
+                            console.log('[App] New Service Worker found, installing...');
+
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    console.log('[App] New version available! Refresh to update.');
+                                    // Optionally show a toast notification here
+                                }
+                            });
+                        });
+                    })
+                    .catch((error) => {
+                        console.error('[App] Service Worker registration failed:', error);
+                    });
+            });
+        }
+    </script>
+
+    <script defer src="dist/app.js?v=1.4.4"></script>
 </body>
 </html>

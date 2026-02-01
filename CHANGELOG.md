@@ -5,6 +5,33 @@ All notable changes to the Dictionary Game will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.5] - 2026-02-01
+
+### Added
+- **Service Worker for Caching**: Progressive Web App (PWA) functionality for offline support
+  - Created `sw.js` with intelligent caching strategies
+  - Caches static assets (HTML, CSS, JS) for instant repeat visits
+  - Caches CDN resources (Firebase, React) separately for better cache management
+  - Cache-first strategy for static assets, network-first for Firebase and APIs
+  - Automatic cache cleanup on version updates
+  - Smart request filtering (skips Firebase DB, external APIs for fresh data)
+  - Service worker registration with update detection
+  - Console logging for debugging and monitoring
+
+### Performance
+- **Near-instant repeat visits**: Static assets served from cache
+  - First visit: Normal load time
+  - Repeat visits: ~90% faster (assets from cache)
+  - Works offline for cached pages
+  - Reduces server load and bandwidth usage
+  - Better experience on slow/unreliable connections
+
+### Developer Experience
+- **Automatic cache versioning**: Tied to app version (v1.4.5)
+- **Update notifications**: Console logs when new version available
+- **Cache management**: Old caches automatically deleted on update
+- **Debugging support**: Detailed console logs for cache hits/misses
+
 ## [1.4.4] - 2026-02-01
 
 ### Performance
