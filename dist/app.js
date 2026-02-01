@@ -1180,52 +1180,66 @@ function MultiplayerDictionaryGame() {
     if (!confirm('End this game and save to history? This will close the game for all players.')) {
       return;
     }
-    const players = gameData.players || {};
-    const leftPlayers = gameData.leftPlayers || {};
-    const roundsPlayed = gameData.roundsPlayed || 0;
 
-    // Combine active and left players
-    const allPlayers = [...Object.entries(players).map(([id, player]) => ({
-      name: player.name,
-      score: player.score,
-      active: true
-    })), ...Object.entries(leftPlayers).map(([id, player]) => ({
-      name: player.name,
-      score: player.score,
-      active: false
-    }))].sort((a, b) => b.score - a.score);
+    // Show immediate feedback
+    showToast('Ending game...', 'info');
 
-    // Save to history only if at least one round was played
-    if (roundsPlayed > 0) {
-      const historyId = `${gameCode}_${Date.now()}`;
-      await database.ref(`gameHistory/${historyId}`).set({
-        gameCode,
-        players: allPlayers,
-        winner: allPlayers[0],
-        endedAt: Date.now(),
-        hostName: gameData.hostName,
-        roundsPlayed
-      });
-    }
+    // Defer heavy operations to avoid blocking UI
+    setTimeout(async () => {
+      try {
+        const players = gameData.players || {};
+        const leftPlayers = gameData.leftPlayers || {};
+        const roundsPlayed = gameData.roundsPlayed || 0;
 
-    // Delete active game
-    await database.ref(`games/${gameCode}`).remove();
+        // Combine active and left players
+        const allPlayers = [...Object.entries(players).map(([id, player]) => ({
+          name: player.name,
+          score: player.score,
+          active: true
+        })), ...Object.entries(leftPlayers).map(([id, player]) => ({
+          name: player.name,
+          score: player.score,
+          active: false
+        }))].sort((a, b) => b.score - a.score);
 
-    // Remove from created games list
-    const createdGames = JSON.parse(localStorage.getItem('dictionaryGame_createdGames') || '[]');
-    const updatedCreatedGames = createdGames.filter(game => game.code !== gameCode);
-    localStorage.setItem('dictionaryGame_createdGames', JSON.stringify(updatedCreatedGames));
+        // Save to history only if at least one round was played
+        if (roundsPlayed > 0) {
+          const historyId = `${gameCode}_${Date.now()}`;
+          await database.ref(`gameHistory/${historyId}`).set({
+            gameCode,
+            players: allPlayers,
+            winner: allPlayers[0],
+            endedAt: Date.now(),
+            hostName: gameData.hostName,
+            roundsPlayed
+          });
+        }
 
-    // Clear localStorage
-    localStorage.removeItem('dictionaryGame_code');
-    localStorage.removeItem('dictionaryGame_playerId');
-    localStorage.removeItem('dictionaryGame_playerName');
-    if (roundsPlayed > 0) {
-      alert('Game ended and saved to history!');
-    } else {
-      alert('Game ended (not saved to history - no rounds played).');
-    }
-    setView('home');
+        // Delete active game
+        await database.ref(`games/${gameCode}`).remove();
+
+        // Remove from created games list
+        const createdGames = JSON.parse(localStorage.getItem('dictionaryGame_createdGames') || '[]');
+        const updatedCreatedGames = createdGames.filter(game => game.code !== gameCode);
+        localStorage.setItem('dictionaryGame_createdGames', JSON.stringify(updatedCreatedGames));
+
+        // Clear localStorage
+        localStorage.removeItem('dictionaryGame_code');
+        localStorage.removeItem('dictionaryGame_playerId');
+        localStorage.removeItem('dictionaryGame_playerName');
+
+        // Navigate home first, then show success message
+        setView('home');
+        if (roundsPlayed > 0) {
+          showToast('Game ended and saved to history!', 'success');
+        } else {
+          showToast('Game ended (not saved to history - no rounds played)', 'info');
+        }
+      } catch (error) {
+        console.error('Error ending game:', error);
+        showToast('Error ending game. Please try again.', 'error');
+      }
+    }, 0);
   };
   const quickJoinGame = code => {
     setInputGameCode(code);
@@ -1799,7 +1813,7 @@ function MultiplayerDictionaryGame() {
         }
       },
       className: "text-xs text-gray-500 hover:text-gray-700"
-    }, "v1.3.4")), gameHistory.length > 0 && /*#__PURE__*/React.createElement("div", {
+    }, "v1.4.1")), gameHistory.length > 0 && /*#__PURE__*/React.createElement("div", {
       className: "mt-8"
     }, /*#__PURE__*/React.createElement("h2", {
       className: "text-lg font-semibold text-gray-700 mb-3"
