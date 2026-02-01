@@ -976,56 +976,69 @@
                     return;
                 }
 
-                const players = gameData.players || {};
-                const leftPlayers = gameData.leftPlayers || {};
-                const roundsPlayed = gameData.roundsPlayed || 0;
+                // Show immediate feedback
+                showToast('Ending game...', 'info');
 
-                // Combine active and left players
-                const allPlayers = [
-                    ...Object.entries(players).map(([id, player]) => ({
-                        name: player.name,
-                        score: player.score,
-                        active: true
-                    })),
-                    ...Object.entries(leftPlayers).map(([id, player]) => ({
-                        name: player.name,
-                        score: player.score,
-                        active: false
-                    }))
-                ].sort((a, b) => b.score - a.score);
+                // Defer heavy operations to avoid blocking UI
+                setTimeout(async () => {
+                    try {
+                        const players = gameData.players || {};
+                        const leftPlayers = gameData.leftPlayers || {};
+                        const roundsPlayed = gameData.roundsPlayed || 0;
 
-                // Save to history only if at least one round was played
-                if (roundsPlayed > 0) {
-                    const historyId = `${gameCode}_${Date.now()}`;
-                    await database.ref(`gameHistory/${historyId}`).set({
-                        gameCode,
-                        players: allPlayers,
-                        winner: allPlayers[0],
-                        endedAt: Date.now(),
-                        hostName: gameData.hostName,
-                        roundsPlayed
-                    });
-                }
+                        // Combine active and left players
+                        const allPlayers = [
+                            ...Object.entries(players).map(([id, player]) => ({
+                                name: player.name,
+                                score: player.score,
+                                active: true
+                            })),
+                            ...Object.entries(leftPlayers).map(([id, player]) => ({
+                                name: player.name,
+                                score: player.score,
+                                active: false
+                            }))
+                        ].sort((a, b) => b.score - a.score);
 
-                // Delete active game
-                await database.ref(`games/${gameCode}`).remove();
+                        // Save to history only if at least one round was played
+                        if (roundsPlayed > 0) {
+                            const historyId = `${gameCode}_${Date.now()}`;
+                            await database.ref(`gameHistory/${historyId}`).set({
+                                gameCode,
+                                players: allPlayers,
+                                winner: allPlayers[0],
+                                endedAt: Date.now(),
+                                hostName: gameData.hostName,
+                                roundsPlayed
+                            });
+                        }
 
-                // Remove from created games list
-                const createdGames = JSON.parse(localStorage.getItem('dictionaryGame_createdGames') || '[]');
-                const updatedCreatedGames = createdGames.filter(game => game.code !== gameCode);
-                localStorage.setItem('dictionaryGame_createdGames', JSON.stringify(updatedCreatedGames));
+                        // Delete active game
+                        await database.ref(`games/${gameCode}`).remove();
 
-                // Clear localStorage
-                localStorage.removeItem('dictionaryGame_code');
-                localStorage.removeItem('dictionaryGame_playerId');
-                localStorage.removeItem('dictionaryGame_playerName');
+                        // Remove from created games list
+                        const createdGames = JSON.parse(localStorage.getItem('dictionaryGame_createdGames') || '[]');
+                        const updatedCreatedGames = createdGames.filter(game => game.code !== gameCode);
+                        localStorage.setItem('dictionaryGame_createdGames', JSON.stringify(updatedCreatedGames));
 
-                if (roundsPlayed > 0) {
-                    alert('Game ended and saved to history!');
-                } else {
-                    alert('Game ended (not saved to history - no rounds played).');
-                }
-                setView('home');
+                        // Clear localStorage
+                        localStorage.removeItem('dictionaryGame_code');
+                        localStorage.removeItem('dictionaryGame_playerId');
+                        localStorage.removeItem('dictionaryGame_playerName');
+
+                        // Navigate home first, then show success message
+                        setView('home');
+
+                        if (roundsPlayed > 0) {
+                            showToast('Game ended and saved to history!', 'success');
+                        } else {
+                            showToast('Game ended (not saved to history - no rounds played)', 'info');
+                        }
+                    } catch (error) {
+                        console.error('Error ending game:', error);
+                        showToast('Error ending game. Please try again.', 'error');
+                    }
+                }, 0);
             };
 
             const quickJoinGame = (code) => {
@@ -1702,7 +1715,7 @@
                                     }}
                                     className="text-xs text-gray-500 hover:text-gray-700"
                                 >
-                                    v1.4.0
+                                    v1.4.1
                                 </button>
                             </div>
 

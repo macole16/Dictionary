@@ -1,6 +1,6 @@
 {
   "name": "dictionary",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "A multiplayer word bluffing game where players create fake definitions to fool their friends!",
   "main": "index.js",
   "dependencies": {
