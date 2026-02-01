@@ -35,10 +35,22 @@
 <body>
     <main id="root"></main>
 
-    <!-- Vercel Speed Insights -->
+    <!-- Vercel Speed Insights - Lazy loaded after page interactive -->
     <script type="module">
-        import { injectSpeedInsights } from 'https://cdn.jsdelivr.net/npm/@vercel/speed-insights@1/dist/index.mjs';
-        injectSpeedInsights();
+        // Defer Speed Insights until page is fully interactive
+        if (document.readyState === 'complete') {
+            loadSpeedInsights();
+        } else {
+            window.addEventListener('load', () => {
+                setTimeout(loadSpeedInsights, 3000); // Load 3s after page load
+            });
+        }
+
+        function loadSpeedInsights() {
+            import('https://cdn.jsdelivr.net/npm/@vercel/speed-insights@1/dist/index.mjs')
+                .then(({ injectSpeedInsights }) => injectSpeedInsights())
+                .catch(err => console.warn('Speed Insights failed to load:', err));
+        }
     </script>
 
     <!-- Service Worker Registration -->
