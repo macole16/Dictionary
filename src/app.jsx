@@ -976,11 +976,11 @@
                     return;
                 }
 
-                // Show immediate feedback
+                // Immediate feedback (0ms blocking)
                 showToast('Ending game...', 'info');
 
-                // Defer heavy operations to avoid blocking UI
-                setTimeout(async () => {
+                // ALL heavy work deferred to next event loop (microtask)
+                Promise.resolve().then(async () => {
                     try {
                         const players = gameData.players || {};
                         const leftPlayers = gameData.leftPlayers || {};
@@ -1038,7 +1038,7 @@
                         console.error('Error ending game:', error);
                         showToast('Error ending game. Please try again.', 'error');
                     }
-                }, 0);
+                });
             };
 
             const quickJoinGame = (code) => {
