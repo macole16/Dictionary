@@ -5,6 +5,28 @@ All notable changes to the Dictionary Game will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.6] - 2026-02-01
+
+### Performance
+- **Cumulative Layout Shift (CLS) Improvements**: Eliminated layout shifts for better user experience
+  - Added explicit width/height (150x150) to QR code image to reserve space
+  - Added skeleton loader for avatar selection (prevents shift when avatars.json loads)
+  - Skeleton shows 10 placeholder boxes with pulse animation during loading
+  - Added `minHeight: 64px` to avatar grid for consistent spacing
+  - Added `font-display: swap` strategy to prevent font loading layout shifts
+  - System fonts render immediately, custom fonts swap in without shifting layout
+  - Fixed version mismatches in HTML (all now v1.4.6)
+  - Updated Service Worker cache names to v1.4.6
+
+### Developer Experience
+- **Cache busting**: Updated all asset versions to v1.4.6 for proper cache invalidation
+
+### Expected Impact
+- **Better Core Web Vitals**: Reduced CLS score significantly
+- **Smoother loading**: No content jumping as page loads
+- **Better mobile experience**: More stable layout on slow connections
+- **Improved SEO**: Google prioritizes pages with low CLS
+
 ## [1.4.5] - 2026-02-01
 
 ### Added

@@ -2,6 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Font Loading Optimization - prevent layout shifts from font loading */
+@layer base {
+    body {
+        font-display: swap; /* Use fallback font immediately, swap when custom font loads */
+    }
+}
+
 /* Custom Styles */
 
 /* 3D Card Effects */

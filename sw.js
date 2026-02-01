@@ -1,7 +1,7 @@
 // Service Worker for Dictionary Game
-// Version 1.4.5
-const CACHE_NAME = 'dictionary-game-v1.4.5';
-const RUNTIME_CACHE = 'dictionary-runtime-v1.4.5';
+// Version 1.4.6
+const CACHE_NAME = 'dictionary-game-v1.4.6';
+const RUNTIME_CACHE = 'dictionary-runtime-v1.4.6';
 
 // Assets to cache on install
 const STATIC_ASSETS = [

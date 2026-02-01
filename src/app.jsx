@@ -1767,21 +1767,28 @@
 
                                 <div>
                                     <label className="block text-sm font-medium mb-2">Choose Your Avatar</label>
-                                    <div className="grid grid-cols-5 gap-2">
-                                        {avatarOptions.map((avatar) => (
-                                            <button
-                                                key={avatar.id}
-                                                onClick={() => setSelectedAvatar(avatar.id)}
-                                                className={`p-3 text-3xl rounded-lg border-2 transition ${
-                                                    selectedAvatar === avatar.id
-                                                        ? 'border-purple-600 bg-purple-50'
-                                                        : 'border-gray-200 hover:border-purple-300'
-                                                }`}
-                                                title={avatar.label}
-                                            >
-                                                {avatar.emoji}
-                                            </button>
-                                        ))}
+                                    <div className="grid grid-cols-5 gap-2" style={{ minHeight: '64px' }}>
+                                        {avatarOptions.length === 0 ? (
+                                            // Skeleton loader to prevent layout shift
+                                            Array.from({ length: 10 }).map((_, i) => (
+                                                <div key={i} className="p-3 rounded-lg border-2 border-gray-200 bg-gray-100 animate-pulse" style={{ height: '64px' }}></div>
+                                            ))
+                                        ) : (
+                                            avatarOptions.map((avatar) => (
+                                                <button
+                                                    key={avatar.id}
+                                                    onClick={() => setSelectedAvatar(avatar.id)}
+                                                    className={`p-3 text-3xl rounded-lg border-2 transition ${
+                                                        selectedAvatar === avatar.id
+                                                            ? 'border-purple-600 bg-purple-50'
+                                                            : 'border-gray-200 hover:border-purple-300'
+                                                    }`}
+                                                    title={avatar.label}
+                                                >
+                                                    {avatar.emoji}
+                                                </button>
+                                            ))
+                                        )}
                                     </div>
                                 </div>
 
@@ -1937,21 +1944,28 @@
 
                                 <div>
                                     <label className="block text-sm font-medium mb-2">Choose Your Avatar</label>
-                                    <div className="grid grid-cols-5 gap-2">
-                                        {avatarOptions.map((avatar) => (
-                                            <button
-                                                key={avatar.id}
-                                                onClick={() => setSelectedAvatar(avatar.id)}
-                                                className={`p-3 text-3xl rounded-lg border-2 transition ${
-                                                    selectedAvatar === avatar.id
-                                                        ? 'border-blue-600 bg-blue-50'
-                                                        : 'border-gray-200 hover:border-blue-300'
-                                                }`}
-                                                title={avatar.label}
-                                            >
-                                                {avatar.emoji}
-                                            </button>
-                                        ))}
+                                    <div className="grid grid-cols-5 gap-2" style={{ minHeight: '64px' }}>
+                                        {avatarOptions.length === 0 ? (
+                                            // Skeleton loader to prevent layout shift
+                                            Array.from({ length: 10 }).map((_, i) => (
+                                                <div key={i} className="p-3 rounded-lg border-2 border-gray-200 bg-gray-100 animate-pulse" style={{ height: '64px' }}></div>
+                                            ))
+                                        ) : (
+                                            avatarOptions.map((avatar) => (
+                                                <button
+                                                    key={avatar.id}
+                                                    onClick={() => setSelectedAvatar(avatar.id)}
+                                                    className={`p-3 text-3xl rounded-lg border-2 transition ${
+                                                        selectedAvatar === avatar.id
+                                                            ? 'border-blue-600 bg-blue-50'
+                                                            : 'border-gray-200 hover:border-blue-300'
+                                                    }`}
+                                                    title={avatar.label}
+                                                >
+                                                    {avatar.emoji}
+                                                </button>
+                                            ))
+                                        )}
                                     </div>
                                 </div>
 
@@ -2448,6 +2462,8 @@
                                                 <img
                                                     src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(window.location.origin + window.location.pathname + '?game=' + gameCode)}`}
                                                     alt="QR Code"
+                                                    width="150"
+                                                    height="150"
                                                     className="mx-auto"
                                                 />
                                                 <p className="text-xs text-gray-600 mt-2 text-center">Scan to join game</p>

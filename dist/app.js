@@ -1813,7 +1813,7 @@ function MultiplayerDictionaryGame() {
         }
       },
       className: "text-xs text-gray-500 hover:text-gray-700"
-    }, "v1.4.4")), gameHistory.length > 0 && /*#__PURE__*/React.createElement("div", {
+    }, "v1.4.5")), gameHistory.length > 0 && /*#__PURE__*/React.createElement("div", {
       className: "mt-8"
     }, /*#__PURE__*/React.createElement("h2", {
       className: "text-lg font-semibold text-gray-700 mb-3"
@@ -1858,8 +1858,21 @@ function MultiplayerDictionaryGame() {
     })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
       className: "block text-sm font-medium mb-2"
     }, "Choose Your Avatar"), /*#__PURE__*/React.createElement("div", {
-      className: "grid grid-cols-5 gap-2"
-    }, avatarOptions.map(avatar => /*#__PURE__*/React.createElement("button", {
+      className: "grid grid-cols-5 gap-2",
+      style: {
+        minHeight: '64px'
+      }
+    }, avatarOptions.length === 0 ?
+    // Skeleton loader to prevent layout shift
+    Array.from({
+      length: 10
+    }).map((_, i) => /*#__PURE__*/React.createElement("div", {
+      key: i,
+      className: "p-3 rounded-lg border-2 border-gray-200 bg-gray-100 animate-pulse",
+      style: {
+        height: '64px'
+      }
+    })) : avatarOptions.map(avatar => /*#__PURE__*/React.createElement("button", {
       key: avatar.id,
       onClick: () => setSelectedAvatar(avatar.id),
       className: `p-3 text-3xl rounded-lg border-2 transition ${selectedAvatar === avatar.id ? 'border-purple-600 bg-purple-50' : 'border-gray-200 hover:border-purple-300'}`,
@@ -2003,8 +2016,21 @@ function MultiplayerDictionaryGame() {
     })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
       className: "block text-sm font-medium mb-2"
     }, "Choose Your Avatar"), /*#__PURE__*/React.createElement("div", {
-      className: "grid grid-cols-5 gap-2"
-    }, avatarOptions.map(avatar => /*#__PURE__*/React.createElement("button", {
+      className: "grid grid-cols-5 gap-2",
+      style: {
+        minHeight: '64px'
+      }
+    }, avatarOptions.length === 0 ?
+    // Skeleton loader to prevent layout shift
+    Array.from({
+      length: 10
+    }).map((_, i) => /*#__PURE__*/React.createElement("div", {
+      key: i,
+      className: "p-3 rounded-lg border-2 border-gray-200 bg-gray-100 animate-pulse",
+      style: {
+        height: '64px'
+      }
+    })) : avatarOptions.map(avatar => /*#__PURE__*/React.createElement("button", {
       key: avatar.id,
       onClick: () => setSelectedAvatar(avatar.id),
       className: `p-3 text-3xl rounded-lg border-2 transition ${selectedAvatar === avatar.id ? 'border-blue-600 bg-blue-50' : 'border-gray-200 hover:border-blue-300'}`,
@@ -2427,6 +2453,8 @@ function MultiplayerDictionaryGame() {
     }, /*#__PURE__*/React.createElement("img", {
       src: `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(window.location.origin + window.location.pathname + '?game=' + gameCode)}`,
       alt: "QR Code",
+      width: "150",
+      height: "150",
       className: "mx-auto"
     }), /*#__PURE__*/React.createElement("p", {
       className: "text-xs text-gray-600 mt-2 text-center"
