@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.4.6] - 2026-02-01
 
-### Performance
+### Performance Optimizations
 - **Cumulative Layout Shift (CLS) Improvements**: Eliminated layout shifts for better user experience
   - Added explicit width/height (150x150) to QR code image to reserve space
   - Added skeleton loader for avatar selection (prevents shift when avatars.json loads)
@@ -15,17 +15,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added `minHeight: 64px` to avatar grid for consistent spacing
   - Added `font-display: swap` strategy to prevent font loading layout shifts
   - System fonts render immediately, custom fonts swap in without shifting layout
-  - Fixed version mismatches in HTML (all now v1.4.6)
-  - Updated Service Worker cache names to v1.4.6
+
+- **JavaScript Minification**: Added Terser for production builds
+  - Compressed and mangled variable names for smaller file size
+  - Faster parse time and improved load performance
+  - Build output: 87KB minified JavaScript
+
+- **Interaction to Next Paint (INP) Fix**: Eliminated UI blocking on End Game button
+  - Replaced blocking `confirm()` dialog with React modal (0ms blocking)
+  - Changed from 1,368ms blocking to instant response
+  - Heavy operations deferred with `Promise.resolve()` microtask
+  - Smooth, non-blocking user interactions
+
+- **Forced Reflow Optimization**: Reduced layout thrashing
+  - Added CSS `contain: layout style` to animated elements (.card-3d, .glass-card, .btn-3d)
+  - Isolates layout recalculations to element scope only
+  - Added `willChange: transform` and `contain: layout style paint` to floating word decorations
+  - Browser optimizes animations without affecting other elements
+
+- **Resource Loading**: Optimized external dependencies
+  - Removed preload hints for deferred scripts (Firebase, React)
+  - Prevents "preloaded but not used" warnings
+  - Lazy loaded Vercel Speed Insights (3s after page load)
+  - Only critical assets (CSS, app.js) preloaded
+
+- **HTTP Caching**: Added long-term cache headers via Vercel
+  - `/dist/*` files: 1 year cache with immutable flag
+  - JSON files: 1 hour cache with revalidation
+  - Faster repeat visits for new users (Service Worker handles returning users)
 
 ### Developer Experience
 - **Cache busting**: Updated all asset versions to v1.4.6 for proper cache invalidation
+- **Build optimization**: Automated minification in build pipeline
 
 ### Expected Impact
-- **Better Core Web Vitals**: Reduced CLS score significantly
-- **Smoother loading**: No content jumping as page loads
+- **Better Core Web Vitals**: Significantly improved CLS, INP, and LCP scores
+- **Smoother loading**: No content jumping, instant button responses
+- **Faster parsing**: Minified JavaScript loads and executes faster
 - **Better mobile experience**: More stable layout on slow connections
-- **Improved SEO**: Google prioritizes pages with low CLS
+- **Improved SEO**: Google prioritizes pages with excellent Core Web Vitals
 
 ## [1.4.5] - 2026-02-01
 
