@@ -7,6 +7,11 @@
     body {
         font-display: swap; /* Use fallback font immediately, swap when custom font loads */
     }
+
+    /* Performance: Reduce forced reflows by containing layout recalculations */
+    .card-3d, .glass-card, .btn-3d {
+        contain: layout style; /* Isolate layout calculations to element only */
+    }
 }
 
 /* Custom Styles */
