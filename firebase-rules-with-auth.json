@@ -5,7 +5,7 @@
       ".write": false,
       "$gameCode": {
         ".read": true,
-        ".write": "data.exists()",
+        ".write": "auth != null && (!data.exists() || data.exists())",
         ".validate": "newData.exists()",
         ".indexOn": ["createdAt", "lastActivity"],
         "players": {
