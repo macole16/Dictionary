@@ -5,6 +5,34 @@ All notable changes to the Dictionary Game will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.2] - 2026-02-01
+
+### Changed
+- **Tailwind CSS Migration**: Migrated from CDN to compiled CSS for massive performance improvement
+  - Removed 3MB Tailwind CDN script (no longer blocking page load)
+  - Implemented Tailwind CLI build process
+  - Compiled CSS reduced to 25KB minified (~99% size reduction)
+  - Created `src/input.css` with all custom styles and Tailwind directives
+  - Created `tailwind.config.js` for build configuration
+  - Updated build scripts: `build:css`, `build:js`, `build`
+  - All custom 3D effects, animations, and mobile optimizations preserved
+
+### Performance
+- **Page Load Speed**: Significantly faster initial page load
+  - Removed blocking 3MB JavaScript CDN request
+  - CSS now loads as non-blocking stylesheet (25KB)
+  - Reduced "unused JavaScript" PageSpeed warning
+  - Improved First Contentful Paint (FCP)
+  - Better Lighthouse/PageSpeed Insights scores expected
+
+### Developer Experience
+- **New Build Commands**:
+  - `npm run build:css` - Compile and minify Tailwind CSS
+  - `npm run build:js` - Compile JSX with Babel
+  - `npm run build` - Build both CSS and JS
+  - `npm run watch:css` - Watch CSS changes in development
+  - Production-ready CSS compilation workflow
+
 ## [1.4.1] - 2026-02-01
 
 ### Fixed

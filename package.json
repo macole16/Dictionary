@@ -1,6 +1,6 @@
 {
   "name": "dictionary",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "description": "A multiplayer word bluffing game where players create fake definitions to fool their friends!",
   "main": "index.js",
   "dependencies": {
@@ -37,7 +37,6 @@
     "nanoid": "^3.3.11",
     "node-releases": "^2.0.27",
     "picocolors": "^1.1.1",
-    "postcss": "^8.5.6",
     "protobufjs": "^7.5.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -67,11 +66,17 @@
     "@babel/cli": "^7.28.6",
     "@babel/core": "^7.28.6",
     "@babel/preset-react": "^7.28.5",
-    "http-server": "^14.1.1"
+    "autoprefixer": "^10.4.24",
+    "http-server": "^14.1.1",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.17"
   },
   "scripts": {
-    "build": "babel src --out-dir dist",
-    "watch": "babel src --out-dir dist --watch",
+    "build:css": "npx tailwindcss -i ./src/input.css -o ./dist/output.css --minify",
+    "build:js": "babel src --out-dir dist",
+    "build": "npm run build:css && npm run build:js",
+    "watch:css": "npx tailwindcss -i ./src/input.css -o ./dist/output.css --watch",
+    "watch:js": "babel src --out-dir dist --watch",
     "start": "http-server -p 8080 -o",
     "dev": "npm run build && npm run start",
     "test": "echo \"Error: no test specified\" && exit 1"
